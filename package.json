@@ -1,0 +1,33 @@
+{
+    "name": "dropbox-web-ui-vue-alternative",
+    "version": "0.0.0",
+    "private": true,
+    "scripts": {
+        "serve": "webpack-dev-server --mode development"
+    },
+    "author": "Matthew Mamonov aka smellyshovel <g.smellyshovel@gmail.com>",
+    "license": "MIT",
+    "devDependencies": {
+        "@babel/core": "^7.2.2",
+        "@babel/plugin-syntax-dynamic-import": "^7.2.0",
+        "@babel/polyfill": "^7.2.5",
+        "@babel/preset-env": "^7.3.1",
+        "babel-loader": "^8.0.5",
+        "css-loader": "^2.1.0",
+        "html-webpack-plugin": "^3.2.0",
+        "isomorphic-fetch": "^2.2.1",
+        "raw-loader": "^1.0.0",
+        "url-loader": "^1.1.2",
+        "vue": "^2.6.2",
+        "vue-loader": "^15.6.2",
+        "vue-router": "^3.0.2",
+        "vue-template-compiler": "^2.6.2",
+        "vuex": "^3.1.0",
+        "webpack": "^4.29.1",
+        "webpack-cli": "^3.2.3",
+        "webpack-dev-server": "^3.1.14"
+    },
+    "dependencies": {
+        "dropbox": "^4.0.15"
+    }
+}
