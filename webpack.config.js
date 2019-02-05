@@ -7,6 +7,9 @@ const Path = require("path");
 
 module.exports = {
     entry: ["@babel/polyfill", "./src/main.js"],
+    output: {
+        publicPath: "/"
+    },
     module: {
         rules: [
             { test: /\.js$/, use: "babel-loader" },
