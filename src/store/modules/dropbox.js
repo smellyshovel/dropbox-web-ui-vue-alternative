@@ -1,10 +1,6 @@
-import Vue from "vue";
-import Vuex from "vuex";
 import { Dropbox } from "dropbox";
 import Fetch from "isomorphic-fetch";
 import AuthToken from "@/../secret/DROPBOX_AUTH_TOKEN.txt";
-
-Vue.use(Vuex);
 
 const DBI = new Dropbox({
     fetch: Fetch,
@@ -63,7 +59,8 @@ function buildTree(filesList) {
     return tree;
 }
 
-export default new Vuex.Store({
+export default {
+    namespaced: true,
     state: {
         DBI: DBI,
         filesList: [],
@@ -123,4 +120,4 @@ export default new Vuex.Store({
             }
         }
     }
-});
+};
