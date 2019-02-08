@@ -63,7 +63,7 @@ export default {
         await this.$store.dispatch("files/updateFiles");
 
         this.folder = this.folderByLink(this.folderLink);
-        if (!this.folder) this.$router.replace({ name: "folder" });
+        if (!this.folder) this.$router.replace({ name: "fm" });
     },
 
     beforeRouteUpdate(to, from, next) {
@@ -72,7 +72,7 @@ export default {
         if (this.folder) {
             next();
         } else {
-            next({ name: "folder" });
+            next({ name: "fm" });
         }
     },
 

@@ -11,7 +11,7 @@ export default new Router({
     routes: [
         {
             path: "/fm/:folderLink*",
-            name: "folder",
+            name: "fm",
             component: FileManager,
             props: ({ params }) => ({ folderLink: params.folderLink || "" })
         }
