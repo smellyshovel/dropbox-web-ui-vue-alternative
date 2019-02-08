@@ -1,8 +1,18 @@
 export default {
     modifyFilesList(filesList) {
+        filesList.unshift({
+            ".tag": "folder",
+            name: "/",
+            path_lower: "",
+            path_display: "",
+            path_link: "",
+            children: []
+        });
+
         filesList.forEach(entry => {
             entry.path_link = entry.path_lower.substr(1);
         });
+
         filesList.forEach(entry => {
             if (entry[".tag"] === "folder") {
                 entry.thumbnail = require("@/assets/mimetypes/folder.png");
@@ -22,6 +32,8 @@ export default {
                 }
             }
         });
+
+        return filesList;
     },
 
     buildTree(filesList) {
@@ -29,13 +41,13 @@ export default {
             return entry[".tag"] === "folder";
         });
 
-        let tree = [];
+        let tree = [filesList[0]];
 
         filesList.forEach(entry => {
             let path = entry.path_lower.split("/");
 
             if (path.length === 2) {
-                tree.push(entry);
+                tree[0].children.push(entry);
             } else if (path.length > 2) {
                 path.pop();
 
