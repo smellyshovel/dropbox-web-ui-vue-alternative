@@ -29,10 +29,15 @@ export default {
                 recursive: true
             });
 
-            this.Helpers.modifyFilesList(entries);
-            return entries;
+            let filesList = this.Helpers.modifyFilesList(entries);
+            return filesList;
         } catch (err) {
-            throw new Error("Couldn't get the files list")
+            // the error comming from the API request is not an instance of Error
+            if (err instanceof Error) {
+                throw new Error("There was an error modifying the files list");
+            } else {
+                throw new Error("Couldn't get the files list");
+            }
         }
     },
 
