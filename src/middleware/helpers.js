@@ -5,12 +5,12 @@ export default {
             name: "/",
             path_lower: "",
             path_display: "",
-            path_link: "",
+            link: "",
             children: []
         });
 
         filesList.forEach(entry => {
-            entry.path_link = entry.path_lower.substr(1);
+            entry.link = entry.path_lower.substr(1);
         });
 
         filesList.forEach(entry => {
