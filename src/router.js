@@ -10,10 +10,10 @@ export default new Router({
     base: process.env.BASE_URL,
     routes: [
         {
-            path: "/fm/:folderPath*",
+            path: "/fm/:folderLink*",
             name: "folder",
             component: FileManager,
-            props: ({ params }) => ({ folderPath: params.folderPath || "" })
+            props: ({ params }) => ({ folderLink: params.folderLink || "" })
         }
     ]
 });
