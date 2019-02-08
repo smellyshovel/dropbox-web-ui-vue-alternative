@@ -25,7 +25,7 @@
         </tree-view>
     </aside>
     <main>
-        <folder-path :path="folderPath" />
+        <folder-path :path="folderLink" />
         <tree-view
             :entries="contents"
         >
@@ -55,19 +55,19 @@ export default {
     },
 
     props: {
-        folderPath: String
+        folderLink: String
     },
 
     async created() {
         this.$store.dispatch("files/connect");
-        await this.$store.dispatch("files/updateFilesList");
+        await this.$store.dispatch("files/updateFiles");
 
-        this.folder = this.folderByPath(this.folderPath);
+        this.folder = this.folderByLink(this.folderLink);
         if (!this.folder) this.$router.replace({ name: "folder" });
     },
 
     beforeRouteUpdate(to, from, next) {
-        this.folder = this.folderByPath(to.params.folderPath);
+        this.folder = this.folderByLink(to.params.folderLink);
 
         if (this.folder) {
             next();
@@ -90,8 +90,8 @@ export default {
         ...mapGetters({
             fatalError: "files/fatalError",
             loading: "files/loading",
-            folderByPath: "files/folderByPath",
-            tree: "files/tree"
+            folderByLink: "files/folderByLink",
+            tree: "files/filesTree"
         })
     }
 };
