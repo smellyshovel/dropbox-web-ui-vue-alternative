@@ -56,19 +56,10 @@ export default {
         filesList: state => state.filesList,
         filesTree: state => state.filesTree,
 
-        folderByPath: (state, getters) => (path = "") => {
-            if (path === "") {
-                return {
-                    name: "Home",
-                    path_lower: "/",
-                    path_display: "/",
-                    children: getters.tree
-                };
-            } else {
-                return state.filesList.find(entry => {
-                    return entry[".tag"] === "folder" && entry.path_lower === "/" + path;
-                });
-            }
+        folderByLink: (state, getters) => (link = "") => {
+            return getters.filesList.find(entry => {
+                return entry[".tag"] === "folder" && entry.link === link;
+            });
         }
     }
 };
