@@ -10,7 +10,7 @@
 <div id="fm" v-else-if="folder">
     <aside>
         <router-link :to="{ name: 'fm' }">Home</router-link>
-        
+
         <tree-view
             :entries="treeWithoutRoot"
             mode="folders"
@@ -63,6 +63,8 @@ export default {
 
         this.folder = this.folderByLink(this.folderLink);
         if (!this.folder) this.$router.replace({ name: "fm" });
+
+        this.loading = false;
     },
 
     beforeRouteUpdate(to, from, next) {
@@ -77,6 +79,7 @@ export default {
 
     data() {
         return {
+            loading: true,
             folder: null
         };
     },
@@ -92,8 +95,7 @@ export default {
 
         ...mapState("files", [
             "fatalError",
-            "excusableError",
-            "loading"
+            "excusableError"
         ]),
 
         ...mapGetters("files", [

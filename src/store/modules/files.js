@@ -5,7 +5,6 @@ export default {
     state: {
         fatalError: null,
         excusableError: null,
-        loading: true,
 
         filesList: [],
         filesTree: {}
@@ -13,7 +12,6 @@ export default {
     mutations: {
         SET_FATAL_ERROR(state, err) {
             state.fatalError = err;
-            state.loading = false;
         },
 
         UPDATE_FILES_LIST(state, filesList) {
@@ -22,7 +20,6 @@ export default {
 
         UPDATE_FILES_TREE(state, filesTree) {
             state.filesTree = filesTree;
-            state.loading = false;
         }
     },
     actions: {
