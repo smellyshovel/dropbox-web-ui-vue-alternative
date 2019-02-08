@@ -1,19 +1,18 @@
 <template>
-<div v-if="loading">
+<div id="loading" v-if="loading">
     Loading data from Dropbox...
 </div>
 
-<div v-else-if="fatalError">
+<div id="fatal-error" v-else-if="fatalError">
     <h1>A Fatal Error Occured: {{ fatalError.message }}</h1>
 </div>
 
-<div
-    id="fm"
-    v-else-if="folder"
->
+<div id="fm" v-else-if="folder">
     <aside>
+        <router-link :to="{ name: 'fm' }">Home</router-link>
+        
         <tree-view
-            :entries="tree"
+            :entries="treeWithoutRoot"
             mode="folders"
             :deepness="3"
             :reveal-current="true"
@@ -44,7 +43,7 @@ import TreeView from "@/components/FileManager/TreeView.vue";
 import FoldersTreeItem from "@/components/FileManager/FoldersTreeItem.vue";
 import FolderContentsItem from "@/components/FileManager/FolderContentsItem.vue";
 import FolderPath from "@/components/FileManager/FolderPath.vue";
-import { mapGetters } from "vuex";
+import { mapState, mapGetters } from "vuex";
 
 export default {
     components: {
@@ -83,21 +82,36 @@ export default {
     },
 
     computed: {
+        treeWithoutRoot() {
+            return this.$store.state.files.filesTree[0].children;
+        },
+
         contents() {
             return this.folder.children;
         },
 
-        ...mapGetters({
-            fatalError: "files/fatalError",
-            loading: "files/loading",
-            folderByLink: "files/folderByLink",
-            tree: "files/filesTree"
-        })
+        ...mapState("files", [
+            "fatalError",
+            "excusableError",
+            "loading"
+        ]),
+
+        ...mapGetters("files", [
+            "folderByLink"
+        ])
     }
 };
 </script>
 
 <style scoped>
+#loading {
+    background-color: rgb(48, 119, 193);
+}
+
+#fatal-error {
+    background-color: rgb(252, 95, 95);
+}
+
 #fm {
     width: 100%;
     height: 100%;
