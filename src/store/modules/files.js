@@ -49,15 +49,8 @@ export default {
         }
     },
     getters: {
-        fatalError: state => state.fatalError,
-        excusableError: state => state.excusableError,
-        loading: state => state.loading,
-
-        filesList: state => state.filesList,
-        filesTree: state => state.filesTree,
-
-        folderByLink: (state, getters) => (link = "") => {
-            return getters.filesList.find(entry => {
+        folderByLink: (state) => (link = "") => {
+            return state.filesList.find(entry => {
                 return entry[".tag"] === "folder" && entry.link === link;
             });
         }
