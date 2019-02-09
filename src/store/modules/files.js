@@ -2,6 +2,7 @@ import API from "@/middleware/api.js";
 
 export default {
     namespaced: true,
+
     state: {
         fatalError: null,
         excusableError: null,
@@ -9,19 +10,25 @@ export default {
         list: [],
         tree: {}
     },
+
     mutations: {
         SET_FATAL_ERROR(state, err) {
             state.fatalError = err;
         },
 
-        UPDATE_LIST(state, list) {
+        SET_EXCUSABLE_ERROR(state, err) {
+            // 
+        },
+
+        SET_LIST(state, list) {
             state.list = list;
         },
 
-        UPDATE_TREE(state, tree) {
-            state.tree = tree;
+        BUILD_TREE(state, list) {
+            state.tree = API.Helpers.buildTree(list);
         }
     },
+
     actions: {
         connect({ commit }) {
             try {
@@ -35,16 +42,16 @@ export default {
         async update({ commit }) {
             try {
                 let list = await API.getFilesList();
-                commit("UPDATE_LIST", list);
 
-                let tree = API.Helpers.buildTree(list);
-                commit("UPDATE_TREE", tree);
+                commit("SET_LIST", list);
+                commit("BUILD_TREE", list);
             } catch (err) {
                 console.error(err);
                 commit("SET_FATAL_ERROR", err);
             }
         }
     },
+
     getters: {
         folderByLink: (state) => (link = "") => {
             return state.list.find(entry => {
