@@ -59,7 +59,7 @@ export default {
 
     async created() {
         this.$store.dispatch("files/connect");
-        await this.$store.dispatch("files/updateFiles");
+        await this.$store.dispatch("files/update");
 
         this.folder = this.folderByLink(this.folderLink);
         if (!this.folder) this.$router.replace({ name: "fm" });
@@ -86,7 +86,7 @@ export default {
 
     computed: {
         treeWithoutRoot() {
-            return this.$store.state.files.filesTree[0].children;
+            return this.$store.state.files.tree[0].children;
         },
 
         contents() {

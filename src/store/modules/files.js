@@ -6,20 +6,20 @@ export default {
         fatalError: null,
         excusableError: null,
 
-        filesList: [],
-        filesTree: {}
+        list: [],
+        tree: {}
     },
     mutations: {
         SET_FATAL_ERROR(state, err) {
             state.fatalError = err;
         },
 
-        UPDATE_FILES_LIST(state, filesList) {
-            state.filesList = filesList;
+        UPDATE_LIST(state, list) {
+            state.list = list;
         },
 
-        UPDATE_FILES_TREE(state, filesTree) {
-            state.filesTree = filesTree;
+        UPDATE_TREE(state, tree) {
+            state.tree = tree;
         }
     },
     actions: {
@@ -32,13 +32,13 @@ export default {
             }
         },
 
-        async updateFiles({ commit }) {
+        async update({ commit }) {
             try {
-                let filesList = await API.getFilesList();
-                commit("UPDATE_FILES_LIST", filesList);
+                let list = await API.getFilesList();
+                commit("UPDATE_LIST", list);
 
-                let filesTree = API.Helpers.buildTree(filesList);
-                commit("UPDATE_FILES_TREE", filesTree);
+                let tree = API.Helpers.buildTree(list);
+                commit("UPDATE_TREE", tree);
             } catch (err) {
                 console.error(err);
                 commit("SET_FATAL_ERROR", err);
@@ -47,7 +47,7 @@ export default {
     },
     getters: {
         folderByLink: (state) => (link = "") => {
-            return state.filesList.find(entry => {
+            return state.list.find(entry => {
                 return entry[".tag"] === "folder" && entry.link === link;
             });
         }
