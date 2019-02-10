@@ -24,8 +24,8 @@ export default {
             state.list = list;
         },
 
-        BUILD_TREE(state, list) {
-            state.tree = API.Helpers.buildTree(list);
+        SET_TREE(state, tree) {
+            state.tree = tree;
         }
     },
 
@@ -42,9 +42,10 @@ export default {
         async update({ commit }) {
             try {
                 let list = await API.getFilesList();
-
                 commit("SET_LIST", list);
-                commit("BUILD_TREE", list);
+
+                let tree = API.Helpers.buildTree(list);
+                commit("SET_TREE", tree);
             } catch (err) {
                 console.error(err);
                 commit("SET_FATAL_ERROR", err);
