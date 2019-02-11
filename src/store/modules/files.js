@@ -17,7 +17,7 @@ export default {
         },
 
         SET_EXCUSABLE_ERROR(state, err) {
-            // 
+            //
         },
 
         SET_LIST(state, list) {
@@ -56,7 +56,7 @@ export default {
     getters: {
         folderByLink: (state) => (link = "") => {
             return state.list.find(entry => {
-                return entry[".tag"] === "folder" && entry.link === link;
+                return API.Helpers.isFolder(entry) && entry.link === link;
             });
         }
     }
