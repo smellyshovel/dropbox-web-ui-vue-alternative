@@ -1,19 +1,12 @@
 <template>
 <li>
-    <div :class="{ selected }">
-        <slot :item="this"></slot>
-    </div>
+    <slot :item="this"></slot>
 
     <tree-view
-        v-if="entry.children"
-        v-show="open"
+        v-if="hasSubTree"
+        v-show="subTreeOpened"
 
-        :entries="entry.children"
-        :mode="mode"
-        :deepness="maxDeepness"
-        :current-deepness="currentDeepness + 1"
-        :parent-tree="this.$parent"
-        :reveal-current="revealCurrent"
+        :tree="subTree"
     >
         <template slot-scope="{ item }">
             <slot :item="item" />
@@ -23,40 +16,65 @@
 </template>
 
 <script>
-export default {
-    props: {
-        entry: Object,
-        mode: String,
-        revealCurrent: Boolean,
-        maxDeepness: Number,
-        currentDeepness: Number
-    },
+import { isFolder, isFile } from "@/middleware/helpers.js";
 
+export default {
     components: {
         TreeView: () => import("./TreeView.vue")
     },
 
-    computed: {
-        hasSubFolders() {
-            if (!this.entry.children) return false;
-            return this.entry.children.filter(child => child[".tag"] === "folder").length > 0;
+    props: {
+        entry: {
+            type: Object,
+            required: true
         }
     },
 
-    data() { return {
-        open: (() => {
-            if (this.revealCurrent && this.$route.path.includes("/fm" + this.entry.path_lower) && this.$route.path !== "/fm" + this.entry.path_lower) {
-                return true;
-            }
-
-            return this.maxdeepness === 0 ? true : (this.currentDeepness < this.maxDeepness ? true : false);
-        })(),
-        selected: false
+    provide() { return {
+        level: this.level + 1
     }},
 
+    inject: {
+        "mode": "providedMode",
+        "deepness": "providedDeepness",
+        "level": {
+            default: 1
+        }
+    },
+
+    created() {
+        this.subTreeOpened = this.deepness === 0 ? true : (this.level < this.deepness ? true : false);
+    },
+
+    data() { return {
+        subTreeOpened: null
+    }},
+
+    computed: {
+        subTree() {
+            return this.entry.children;
+        },
+
+        hasSubTree() {
+            return this.subTree && this.subTree.some(child => {
+                switch (this.mode) {
+                    case "all":
+                        return true;
+                        break;
+                    case "folders":
+                        return isFolder(child);
+                        break;
+                    case "files":
+                        return isFile(child);
+                        break;
+                }
+            });
+        }
+    },
+
     methods: {
-        toggle() {
-            this.open = !this.open;
+        toggleSubTree() {
+            this.subTreeOpened = !this.subTreeOpened;
         }
     }
 };

@@ -1,16 +1,10 @@
 <template>
 <ol>
     <tree-item
-        v-for="(entry, index) in tree"
+        v-for="(entry, index) in normalizedTree"
         :key="index"
 
         :entry="entry"
-        :mode="mode"
-        :max-deepness="deepness"
-        :current-deepness="currentDeepness"
-        :reveal-current="revealCurrent"
-
-        
     >
         <template slot-scope="{ item }">
             <slot :item="item" />
@@ -21,6 +15,7 @@
 
 <script>
 import TreeItem from "@/components/FileManager/TreeItem.vue";
+import { isFolder, isFile } from "@/middleware/helpers.js";
 
 export default {
     components: {
@@ -28,104 +23,59 @@ export default {
     },
 
     props: {
-        entries: {
+        tree: {
             type: Array,
             required: true
         },
         mode: {
             type: String,
             default: "all",
-            validator: value => ["all", "folders", "files"].indexOf(value) !== -1
+            validator: value => ["all", "folders", "files"].includes(value)
         },
         deepness: {
             type: Number,
             default: 1
-        },
-        revealCurrent: {
-            type: Boolean,
-            default: false
-        },
-
-        currentDeepness: {
-            type: Number,
-            default: 1
-        },
-        parentTree: {
-            type: Object
         }
     },
 
-    created() {
-        if (this.parentTree) {
-            this.parentTree.childTrees.push(this);
+    provide() {
+        return {
+            providedMode: this.resolvedMode,
+            providedDeepness: this.resolvedDeepness
         }
     },
 
-    computed: {
-        tree() {
-            return this.entries.filter(entry => {
-                switch (this.mode) {
-                    case "all":
-                        return true;
-                        break;
-                    case "folders":
-                        return entry[".tag"] === "folder";
-                        break;
-                    case "files":
-                        return entry[".tag"] === "file";
-                        break;
-                }
-            });
+    inject: {
+        injectedMode: {
+            from: "providedMode",
+            default: null
+        },
+        injectedDeepness: {
+            from: "providedDeepness",
+            default: null
         }
     },
 
     data() { return {
-        childTrees: [],
-        selected: [],
-        lastSelectedIndex: null
+        resolvedMode: this.injectedMode || this.mode,
+        resolvedDeepness : this.injectedDeepness || this.deepness
     }},
 
-    methods: {
-        selectSingle(event, item) {
-            this.deselectAll();
-            this.selected = [item];
-        },
-
-        selectMore(event, item) {
-            this.selected.push(item);
-        },
-
-        selectMany(event, item) {
-            let lastSelectedIndex = zthis.selected.length - 1;
-            let targetIndex = this.$children.indexOf(item);
-
-            this.deselectAll();
-
-            if (lastSelectedIndex < targetIndex) {
-                for (let i = lastSelectedIndex; i < targetIndex; i++) {
-                    this.$children[i].selected = true;
-                    this.selected.push(this.$children[i]);
+    computed: {
+        normalizedTree() {
+            return this.tree.filter(entry => {
+                switch (this.resolvedMode) {
+                    case "all":
+                        return true;
+                        break;
+                    case "folders":
+                        return isFolder(entry);
+                        break;
+                    case "files":
+                        return isFile(entry);
+                        break;
                 }
-            } else {
-                for (let i = lastSelectedIndex; i > targetIndex; i--) {
-                    this.$children[i].selected = true;
-                    this.selected.push(this.$children[i]);
-                }
-            }
-
-        },
-
-        deselect(event, item) {
-            let index = this.selected.indexOf(item);
-            this.selected.splice(index, 1);
-        },
-
-        deselectAll() {
-            this.selected.forEach(selectedItem => {
-                selectedItem.selected = false;
             });
-
-            this.selected = [];
         }
     }
 };

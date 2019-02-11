@@ -1,15 +1,17 @@
 <template>
 <div
-    @dblclick="$router.push('/fm' + entry.path_lower)"
     :class="{ current: isCurrentDirectory }"
 >
-    <span
-        v-if="item.hasSubFolders"
-        @click.stop="item.toggle"
-    >
-        {{ item.open ? '⮝' : '⮟' }}
-    </span>
     <img :src="entry.thumbnail">
+
+    <span
+        v-if="item.hasSubTree"
+        class="toggler"
+        @click="item.toggleSubTree()"
+    >
+        {{ item.subTreeOpened ? "⮝" : "⮟" }}
+    </span>
+
     {{ entry.name }}
 </div>
 </template>
@@ -40,5 +42,9 @@ img {
 .current {
     background-color: rgb(75, 115, 184);
     color: #fff;
+}
+
+.toggler {
+    color: #be006c;
 }
 </style>
