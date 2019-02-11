@@ -69,6 +69,3 @@ export function isFolder(entry) {
 export function isFile(entry) {
     return entry[".tag"] === "file";
 }
-
-// a dirty hack for Webpack so it could stop complaining that there's no `default`
-export default null;
