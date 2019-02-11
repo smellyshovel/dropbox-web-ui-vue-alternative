@@ -62,12 +62,11 @@ export function buildTree(filesList) {
     return tree;
 }
 
-
 export function isFolder(entry) {
     return entry[".tag"] === "folder";
 }
 
-export isFile(entry) {
+export function isFile(entry) {
     return entry[".tag"] === "file";
 }
 
