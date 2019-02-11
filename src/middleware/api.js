@@ -1,7 +1,7 @@
 import { Dropbox } from "dropbox";
 import IsomorphicFetch from "isomorphic-fetch";
 import AccessToken from "@/../secret/DROPBOX_AUTH_TOKEN.txt";
-import Helpers from "./helpers.js";
+import * as Helpers from "./helpers.js";
 
 export default {
     connect() {
