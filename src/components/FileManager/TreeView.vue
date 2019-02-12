@@ -1,6 +1,7 @@
 <template>
 <ol>
     <tree-item
+        ref="items"
         v-for="(entry, index) in normalizedTree"
         :key="index"
 
