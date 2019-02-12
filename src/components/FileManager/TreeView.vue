@@ -1,5 +1,5 @@
 <template>
-<ol>
+<ol v-if="normalizedTree.length">
     <tree-item
         ref="items"
         v-for="(entry, index) in normalizedTree"
@@ -12,6 +12,10 @@
         </template>
     </tree-item>
 </ol>
+
+<div v-else>
+    <slot name="empty"></slot>
+</div>
 </template>
 
 <script>

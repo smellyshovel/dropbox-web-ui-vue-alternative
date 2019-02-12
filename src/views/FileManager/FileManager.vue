@@ -12,27 +12,31 @@
         <router-link :to="{ name: 'fm' }">Home</router-link>
 
         <tree-view
-            :entries="treeWithoutRoot"
+            :tree="treeWithoutRoot"
             mode="folders"
             :deepness="3"
-            :reveal-current="true"
         >
-            <folders-tree-item
-                slot-scope="{ item }"
-                :item="item"
-            ></folders-tree-item>
+            <template v-slot:default="{ item }">
+                <folders-tree-item :item="item" />
+            </template>
+
+            <template v-slot:empty>
+                No folders are in the root directory
+            </template>
         </tree-view>
     </aside>
     <main>
         <folder-path :path="folderLink" />
         <tree-view
-            :entries="contents"
+            :tree="contents"
         >
-            <folder-contents-item
-                slot-scope="{ item }"
-                :item="item"
-                @dblclick.native="download(item.entry)"
-            ></folder-contents-item>
+            <template v-slot:default="{ item }">
+                <folder-contents-item :item="item" />
+            </template>
+
+            <template v-slot:empty>
+                The folder's empty
+            </template>
         </tree-view>
     </main>
 </div>
@@ -90,7 +94,7 @@ export default {
         },
 
         contents() {
-            return this.folder.children;
+            return this.folder.children || [];
         },
 
         ...mapState("files", [
