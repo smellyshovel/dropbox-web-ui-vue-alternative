@@ -1,6 +1,15 @@
 <template>
-<li>
-    <slot :item="this"></slot>
+<li
+
+    @click.exact.stop="select"
+    @click.ctrl.exact.stop="ctrlSelect"
+    @click.shift.exact.stop="shiftSelect"
+>
+    <div
+        :class="{selected: isSelected}"
+    >
+        <slot :item="this"></slot>
+    </div>
 
     <tree-view
         v-if="hasSubTree"
@@ -69,12 +78,34 @@ export default {
                         break;
                 }
             });
+        },
+
+        isSelected() {
+            return this.$store.getters["selections/isSelected"](this);
         }
     },
 
     methods: {
         toggleSubTree() {
             this.subTreeOpened = !this.subTreeOpened;
+        },
+
+        select() {
+            this.$store.dispatch("selections/setSingle", this);
+        },
+
+        ctrlSelect() {
+            this.$store.dispatch("selections/toggle", this);
+        },
+
+        shiftSelect() {
+            // ctrl-select instead of shift-select for nested trees
+            if (this.deepness !== 1) return this.selectCtrl();
+
+            this.$store.dispatch("selections/setRange", {
+                target: this,
+                bank: this.$parent.$refs.items
+            });
         }
     }
 };
