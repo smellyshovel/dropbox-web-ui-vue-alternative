@@ -2,8 +2,8 @@
 <ol v-if="normalizedTree.length">
     <tree-item
         ref="items"
-        v-for="(entry, index) in normalizedTree"
-        :key="index"
+        v-for="entry in normalizedTree"
+        :key="entry.id"
 
         :entry="entry"
     >
