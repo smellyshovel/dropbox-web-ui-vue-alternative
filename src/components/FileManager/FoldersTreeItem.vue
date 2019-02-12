@@ -1,6 +1,7 @@
 <template>
 <div
     :class="{ current: isCurrentDirectory }"
+    @dblclick="navigate"
 >
     <img :src="entry.thumbnail">
 
@@ -28,7 +29,13 @@ export default {
         },
 
         isCurrentDirectory() {
-            return this.$route.path === "/fm" + this.item.entry.path_lower;
+            return this.$route.params.folderLink === this.entry.link;
+        }
+    },
+
+    methods: {
+        navigate() {
+            this.$router.push({ name: "fm", params: { folderLink: this.entry.link } });
         }
     }
 }
