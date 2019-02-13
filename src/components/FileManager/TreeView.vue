@@ -40,13 +40,18 @@ export default {
         deepness: {
             type: Number,
             default: 1
+        },
+        reveal: {
+            type: String,
+            default: ""
         }
     },
 
     provide() {
         return {
             providedMode: this.resolvedMode,
-            providedDeepness: this.resolvedDeepness
+            providedDeepness: this.resolvedDeepness,
+            providedReveal: this.resolvedReveal
         }
     },
 
@@ -58,12 +63,17 @@ export default {
         injectedDeepness: {
             from: "providedDeepness",
             default: null
+        },
+        injectedReveal: {
+            from: "providedReveal",
+            default: null
         }
     },
 
     data() { return {
         resolvedMode: this.injectedMode || this.mode,
-        resolvedDeepness : this.injectedDeepness || this.deepness
+        resolvedDeepness: this.injectedDeepness || this.deepness,
+        resolvedReveal: this.injectedReveal || this.reveal
     }},
 
     computed: {

@@ -46,13 +46,17 @@ export default {
     inject: {
         "mode": "providedMode",
         "deepness": "providedDeepness",
+        "reveal": "providedReveal",
         "level": {
             default: 1
         }
     },
 
     created() {
-        this.subTreeOpened = this.deepness === 0 ? true : (this.level < this.deepness ? true : false);
+        this.subTreeOpened = (() => {
+            if (this.reveal && this.reveal.includes(this.entry.link) && this.reveal !== this.entry.link) return true;
+            return this.deepness === 0 ? true : (this.level < this.deepness ? true : false);
+        })();
     },
 
     data() { return {

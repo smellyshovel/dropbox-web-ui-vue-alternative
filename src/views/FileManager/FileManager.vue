@@ -15,6 +15,7 @@
             :tree="treeWithoutRoot"
             mode="folders"
             :deepness="3"
+            :reveal="this.folderLink"
         >
             <template v-slot:default="{ item }">
                 <folders-tree-item :item="item" />
