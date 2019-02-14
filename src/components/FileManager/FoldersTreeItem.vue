@@ -23,6 +23,11 @@ export default {
         item: Object
     },
 
+    created() {
+        let reveal = this.$route.params.folderLink;
+        if (reveal.includes(this.entry.link) && reveal !== this.entry.link) this.item.subTreeOpened = true;
+    },
+
     computed: {
         entry() {
             return this.item.entry;
