@@ -100,7 +100,7 @@ export default {
 
         shiftSelect() {
             // ctrl-select instead of shift-select for nested trees
-            if (this.deepness !== 1) return this.selectCtrl();
+            if (this.deepness !== 1) return this.ctrlSelect();
 
             this.$store.dispatch("selections/setRange", {
                 target: this,
