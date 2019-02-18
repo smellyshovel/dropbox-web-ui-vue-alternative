@@ -24,7 +24,7 @@ export default {
     },
 
     created() {
-        let reveal = this.$route.params.folderLink;
+        let reveal = this.$route.params.folderLink || "";
         if (reveal.includes(this.entry.link) && reveal !== this.entry.link) this.item.subTreeOpened = true;
     },
 
