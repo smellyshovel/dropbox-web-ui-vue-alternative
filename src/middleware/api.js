@@ -41,5 +41,25 @@ export default {
         }
     },
 
+    async download(entry) {
+        try {
+            let { link } = await this.Conn.filesGetTemporaryLink({
+                path: entry.path_lower
+            });
+
+            let downloadButton = document.createElement("a");
+            downloadButton.setAttribute("href", link);
+            downloadButton.click();
+            // downloadButton.remove();
+        } catch (err) {
+            // the error comming from the API request is not an instance of Error
+            if (err instanceof Error) {
+                throw new Error("There was an error processing your download");
+            } else {
+                throw new Error("Couldn't download the file");
+            }
+        }
+    },
+
     Helpers
 }
