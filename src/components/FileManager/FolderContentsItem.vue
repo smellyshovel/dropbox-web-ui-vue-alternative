@@ -1,6 +1,6 @@
 <template>
 <div
-    @dblclick="go"
+    @dblclick="mainAction()"
 >
     <img :src="entry.thumbnail">
     {{ entry.name }}
@@ -8,6 +8,8 @@
 </template>
 
 <script>
+import { isFile, isFolder } from "@/middleware/helpers.js";
+
 export default {
     props: {
         item: Object
@@ -19,25 +21,13 @@ export default {
         }
     },
 
-    data() { return {
-        selected: false
-    }},
-
     methods: {
-        go() {
-            let ext = this.entry.name.split(".");
-            ext = ext.length > 1 ? ext[ext.length - 1] : "";
-
-            const previewExts = ["ai", "doc", "docm", "docx", "eps", "odp", "odt", "pps", "ppsm", "ppsx", "ppt", "pptm", "pptx", "rtf", "csv", "ods", "xls", "xlsm", "xlsx"];
-
-            if (previewExts.includes(ext)) {
-                console.log(this.$route);
-                this.$router.push({ path: this.$route.path, query: { preview: this.entry.name } })
+        mainAction() {
+            if (isFolder(this.entry)) {
+                this.$router.push({ name: "fm", params: { folderLink: this.entry.link } })
+            } else if (isFile(this.entry)) {
+                this.$store.dispatch("files/download", this.entry);
             }
-        },
-
-        select() {
-            this.selected = true;
         }
     }
 }
