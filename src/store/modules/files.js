@@ -17,7 +17,7 @@ export default {
         },
 
         SET_EXCUSABLE_ERROR(state, err) {
-            //
+            state.excusableError = err;
         },
 
         SET_LIST(state, list) {
@@ -49,6 +49,15 @@ export default {
             } catch (err) {
                 console.error(err);
                 commit("SET_FATAL_ERROR", err);
+            }
+        },
+
+        async download({ commit }, entry) {
+            try {
+                await API.download(entry);
+            } catch (err) {
+                console.error(err);
+                commit("SET_EXCUSABLE_ERROR", err);
             }
         }
     },
