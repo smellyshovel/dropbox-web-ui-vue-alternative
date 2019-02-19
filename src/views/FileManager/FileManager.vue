@@ -52,7 +52,7 @@ import TreeView from "@/components/FileManager/TreeView.vue";
 import FoldersTreeItem from "@/components/FileManager/FoldersTreeItem.vue";
 import FolderContentsItem from "@/components/FileManager/FolderContentsItem.vue";
 import FolderPath from "@/components/FileManager/FolderPath.vue";
-import { mapState, mapGetters } from "vuex";
+import { mapState, mapGetters, mapActions } from "vuex";
 
 export default {
     components: {
@@ -84,6 +84,8 @@ export default {
         } else {
             next({ name: "fm" });
         }
+
+        this.clearSelections();
     },
 
     data() {
@@ -110,6 +112,12 @@ export default {
         ...mapGetters("files", [
             "folderByLink"
         ])
+    },
+
+    methods: {
+        ...mapActions("selections", {
+            clearSelections: "clear"
+        })
     }
 };
 </script>
