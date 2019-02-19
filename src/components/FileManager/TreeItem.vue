@@ -12,9 +12,7 @@
     </div>
 
     <tree-view
-        v-if="hasSubTree"
-        v-show="subTreeOpened"
-
+        v-if="hasSubTree && subTreeOpened"
         :tree="subTree"
     >
         <template slot-scope="{ item }">
