@@ -27,6 +27,11 @@
     </aside>
     <main>
         <folder-path :path="folderLink" />
+
+        <div id="excusable-error" v-if="excusableError">
+            {{ excusableError }}
+        </div>
+
         <tree-view
             :tree="contents"
         >
@@ -115,6 +120,10 @@ export default {
 }
 
 #fatal-error {
+    background-color: rgb(252, 95, 95);
+}
+
+#excusable-error {
     background-color: rgb(252, 95, 95);
 }
 
