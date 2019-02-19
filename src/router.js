@@ -22,7 +22,7 @@ router.beforeEach((to, from, next) => {
     let newPath = decodeURIComponent(to.path);
 
     if (to.fullPath !== newPath) {
-        next({ path: newPath, replace: true });
+        next({ path: newPath });
     } else {
         next();
     }
