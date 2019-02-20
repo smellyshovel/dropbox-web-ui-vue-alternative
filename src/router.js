@@ -3,7 +3,7 @@ import Router from "vue-router";
 
 Vue.use(Router);
 
-import FileManager from "./views/FileManager/FileManager.vue";
+import FileManager from "./views/FileManager.vue";
 
 const router = new Router({
     mode: "history",
