@@ -1,6 +1,6 @@
 <template>
 <ol v-if="normalizedTree.length">
-    <tree-item
+    <tree-view-item
         ref="items"
         v-for="entry in normalizedTree"
         :key="entry.id"
@@ -10,7 +10,7 @@
         <template slot-scope="{ item }">
             <slot :item="item" />
         </template>
-    </tree-item>
+    </tree-view-item>
 </ol>
 
 <div v-else>
@@ -19,12 +19,12 @@
 </template>
 
 <script>
-import TreeItem from "@/components/FileManager/TreeItem.vue";
+import TreeViewItem from "@/components/TreeViewItem.vue";
 import { isFolder, isFile } from "@/middleware/helpers.js";
 
 export default {
     components: {
-        TreeItem
+        TreeViewItem
     },
 
     props: {
