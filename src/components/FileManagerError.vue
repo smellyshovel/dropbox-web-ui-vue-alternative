@@ -1,15 +1,15 @@
 <template>
-<div class="loading">
-    <h1>Loading...</h1>
-    <p>{{ loading }}</p>
+<div class="error">
+    <h1>A Fatal Error:</h1>
+    <p>{{ error.message }}</p>
 </div>
 </template>
 
 <script>
 export default {
     props: {
-        loading: {
-            type: String,
+        error: {
+            type: Error,
             required: true
         }
     }
@@ -17,8 +17,8 @@ export default {
 </script>
 
 <style scoped>
-.loading {
-    background-color: #007dff;
+.error {
+    background-color: #cc0050;
     color: #fff;
 }
 </style>
