@@ -1,5 +1,5 @@
 <template>
-<div id="fm">
+<div id="file-manager">
     <aside>
         <router-link :to="{ name: 'fm' }">Home</router-link>
 
@@ -80,10 +80,17 @@ export default {
 </script>
 
 <style scoped>
-#fm {
+#file-manager {
     width: 100%;
     height: 100%;
     display: grid;
     grid-template-columns: 300px auto;
+
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none;
 }
 </style>
