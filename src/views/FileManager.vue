@@ -1,7 +1,8 @@
 <template>
-<div id="loading" v-if="loading">
-    Loading data from Dropbox...
-</div>
+<file-manager-loading
+    v-if="loading"
+    :status="loading"
+/>
 
 <div id="fatal-error" v-else-if="fatalError">
     <h1>A Fatal Error Occured: {{ fatalError.message }}</h1>
@@ -48,6 +49,8 @@
 </template>
 
 <script>
+import FileManagerLoading from "@/components/FileManagerLoading";
+
 import TreeView from "@/components/FileManager/TreeView.vue";
 import FoldersTreeItem from "@/components/FileManager/FoldersTreeItem.vue";
 import FolderContentsItem from "@/components/FileManager/FolderContentsItem.vue";
@@ -56,6 +59,8 @@ import { mapState, mapGetters, mapActions } from "vuex";
 
 export default {
     components: {
+        FileManagerLoading,
+
         TreeView,
         FoldersTreeItem,
         FolderContentsItem,
@@ -67,13 +72,17 @@ export default {
     },
 
     async created() {
-        this.$store.dispatch("files/connect");
+        this.setLoading("Connecting to the cloud...");
+        await this.$store.dispatch("files/connect");
+
+        this.setLoading("Updating the files list...")
         await this.$store.dispatch("files/update");
 
+        this.setLoading("Searching for the folder...")
         this.folder = this.folderByLink(this.folderLink);
         if (!this.folder) this.$router.replace({ name: "fm" });
 
-        this.loading = false;
+        this.stopLoading();
     },
 
     beforeRouteUpdate(to, from, next) {
@@ -90,7 +99,6 @@ export default {
 
     data() {
         return {
-            loading: true,
             folder: null
         };
     },
@@ -105,6 +113,7 @@ export default {
         },
 
         ...mapState("files", [
+            "loading",
             "fatalError",
             "excusableError"
         ]),
@@ -117,6 +126,11 @@ export default {
     methods: {
         ...mapActions("selections", {
             clearSelections: "clear"
+        }),
+
+        ...mapActions("files", {
+            setLoading: "setLoading",
+            stopLoading: "stopLoading"
         })
     }
 };

@@ -4,6 +4,7 @@ export default {
     namespaced: true,
 
     state: {
+        loading: null,
         fatalError: null,
         excusableError: null,
 
@@ -12,6 +13,14 @@ export default {
     },
 
     mutations: {
+        SET_LOADING(state, status) {
+            state.loading = status;
+        },
+
+        STOP_LOADING(state, status) {
+            state.loading = false;
+        },
+
         SET_FATAL_ERROR(state, err) {
             state.fatalError = err;
         },
@@ -30,7 +39,19 @@ export default {
     },
 
     actions: {
+        setLoading({ commit }, status) {
+            commit("SET_LOADING", status);
+        },
+
+        stopLoading({ commit }) {
+            commit("STOP_LOADING");
+        },
+
         connect({ commit }) {
+            let i = 0;
+            while (i < 1000000) {
+                i++;
+            }
             try {
                 API.connect();
             } catch (err) {
