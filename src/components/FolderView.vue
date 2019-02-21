@@ -2,8 +2,10 @@
 <div>
     <folder-path :path="folder.link" />
 
+    <input type="file" @change="upload($event)" :key="folder.id">
+
     <tree-view
-        :tree="contents"
+        :tree="tree"
     >
         <template v-slot:default="{ item }">
             <tree-item :item="item" />
@@ -20,7 +22,6 @@
 import TreeView from "@/components/TreeView.vue";
 import TreeItem from "@/components/FolderViewTreeItem.vue";
 import FolderPath from "@/components/FolderPath.vue";
-import { mapState, mapGetters, mapActions } from "vuex";
 
 export default {
     components: {
@@ -37,19 +38,20 @@ export default {
     },
 
     computed: {
-        treeWithoutRoot() {
-            return this.$store.state.files.tree[0].children;
-        },
-
-        contents() {
+        tree() {
             return this.folder.children || [];
         }
     },
 
     methods: {
-        ...mapActions("selections", {
-            clearSelections: "clear"
-        })
+        async upload(event) {
+            await this.$store.dispatch("files/upload", {
+                file: event.target.files[0],
+                where: this.folder.path_lower
+            });
+            await this.$store.dispatch("files/update");
+            event.target.value = "";
+        }
     }
 }
 </script>

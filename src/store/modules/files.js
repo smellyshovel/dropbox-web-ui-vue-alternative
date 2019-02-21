@@ -33,6 +33,10 @@ export default {
 
         async download({ commit }, entry) {
             await API.download(entry);
+        },
+
+        async upload({ commit }, payload) {
+            await API.upload(payload);
         }
     },
 

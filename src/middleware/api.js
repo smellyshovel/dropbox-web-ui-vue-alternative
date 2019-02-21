@@ -61,5 +61,14 @@ export default {
         }
     },
 
+    async upload(payload) {;
+       try {
+           let ans = await this.Conn.filesUpload({path: payload.where + "/" + payload.file.name, contents: payload.file});
+           console.log(ans);
+       } catch (err) {
+           throw new Error("upload failed");
+       }
+    },
+
     Helpers
 }
