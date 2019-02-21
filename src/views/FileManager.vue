@@ -41,33 +41,25 @@ export default {
             await this.$store.dispatch("files/update");
         } catch (err) {
             this.error = err;
-        }
-
-        this.folder = this.folderByLink(this.folderLink);
-        if (!this.folder) this.$router.replace({ name: "fm" });
-
-        this.loading = false;
-    },
-
-    beforeRouteUpdate(to, from, next) {
-        this.folder = this.folderByLink(to.params.folderLink);
-
-        if (this.folder) {
-            next();
-        } else {
-            next({ name: "fm" });
+        } finally {
+            this.loading = false;
         }
     },
 
     data() {
         return {
             loading: "Loading the File Manager...",
-            error: null,
-            folder: null
+            error: null
         };
     },
 
     computed: {
+        folder() {
+            let folder = this.folderByLink(this.folderLink);
+            if (!folder) this.$router.replace({ name: "fm" });
+            return folder;
+        },
+
         ...mapGetters("files", [
             "folderByLink"
         ])
