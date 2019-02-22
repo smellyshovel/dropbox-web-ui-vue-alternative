@@ -4,7 +4,7 @@
         <the-file-manager-sidebar />
     </aside>
     <main>
-        <folder-view :folder="folder" />
+        <folder-view />
     </main>
 </div>
 </template>
@@ -17,13 +17,6 @@ export default {
     components: {
         FolderView,
         TheFileManagerSidebar,
-    },
-
-    props: {
-        folder: {
-            type: Object,
-            required: true
-        }
     }
 }
 </script>

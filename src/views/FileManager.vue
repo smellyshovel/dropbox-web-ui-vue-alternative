@@ -10,8 +10,7 @@
 />
 
 <file-manager-layout
-    v-else-if="folder"
-    :folder="folder"
+    v-else
 />
 </template>
 
@@ -19,17 +18,12 @@
 import FileManagerLoading from "@/components/FileManagerLoading.vue";
 import FileManagerError from "@/components/FileManagerError.vue";
 import FileManagerLayout from "@/components/FileManagerLayout.vue";
-import { mapGetters } from "vuex";
 
 export default {
     components: {
         FileManagerLoading,
         FileManagerError,
         FileManagerLayout
-    },
-
-    props: {
-        folderLink: String
     },
 
     async created() {
@@ -48,24 +42,9 @@ export default {
 
     data() {
         return {
-            loading: "Loading the File Manager...",
+            loading: true,
             error: null
         };
-    },
-
-    computed: {
-        folder() {
-            let folder = this.folderByLink(this.folderLink);
-            if (!folder) this.$router.replace({ name: "fm" });
-            return folder;
-        },
-
-        ...mapGetters("files", [
-            "folderByLink"
-        ])
     }
 };
 </script>
-
-<style scoped>
-</style>

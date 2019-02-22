@@ -12,8 +12,7 @@ const router = new Router({
         {
             path: "/fm/:folderLink*",
             name: "fm",
-            component: FileManager,
-            props: ({ params }) => ({ folderLink: params.folderLink || "" })
+            component: FileManager
         }
     ]
 });

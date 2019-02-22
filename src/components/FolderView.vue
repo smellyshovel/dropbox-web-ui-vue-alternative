@@ -22,6 +22,7 @@
 import TreeView from "@/components/TreeView.vue";
 import TreeItem from "@/components/FolderViewTreeItem.vue";
 import FolderPath from "@/components/FolderPath.vue";
+import { mapGetters } from "vuex";
 
 export default {
     components: {
@@ -30,14 +31,17 @@ export default {
         FolderPath
     },
 
-    props: {
-        folder: {
-            type: Object,
-            required: true
-        }
-    },
-
     computed: {
+        folder() {
+            let folder = this.folderByLink(this.$route.params.folderLink);
+            if (!folder) this.$router.replace({ name: "fm" });
+            return folder;
+        },
+
+        ...mapGetters("files", [
+            "folderByLink"
+        ]),
+
         tree() {
             return this.folder.children || [];
         }
