@@ -9,21 +9,30 @@
     :error="error"
 />
 
-<file-manager-layout
+<div
+    id="fm"
     v-else
-/>
+>
+    <file-manager-header id="fm-header" />
+    <file-manager-sidebar id="fm-sidebar" />
+    <file-manager-main id="fm-main" />
+</div>
 </template>
 
 <script>
 import FileManagerLoading from "@/components/FileManagerLoading.vue";
 import FileManagerError from "@/components/FileManagerError.vue";
-import FileManagerLayout from "@/components/FileManagerLayout.vue";
+import FileManagerHeader from "@/components/FileManagerHeader.vue";
+import FileManagerSidebar from "@/components/FileManagerSidebar.vue";
+import FileManagerMain from "@/components/FileManagerMain.vue";
 
 export default {
     components: {
         FileManagerLoading,
         FileManagerError,
-        FileManagerLayout
+        FileManagerHeader,
+        FileManagerSidebar,
+        FileManagerMain
     },
 
     async created() {
@@ -48,3 +57,29 @@ export default {
     }
 };
 </script>
+
+<style scoped>
+#fm {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-areas:
+        "sidebar header"
+        "sidebar main";
+    grid-template-columns: 300px auto;
+    grid-template-rows: 50px auto;
+    user-select: none;
+}
+
+#fm-header {
+    grid-area: header;
+}
+
+#fm-sidebar {
+    grid-area: sidebar;
+}
+
+#fm-main {
+    grid-area: main;
+}
+</style>

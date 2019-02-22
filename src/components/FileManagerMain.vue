@@ -1,5 +1,5 @@
 <template>
-<div>
+<main>
     <folder-path :path="folder.link" />
 
     <input type="file" @change="upload($event)" :key="folder.id">
@@ -15,7 +15,7 @@
             The folder's empty
         </template>
     </tree-view>
-</div>
+</main>
 </template>
 
 <script>

@@ -1,5 +1,5 @@
 <template>
-<div>
+<aside>
     <router-link :to="{ name: 'fm' }">Home</router-link>
 
     <tree-view
@@ -15,7 +15,7 @@
             Nothing to show
         </template>
     </tree-view>
-</div>
+</aside>
 </template>
 
 <script>
