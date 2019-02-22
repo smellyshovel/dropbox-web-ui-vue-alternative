@@ -19,10 +19,10 @@ const router = new Router({
 });
 
 router.beforeEach((to, from, next) => {
-    let newPath = decodeURIComponent(to.path);
+    let newFullPath = decodeURIComponent(to.fullPath);
 
-    if (to.fullPath !== newPath) {
-        next({ path: newPath });
+    if (to.fullPath !== newFullPath) {
+        next(newFullPath);
     } else {
         next();
     }
