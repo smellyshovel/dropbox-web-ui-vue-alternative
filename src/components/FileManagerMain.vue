@@ -38,7 +38,7 @@ export default {
             return folder;
         },
 
-        ...mapGetters("files", [
+        ...mapGetters("cloud", [
             "folderByLink"
         ]),
 
@@ -49,11 +49,11 @@ export default {
 
     methods: {
         async upload(event) {
-            await this.$store.dispatch("files/upload", {
+            await this.$store.dispatch("cloud/upload", {
                 file: event.target.files[0],
                 where: this.folder.path_lower
             });
-            await this.$store.dispatch("files/update");
+            await this.$store.dispatch("cloud/update");
             event.target.value = "";
         }
     }

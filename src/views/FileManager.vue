@@ -38,10 +38,10 @@ export default {
     async created() {
         try {
             this.loading = "Connecting to the cloud...";
-            await this.$store.dispatch("files/connect");
+            await this.$store.dispatch("cloud/connect");
 
             this.loading = "Updating the files list...";
-            await this.$store.dispatch("files/update");
+            await this.$store.dispatch("cloud/update");
         } catch (err) {
             this.error = err;
         } finally {

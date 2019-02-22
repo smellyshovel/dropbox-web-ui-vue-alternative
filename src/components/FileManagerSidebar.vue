@@ -30,7 +30,7 @@ export default {
 
     computed: {
         tree() {
-            return this.$store.state.files.tree[0].children;
+            return this.$store.state.cloud.tree[0].children;
         }
     }
 }

@@ -26,7 +26,7 @@ export default {
             if (isFolder(this.entry)) {
                 this.$router.push({ name: "fm", params: { folderLink: this.entry.link } })
             } else if (isFile(this.entry)) {
-                this.$store.dispatch("files/download", this.entry);
+                this.$store.dispatch("cloud/download", this.entry);
             }
         }
     }
