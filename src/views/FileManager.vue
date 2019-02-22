@@ -9,7 +9,7 @@
     :error="error"
 />
 
-<file-manager
+<file-manager-layout
     v-else-if="folder"
     :folder="folder"
 />
@@ -18,14 +18,14 @@
 <script>
 import FileManagerLoading from "@/components/FileManagerLoading.vue";
 import FileManagerError from "@/components/FileManagerError.vue";
-import FileManager from "@/components/FileManager.vue";
+import FileManagerLayout from "@/components/FileManagerLayout.vue";
 import { mapGetters } from "vuex";
 
 export default {
     components: {
         FileManagerLoading,
         FileManagerError,
-        FileManager
+        FileManagerLayout
     },
 
     props: {
