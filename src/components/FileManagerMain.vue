@@ -3,6 +3,7 @@
     <folder-path :path="folder.link" />
 
     <input type="file" @change="upload($event)" :key="folder.id">
+    <input type="button" value="Update" @click="update">
 
     <tree-view
         :tree="tree"
@@ -53,8 +54,12 @@ export default {
                 file: event.target.files[0],
                 where: this.folder.path_lower
             });
-            await this.$store.dispatch("cloud/update");
+            await this.$store.dispatch("cloud/updateFilesList");
             event.target.value = "";
+        },
+
+        async update() {
+            await await this.$store.dispatch("cloud/updateFilesList");
         }
     }
 }
