@@ -30,6 +30,7 @@ export default {
             });
 
             let filesList = this.Helpers.modifyFilesList(entries);
+            this.Helpers.buildTree(filesList);
             return filesList;
         } catch (err) {
             // the error comming from the API request is not an instance of Error

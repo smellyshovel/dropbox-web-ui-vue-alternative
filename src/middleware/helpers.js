@@ -58,8 +58,6 @@ export function buildTree(filesList) {
             parentFolder.children.push(entry);
         }
     });
-
-    return tree;
 }
 
 export function isFolder(entry) {

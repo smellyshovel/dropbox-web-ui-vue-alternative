@@ -4,17 +4,12 @@ export default {
     namespaced: true,
 
     state: {
-        list: [],
-        tree: []
+        fielsList: []
     },
 
     mutations: {
-        SET_LIST(state, list) {
-            state.list = list;
-        },
-
-        SET_TREE(state, tree) {
-            state.tree = tree;
+        SET_FILES_LIST(state, filesList) {
+            state.filesList = filesList;
         }
     },
 
@@ -23,12 +18,9 @@ export default {
             await API.connect();
         },
 
-        async update({ commit }) {
-            let list = await API.getFilesList();
-            commit("SET_LIST", list);
-
-            let tree = API.Helpers.buildTree(list);
-            commit("SET_TREE", tree);
+        async updateFilesList({ commit }) {
+            let filesList = await API.getFilesList();
+            commit("SET_FILES_LIST", filesList);
         },
 
         async download({ commit }, entry) {
@@ -42,7 +34,7 @@ export default {
 
     getters: {
         folderByLink: (state) => (link = "") => {
-            return state.list.find(entry => {
+            return state.filesList.find(entry => {
                 return API.Helpers.isFolder(entry) && entry.link === link;
             });
         }
