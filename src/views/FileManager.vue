@@ -41,7 +41,7 @@ export default {
             await this.$store.dispatch("cloud/connect");
 
             this.loading = "Updating the files list...";
-            await this.$store.dispatch("cloud/update");
+            await this.$store.dispatch("cloud/updateFilesList");
         } catch (err) {
             this.error = err;
         } finally {
