@@ -4,7 +4,7 @@ export default {
     namespaced: true,
 
     state: {
-        fielsList: []
+        filesList: []
     },
 
     mutations: {
@@ -27,8 +27,12 @@ export default {
             await API.download(entry);
         },
 
-        async upload({ commit }, payload) {
-            await API.upload(payload);
+        async upload({ commit, dispatch }, payload) {
+            let files = payload.files;
+            const dest = payload.destination;
+
+            await API.uploadFiles(files, dest);
+            await dispatch("updateFilesList");
         }
     },
 

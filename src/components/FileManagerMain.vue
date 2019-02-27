@@ -2,7 +2,22 @@
 <main>
     <folder-path :path="folder.link" />
 
-    <input type="file" @change="upload($event)" :key="folder.id">
+    <label for="upload-files">Upload Files</label>
+    <input
+        id="upload-files"
+        type="file" multiple
+        @change="upload($event)"
+        hidden
+    >
+
+    <label for="upload-dir">Upload Folder</label>
+    <input
+        id="upload-dir"
+        type="file" webkitdirectory
+        @change="upload($event)"
+        hidden
+    >
+
     <input type="button" value="Update" @click="update">
 
     <tree-view
@@ -51,15 +66,13 @@ export default {
     methods: {
         async upload(event) {
             await this.$store.dispatch("cloud/upload", {
-                file: event.target.files[0],
-                where: this.folder.path_lower
+                files: event.target.files,
+                destination: this.folder.path_lower
             });
-            await this.$store.dispatch("cloud/updateFilesList");
-            event.target.value = "";
         },
 
         async update() {
-            await await this.$store.dispatch("cloud/updateFilesList");
+            await this.$store.dispatch("cloud/updateFilesList");
         }
     }
 }
