@@ -51,7 +51,6 @@ export default {
             let downloadButton = document.createElement("a");
             downloadButton.setAttribute("href", link);
             downloadButton.click();
-            // downloadButton.remove();
         } catch (err) {
             // the error comming from the API request is not an instance of Error
             if (err instanceof Error) {
@@ -63,59 +62,75 @@ export default {
     },
 
     async uploadFiles(files, dest) {
-        let uplSmpl = async (file) => {
-            return await this.Conn.filesUpload({path: '/' + file.name, contents: file})
-        };
-
-        let uplCmpx = async (file) => {
-            const maxBlob = 8 * 1000 * 1000; // 8Mb - Dropbox JavaScript API suggested max file / chunk size
-            var workItems = [];
-
-            var offset = 0;
-            while (offset < file.size) {
-                var chunkSize = Math.min(maxBlob, file.size - offset);
-                workItems.push(file.slice(offset, offset + chunkSize));
-                offset += chunkSize;
-            }
-
-            const task = workItems.reduce((acc, blob, idx, items) => {
-                if (idx == 0) {
-                    // Starting multipart upload of file
-                    return acc.then(() => {
-                        return this.Conn.filesUploadSessionStart({ close: false, contents: blob})
-                            .then(response => response.session_id)
-                    });
-                } else if (idx < items.length-1) {
-                    // Append part to the upload session
-                    return acc.then((sessionId) => {
-                        var cursor = { session_id: sessionId, offset: idx * maxBlob };
-                        return this.Conn.filesUploadSessionAppendV2({ cursor: cursor, close: false, contents: blob })
-                            .then(() => sessionId);
-                    });
-                } else {
-                    // Last chunk of data, close session
-                    return acc.then((sessionId) => {
-                        var cursor = { session_id: sessionId, offset: file.size - blob.size };
-                        var commit = { path: '/' + file.name, mode: 'add', autorename: true, mute: false };
-                        return this.Conn.filesUploadSessionFinish({ cursor: cursor, commit: commit, contents: blob });
-                    });
-                }
-            }, Promise.resolve());
-
-            return await task;
-        }
-
-        const UPLOAD_FILE_SIZE_LIMIT = 150 * 1024 * 1024;
+        const STRAIGHT_UPLOAD_FILE_SIZE_LIMIT = 150 * 1024 * 1024;
+        const SESSION_UPLOAD_MAX_CHUNK_SIZE = 8 * 1024 * 1024;
+        const UPLOADS = [];
 
         for (let i = 0; i < files.length; i++) {
-            let file = files.item(i);
+            let file = files.item(i),
+                desiredPath = dest + "/" + (file.webkitRelativePath || file.name);
 
-            if (file.size < UPLOAD_FILE_SIZE_LIMIT) {
-                await uplSmpl(file);
+            if (file.size < STRAIGHT_UPLOAD_FILE_SIZE_LIMIT) {
+                UPLOADS.push(this.Conn.filesUpload({
+                    path: desiredPath,
+                    autorename: true,
+                    contents: file
+                }));
             } else {
-                await uplCmpx(file);
+                let fileBlobs = [],
+                    offset = 0;
+
+                while (offset < file.size) {
+                    let chunkSize = Math.min(SESSION_UPLOAD_MAX_CHUNK_SIZE, file.size - offset);
+                    fileBlobs.push(file.slice(offset, offset + chunkSize));
+                    offset += chunkSize;
+                }
+
+                let task = fileBlobs.reduce(async (sessionId, blob, index, items) => {
+                    if (index === 1) {
+                        return (await this.Conn.filesUploadSessionStart({
+                            close: false,
+                            contents: blob
+                        })).session_id;
+                    } else if (index < items.length - 1) {
+                        let cursor = {
+                            session_id: await sessionId,
+                            offset: (index - 1) * SESSION_UPLOAD_MAX_CHUNK_SIZE,
+                        };
+
+                        await this.Conn.filesUploadSessionAppendV2({
+                            cursor: cursor,
+                            close: false,
+                            contents: blob
+                        });
+
+                        return sessionId;
+                    } else {
+                        var cursor = {
+                            session_id: await sessionId,
+                            offset: file.size - blob.size - SESSION_UPLOAD_MAX_CHUNK_SIZE
+                        };
+
+                        var commit = {
+                            path: desiredPath,
+                            mode: 'add',
+                            autorename: true,
+                            mute: false
+                        };
+
+                        return this.Conn.filesUploadSessionFinish({
+                            cursor: cursor,
+                            commit: commit,
+                            contents: blob
+                        });
+                    }
+                });
+
+                UPLOADS.push(task);
             }
         }
+
+        return Promise.all(UPLOADS)
     },
 
     Helpers

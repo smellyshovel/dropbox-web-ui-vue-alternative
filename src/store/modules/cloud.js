@@ -28,10 +28,7 @@ export default {
         },
 
         async upload({ commit, dispatch }, payload) {
-            let files = payload.files;
-            const dest = payload.destination;
-
-            await API.uploadFiles(files, dest);
+            await API.uploadFiles(payload.files, payload.destination);
             await dispatch("updateFilesList");
         }
     },
