@@ -7,9 +7,19 @@
         {{ entry.name }}
     </div>
     <div>
-        <button><s>Move</s></button>
+        <button @click="toggleMoveDialog">Move</button>
+        <div v-if="moveDialogOpened">
+            Moving...
+            <select v-model="moveDest" @change="moveEntry">
+                <option
+                    v-for="folder in allFolders"
+                    :value="folder.path_lower"
+                >{{ folder.path_display }}</option>
+            </select>
+        </div>
         <button @click="toggleCopyDialog">Copy</button>
         <div v-if="copyDialogOpened">
+            Copying...
             <select v-model="copyDest" @change="copyEntry">
                 <option
                     v-for="folder in allFolders"
@@ -46,7 +56,9 @@ export default {
     data() {
         return {
             copyDialogOpened: false,
-            copyDest: null
+            copyDest: null,
+            moveDialogOpened: false,
+            moveDest: null
         };
     },
 
@@ -57,6 +69,17 @@ export default {
             } else if (isFile(this.entry)) {
                 this.$store.dispatch("cloud/download", this.entry);
             }
+        },
+
+        toggleMoveDialog() {
+            this.moveDialogOpened = !this.moveDialogOpened;
+        },
+
+        moveEntry() {
+            this.$store.dispatch("cloud/moveEntries", {
+                entries: [this.entry],
+                destination: this.moveDest
+            })
         },
 
         toggleCopyDialog() {

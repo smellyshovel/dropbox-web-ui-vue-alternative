@@ -37,6 +37,11 @@ export default {
             await dispatch("updateFilesList");
         },
 
+        async moveEntries({ commit, dispatch }, payload) {
+            await API.moveEntries(payload.entries, payload.destination);
+            await dispatch("updateFilesList");
+        },
+
         async copyEntries({ commit, dispatch }, payload) {
             await API.copyEntries(payload.entries, payload.destination);
             await dispatch("updateFilesList");

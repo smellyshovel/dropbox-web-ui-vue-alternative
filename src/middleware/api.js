@@ -140,6 +140,27 @@ export default {
         return Promise.all(UPLOADS)
     },
 
+    async moveEntries(entries, dest) {
+        let entriesPaths = entries.map(entry => {
+            return {
+                from_path: entry.path_lower,
+                to_path: dest + "/" + entry.name
+            }
+        });
+
+        let { async_job_id } = await this.Conn.filesMoveBatchV2({
+            entries: entriesPaths,
+            autorename: true
+        });
+
+        while (true) {
+            let { ".tag": tag } = await this.Conn.filesMoveBatchCheckV2({ async_job_id });
+            if (tag === "complete") {
+                return Promise.resolve();
+            }
+        }
+    },
+
     async copyEntries(entries, dest) {
         let entriesPaths = entries.map(entry => {
             return {
@@ -148,13 +169,13 @@ export default {
             }
         });
 
-        let { async_job_id } = await this.Conn.filesCopyBatch({
+        let { async_job_id } = await this.Conn.filesCopyBatchV2({
             entries: entriesPaths,
             autorename: true
         });
 
         while (true) {
-            let { ".tag": tag } = await this.Conn.filesCopyBatchCheck({ async_job_id });
+            let { ".tag": tag } = await this.Conn.filesCopyBatchCheckV2({ async_job_id });
             if (tag === "complete") {
                 return Promise.resolve();
             }
