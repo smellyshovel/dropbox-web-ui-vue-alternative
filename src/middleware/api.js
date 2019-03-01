@@ -140,6 +140,35 @@ export default {
         return Promise.all(UPLOADS)
     },
 
+    async renameEntries(entries, names) {
+        let entriesPaths = entries.map((entry, i) => {
+            return {
+                from_path: entry.path_lower,
+                to_path: function() {
+                    let newPath = entry.path_lower.split("/");
+                    newPath.pop();
+                    newPath = newPath.join("/");
+
+                    newPath = newPath + "/" + names[i];
+                    console.log(entry.path_lower, newPath);
+                    return newPath;
+                }()
+            }
+        });
+
+        let { async_job_id } = await this.Conn.filesMoveBatchV2({
+            entries: entriesPaths,
+            autorename: true
+        });
+
+        while (true) {
+            let { ".tag": tag } = await this.Conn.filesMoveBatchCheckV2({ async_job_id });
+            if (tag === "complete") {
+                return Promise.resolve();
+            }
+        }
+    },
+
     async moveEntries(entries, dest) {
         let entriesPaths = entries.map(entry => {
             return {

@@ -47,6 +47,11 @@ export default {
             await dispatch("updateFilesList");
         },
 
+        async renameEntries({ commit, dispatch }, payload) {
+            await API.renameEntries(payload.entries, payload.names);
+            await dispatch("updateFilesList");
+        },
+
         async deleteEntries({ commit, dispatch }, entriesPaths) {
             await API.deleteEntries(entriesPaths);
             await dispatch("updateFilesList");

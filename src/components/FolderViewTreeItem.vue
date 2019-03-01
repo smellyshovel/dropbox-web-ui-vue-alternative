@@ -17,6 +17,7 @@
                 >{{ folder.path_display }}</option>
             </select>
         </div>
+
         <button @click="toggleCopyDialog">Copy</button>
         <div v-if="copyDialogOpened">
             Copying...
@@ -27,7 +28,16 @@
                 >{{ folder.path_display }}</option>
             </select>
         </div>
-        <button><s>Rename</s></button>
+
+        <button @click="toggleRenameDialog">Rename</button>
+        <div v-if="renameDialogOpened">
+            Renaming...
+            <form @submit.prevent="renameEntry">
+                <input type="text" v-model="renameName">
+                <input type="submit">
+            </form>
+        </div>
+
         <button @click="deleteEntry">Delete</button>
     </div>
 </div>
@@ -58,7 +68,9 @@ export default {
             copyDialogOpened: false,
             copyDest: null,
             moveDialogOpened: false,
-            moveDest: null
+            moveDest: null,
+            renameDialogOpened: false,
+            renameName: ""
         };
     },
 
@@ -69,6 +81,17 @@ export default {
             } else if (isFile(this.entry)) {
                 this.$store.dispatch("cloud/download", this.entry);
             }
+        },
+
+        toggleRenameDialog() {
+            this.renameDialogOpened = !this.renameDialogOpened;
+        },
+
+        renameEntry() {
+            this.$store.dispatch("cloud/renameEntries", {
+                entries: [this.entry],
+                names: [this.renameName]
+            })
         },
 
         toggleMoveDialog() {
