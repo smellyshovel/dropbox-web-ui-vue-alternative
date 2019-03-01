@@ -18,6 +18,14 @@
         hidden
     >
 
+    <button @click="toggleCreateFolderDialog">Create Folder</button>
+    <div v-if="createFolderDialogOpened">
+        <form @submit.prevent="createFolder">
+            <input type="text" v-model="folderToCreateName">
+            <input type="submit">
+        </form>
+    </div>
+
     <input type="button" value="Update" @click="update">
 
     <tree-view
@@ -63,6 +71,13 @@ export default {
         }
     },
 
+    data() {
+        return {
+            createFolderDialogOpened: false,
+            folderToCreateName: ""
+        }
+    },
+
     methods: {
         async upload(event) {
             await this.$store.dispatch("cloud/upload", {
@@ -73,6 +88,17 @@ export default {
 
         async update() {
             await this.$store.dispatch("cloud/updateFilesList");
+        },
+
+        async createFolder() {
+            await this.$store.dispatch("cloud/createFolder", {
+                name: this.folderToCreateName,
+                destination: this.folder.path_lower
+            });
+        },
+
+        toggleCreateFolderDialog() {
+            this.createFolderDialogOpened = !this.createFolderDialogOpened;
         }
     }
 }

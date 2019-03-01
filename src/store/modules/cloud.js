@@ -23,12 +23,22 @@ export default {
             commit("SET_FILES_LIST", filesList);
         },
 
+        async createFolder({ commit, dispatch }, payload) {
+            await API.createFolder(payload.name, payload.destination);
+            await dispatch("updateFilesList");
+        },
+
         async download({ commit }, entry) {
             await API.download(entry);
         },
 
         async upload({ commit, dispatch }, payload) {
             await API.uploadFiles(payload.files, payload.destination);
+            await dispatch("updateFilesList");
+        },
+
+        async deleteEntries({ commit, dispatch}, entriesPaths) {
+            await API.deleteEntries(entriesPaths);
             await dispatch("updateFilesList");
         }
     },

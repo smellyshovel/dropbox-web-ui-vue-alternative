@@ -42,6 +42,13 @@ export default {
         }
     },
 
+    async createFolder(name, dest) {
+        return this.Conn.filesCreateFolderV2({
+            path: dest + "/" + name,
+            autorename: true
+        });
+    },
+
     async download(entry) {
         try {
             let { link } = await this.Conn.filesGetTemporaryLink({
@@ -131,6 +138,23 @@ export default {
         }
 
         return Promise.all(UPLOADS)
+    },
+
+    async deleteEntries(entriesPaths) {
+        entriesPaths = entriesPaths.map(entryPath => {
+            return { path: entryPath }
+        });
+
+        let { async_job_id } = await this.Conn.filesDeleteBatch({
+            entries: entriesPaths
+        });
+
+        while (true) {
+            let { ".tag": tag } = await this.Conn.filesDeleteBatchCheck({ async_job_id });
+            if (tag === "complete") {
+                return Promise.resolve();
+            }
+        }
     },
 
     Helpers
