@@ -37,7 +37,12 @@ export default {
             await dispatch("updateFilesList");
         },
 
-        async deleteEntries({ commit, dispatch}, entriesPaths) {
+        async copyEntries({ commit, dispatch }, payload) {
+            await API.copyEntries(payload.entries, payload.destination);
+            await dispatch("updateFilesList");
+        },
+
+        async deleteEntries({ commit, dispatch }, entriesPaths) {
             await API.deleteEntries(entriesPaths);
             await dispatch("updateFilesList");
         }

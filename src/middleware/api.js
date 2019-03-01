@@ -140,6 +140,27 @@ export default {
         return Promise.all(UPLOADS)
     },
 
+    async copyEntries(entries, dest) {
+        let entriesPaths = entries.map(entry => {
+            return {
+                from_path: entry.path_lower,
+                to_path: dest + "/" + entry.name
+            }
+        });
+
+        let { async_job_id } = await this.Conn.filesCopyBatch({
+            entries: entriesPaths,
+            autorename: true
+        });
+
+        while (true) {
+            let { ".tag": tag } = await this.Conn.filesCopyBatchCheck({ async_job_id });
+            if (tag === "complete") {
+                return Promise.resolve();
+            }
+        }
+    },
+
     async deleteEntries(entriesPaths) {
         entriesPaths = entriesPaths.map(entryPath => {
             return { path: entryPath }
