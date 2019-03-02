@@ -4,12 +4,12 @@ export default {
     namespaced: true,
 
     state: {
-        filesList: []
+        entries: []
     },
 
     mutations: {
-        SET_FILES_LIST(state, filesList) {
-            state.filesList = filesList;
+        SET_FILES_LIST(state, entries) {
+            state.entries = entries;
         }
     },
 
@@ -18,14 +18,14 @@ export default {
             await API.connect();
         },
 
-        async updateFilesList({ commit }) {
-            let filesList = await API.getFilesList();
-            commit("SET_FILES_LIST", filesList);
+        async updateEntries({ commit }) {
+            let entries = await API.getFilesList();
+            commit("SET_FILES_LIST", entries);
         },
 
         async createFolder({ commit, dispatch }, payload) {
             await API.createFolder(payload.name, payload.destination);
-            await dispatch("updateFilesList");
+            await dispatch("updateEntries");
         },
 
         async download({ commit }, entry) {
@@ -34,33 +34,33 @@ export default {
 
         async upload({ commit, dispatch }, payload) {
             await API.uploadFiles(payload.files, payload.destination);
-            await dispatch("updateFilesList");
+            await dispatch("updateEntries");
         },
 
         async moveEntries({ commit, dispatch }, payload) {
             await API.moveEntries(payload.entries, payload.destination);
-            await dispatch("updateFilesList");
+            await dispatch("updateEntries");
         },
 
         async copyEntries({ commit, dispatch }, payload) {
             await API.copyEntries(payload.entries, payload.destination);
-            await dispatch("updateFilesList");
+            await dispatch("updateEntries");
         },
 
         async renameEntries({ commit, dispatch }, payload) {
             await API.renameEntries(payload.entries, payload.names);
-            await dispatch("updateFilesList");
+            await dispatch("updateEntries");
         },
 
         async deleteEntries({ commit, dispatch }, entriesPaths) {
             await API.deleteEntries(entriesPaths);
-            await dispatch("updateFilesList");
+            await dispatch("updateEntries");
         }
     },
 
     getters: {
         folderByLink: (state) => (link = "") => {
-            return state.filesList.find(entry => {
+            return state.entries.find(entry => {
                 return API.Helpers.isFolder(entry) && entry.link === link;
             });
         }
