@@ -1,4 +1,5 @@
 import API from "@/middleware/api.js";
+import Errors from "@/middleware/errors.js";
 
 export default {
     namespaced: true,
@@ -8,23 +9,34 @@ export default {
     },
 
     mutations: {
-        SET_FILES_LIST(state, entries) {
+        SET_ENTRIES(state, entries) {
             state.entries = entries;
         }
     },
 
     actions: {
-        async connect({ commit }) {
+        async connect() {
             await API.connect();
         },
 
         async updateEntries({ commit }) {
-            let entries = await API.getFilesList();
-            commit("SET_FILES_LIST", entries);
+            let entries = await API.getEntries();
+            commit("SET_ENTRIES", entries);
         },
 
-        async createFolder({ commit, dispatch }, payload) {
-            await API.createFolder(payload.name, payload.destination);
+        async createFolders({ dispatch, getters }, { names, destination }) {
+            names.forEach(name => {
+                let exists = getters.entryByNameInFolder(name, destination)
+                if (exists) {
+                    throw new Errors.CreateFoldersError(Errors.CreateFoldersError.alreadyExists(exists));
+                }
+
+                if (!API.Helpers.nameIsCorrect(name)) {
+                    throw new Errors.CreateFoldersError(Errors.CreateFoldersError.badName(name));
+                }
+            });
+
+            await API.createFolders(names, destination);
             await dispatch("updateEntries");
         },
 
@@ -63,6 +75,16 @@ export default {
             return state.entries.find(entry => {
                 return API.Helpers.isFolder(entry) && entry.link === link;
             });
+        },
+
+        entryByNameInFolder: (state) => (name, folder) => {
+            if (folder.children) {
+                return folder.children.find(child => {
+                    return child.name === name;
+                });
+            }
+
+            return null;
         }
     }
 };

@@ -67,3 +67,8 @@ export function isFolder(entry) {
 export function isFile(entry) {
     return entry[".tag"] === "file";
 }
+
+export function nameIsCorrect(name) {
+    // at least one character long and deny <, >, /, \, :, ?, *, ", |
+    return name.length && !/<|>|\/|\\|:|\?|\*|"|\|/g.test(name);
+}

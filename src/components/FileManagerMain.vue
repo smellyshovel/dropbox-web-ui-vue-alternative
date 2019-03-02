@@ -20,6 +20,12 @@
 
     <button @click="toggleCreateFolderDialog">Create Folder</button>
     <div v-if="createFolderDialogOpened">
+        <div
+            v-if="createFolderError"
+            class="error"
+        >
+            {{ createFolderError.message }}
+        </div>
         <form @submit.prevent="createFolder">
             <input type="text" v-model="folderToCreateName">
             <input type="submit">
@@ -46,6 +52,7 @@
 import TreeView from "@/components/TreeView.vue";
 import TreeItem from "@/components/FolderViewTreeItem.vue";
 import FolderPath from "@/components/FolderPath.vue";
+import Errors from "@/middleware/errors.js";
 import { mapGetters } from "vuex";
 
 export default {
@@ -74,7 +81,8 @@ export default {
     data() {
         return {
             createFolderDialogOpened: false,
-            folderToCreateName: ""
+            folderToCreateName: "",
+            createFolderError: null
         }
     },
 
@@ -87,14 +95,26 @@ export default {
         },
 
         async update() {
-            await this.$store.dispatch("cloud/updateFilesList");
+            await this.$store.dispatch("cloud/updateEntries");
         },
 
         async createFolder() {
-            await this.$store.dispatch("cloud/createFolder", {
-                name: this.folderToCreateName,
-                destination: this.folder.path_lower
-            });
+            try {
+                await this.$store.dispatch("cloud/createFolders", {
+                    names: this.folderToCreateName.split(","),
+                    destination: this.folder
+                });
+
+                this.createFolderError = null;
+            } catch (err) {
+                console.error(err);
+
+                if (err instanceof Errors.CreateFoldersError) {
+                    this.createFolderError = err;
+                } else {
+                    this.createFolderError = new Error("Something went wrong...");
+                }
+            }
         },
 
         toggleCreateFolderDialog() {
@@ -103,3 +123,9 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+.error {
+    color: red;
+}
+</style>

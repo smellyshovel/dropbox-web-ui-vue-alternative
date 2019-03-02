@@ -2,6 +2,7 @@ import { Dropbox } from "dropbox";
 import IsomorphicFetch from "isomorphic-fetch";
 import AccessToken from "@/../secret/DROPBOX_AUTH_TOKEN.txt";
 import * as Helpers from "./helpers.js";
+import Errors from "@/middleware/errors.js";
 
 export default {
     connect() {
@@ -22,7 +23,7 @@ export default {
         return this._connection;
     },
 
-    async getFilesList() {
+    async getEntries() {
         try {
             var { entries } = await this.Conn.filesListFolder({
                 path: "",
@@ -42,11 +43,37 @@ export default {
         }
     },
 
-    async createFolder(name, dest) {
-        return this.Conn.filesCreateFolderV2({
-            path: dest + "/" + name,
-            autorename: true
-        });
+    async createFolders(names, destination) {
+        if (names.length === 1) {
+            let desiredPath = destination.path_lower + "/" + names[0];
+
+            try {
+                await this.Conn.filesCreateFolderV2({
+                    path: desiredPath,
+                    autorename: true
+                });
+            } catch (err) {
+                throw new Errors.CreateFoldersError(Errors.CreateFoldersError.serverError(err));
+            }
+        } else if (names.length > 1) {
+            let desiredPaths = names.map(name => destination.path_lower + "/" + name);
+
+            let { async_job_id } = await this.Conn.filesCreateFolderBatch({
+                paths: desiredPaths,
+                autorename: true,
+                force_async: true
+            });
+
+            while (true) {
+                let { ".tag": result, failed } = await this.Conn.filesCreateFolderBatchCheck({ async_job_id });
+
+                if (result === "complete") {
+                    return Promise.resolve();
+                } else if (result === "failed") {
+                    throw new Errors.CreateFoldersError(Errors.CreateFoldersError.serverError(failed));
+                }
+            }
+        }
     },
 
     async download(entry) {
