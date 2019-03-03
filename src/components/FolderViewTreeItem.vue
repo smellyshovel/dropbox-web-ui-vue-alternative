@@ -28,10 +28,17 @@
         <button @click="toggleCopyDialog">Copy</button>
         <div v-if="copyDialogOpened">
             Copying...
+            <div
+                v-if="copyEntriesError"
+                class="error"
+            >
+                {{ copyEntriesError.message }}
+            </div>
+
             <select v-model="copyDest" @change="copyEntry">
                 <option
                     v-for="folder in allFolders"
-                    :value="folder.path_lower"
+                    :value="folder"
                 >{{ folder.path_display }}</option>
             </select>
         </div>
@@ -73,11 +80,12 @@ export default {
 
     data() {
         return {
-            copyDialogOpened: false,
-            copyDest: null,
             moveDialogOpened: false,
             moveDest: null,
             moveEntriesError: null,
+            copyDialogOpened: false,
+            copyDest: null,
+            copyEntriesError: null,
             renameDialogOpened: false,
             renameName: ""
         };
@@ -119,11 +127,23 @@ export default {
             this.copyDialogOpened = !this.copyDialogOpened;
         },
 
-        copyEntry() {
-            this.$store.dispatch("cloud/copyEntries", {
-                entries: [this.entry],
-                destination: this.copyDest
-            })
+        async copyEntry() {
+            try {
+                await this.$store.dispatch("cloud/copyEntries", {
+                    entries: [this.entry],
+                    destination: this.copyDest
+                })
+
+                this.copyEntriesError = null;
+            } catch (err) {
+                console.error(err);
+
+                if (err instanceof Errors.CopyEntriesError) {
+                    this.copyEntriesError = err;
+                } else {
+                    this.copyEntriesError = new Error("Something went wrong...");
+                }
+            }
         },
 
         toggleRenameDialog() {

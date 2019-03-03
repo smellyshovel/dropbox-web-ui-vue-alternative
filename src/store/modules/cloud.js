@@ -45,8 +45,8 @@ export default {
             await dispatch("updateEntries");
         },
 
-        async copyEntries({ commit, dispatch }, payload) {
-            await API.copyEntries(payload.entries, payload.destination);
+        async copyEntries({ commit, dispatch }, { entries, destination }) {
+            await API.copyEntries(entries, destination);
             await dispatch("updateEntries");
         },
 
