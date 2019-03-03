@@ -24,19 +24,8 @@ export default {
             commit("SET_ENTRIES", entries);
         },
 
-        async createFolders({ dispatch, getters }, { names, destination }) {
-            names.forEach(name => {
-                let exists = getters.entryByNameInFolder(name, destination)
-                if (exists) {
-                    throw new Errors.CreateFoldersError(Errors.CreateFoldersError.alreadyExists(exists));
-                }
-
-                if (!API.Helpers.nameIsCorrect(name)) {
-                    throw new Errors.CreateFoldersError(Errors.CreateFoldersError.badName(name));
-                }
-            });
-
-            await API.createFolders(names, destination);
+        async createFolder({ dispatch, getters }, { name, destination }) {
+            await API.createFolder(name, destination);
             await dispatch("updateEntries");
         },
 

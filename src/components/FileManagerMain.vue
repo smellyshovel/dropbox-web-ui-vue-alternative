@@ -100,8 +100,8 @@ export default {
 
         async createFolder() {
             try {
-                await this.$store.dispatch("cloud/createFolders", {
-                    names: this.folderToCreateName.split(","),
+                await this.$store.dispatch("cloud/createFolder", {
+                    name: this.folderToCreateName,
                     destination: this.folder
                 });
 
@@ -109,7 +109,7 @@ export default {
             } catch (err) {
                 console.error(err);
 
-                if (err instanceof Errors.CreateFoldersError) {
+                if (err instanceof Errors.CreateFolderError) {
                     this.createFolderError = err;
                 } else {
                     this.createFolderError = new Error("Something went wrong...");

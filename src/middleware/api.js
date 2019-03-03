@@ -43,36 +43,26 @@ export default {
         }
     },
 
-    async createFolders(names, destination) {
-        if (names.length === 1) {
-            let desiredPath = destination.path_lower + "/" + names[0];
+    async createFolder(name, destination) {
+        if (!this.Helpers.nameIsCorrect(name)) {
+            throw new Errors.CreateFolderError(Errors.CreateFolderError.badName(name));
+        }
 
-            try {
-                await this.Conn.filesCreateFolderV2({
-                    path: desiredPath,
-                    autorename: true
-                });
-            } catch (err) {
-                throw new Errors.CreateFoldersError(Errors.CreateFoldersError.serverError(err));
+        destination.children.forEach(child => {
+            if (child.name === name) {
+                throw new Errors.CreateFolderError(Errors.CreateFolderError.alreadyExists(child));
             }
-        } else if (names.length > 1) {
-            let desiredPaths = names.map(name => destination.path_lower + "/" + name);
+        });
 
-            let { async_job_id } = await this.Conn.filesCreateFolderBatch({
-                paths: desiredPaths,
-                autorename: true,
-                force_async: true
+        let desiredPath = destination.path_lower + "/" + name;
+
+        try {
+            await this.Conn.filesCreateFolderV2({
+                path: desiredPath,
+                autorename: true
             });
-
-            while (true) {
-                let { ".tag": result, failed } = await this.Conn.filesCreateFolderBatchCheck({ async_job_id });
-
-                if (result === "complete") {
-                    return Promise.resolve();
-                } else if (result === "failed") {
-                    throw new Errors.CreateFoldersError(Errors.CreateFoldersError.serverError(failed));
-                }
-            }
+        } catch (err) {
+            throw new Errors.CreateFolderError(Errors.CreateFolderError.serverError(err));
         }
     },
 
