@@ -50,8 +50,8 @@ export default {
             await dispatch("updateEntries");
         },
 
-        async renameEntries({ commit, dispatch }, payload) {
-            await API.renameEntries(payload.entries, payload.names);
+        async renameEntry({ commit, dispatch }, { entry, name }) {
+            await API.renameEntry(entry, name);
             await dispatch("updateEntries");
         },
 

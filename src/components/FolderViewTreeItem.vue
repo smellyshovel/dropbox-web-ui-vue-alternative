@@ -45,6 +45,13 @@
 
         <button @click="toggleRenameDialog">Rename</button>
         <div v-if="renameDialogOpened">
+            <div
+                v-if="renameEntryError"
+                class="error"
+            >
+                {{ renameEntryError.message }}
+            </div>
+
             Renaming...
             <form @submit.prevent="renameEntry">
                 <input type="text" v-model="renameName">
@@ -87,7 +94,8 @@ export default {
             copyDest: null,
             copyEntriesError: null,
             renameDialogOpened: false,
-            renameName: ""
+            renameName: "",
+            renameEntryError: null,
         };
     },
 
@@ -150,11 +158,23 @@ export default {
             this.renameDialogOpened = !this.renameDialogOpened;
         },
 
-        renameEntry() {
-            this.$store.dispatch("cloud/renameEntries", {
-                entries: [this.entry],
-                names: [this.renameName]
-            })
+        async renameEntry() {
+            try {
+                await this.$store.dispatch("cloud/renameEntry", {
+                    entry: this.entry,
+                    name: this.renameName
+                })
+
+                this.renameEntryError = null;
+            } catch (err) {
+                console.error(err);
+
+                if (err instanceof Errors.RenameEntryError) {
+                    this.renameEntryError = err;
+                } else {
+                    this.renameEntryError = new Error("Something went wrong...");
+                }
+            }
         },
 
         deleteEntry() {
