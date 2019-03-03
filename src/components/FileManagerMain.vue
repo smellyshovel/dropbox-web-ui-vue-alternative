@@ -23,9 +23,8 @@
         <div
             v-if="createFolderError"
             class="error"
-        >
-            {{ createFolderError.message }}
-        </div>
+            v-html="createFolderError.message"
+        />
         <form @submit.prevent="createFolder">
             <input type="text" v-model="folderToCreateName">
             <input type="submit">
@@ -52,7 +51,6 @@
 import TreeView from "@/components/TreeView.vue";
 import TreeItem from "@/components/FolderViewTreeItem.vue";
 import FolderPath from "@/components/FolderPath.vue";
-import Errors from "@/middleware/errors.js";
 import { mapGetters } from "vuex";
 
 export default {
@@ -107,13 +105,7 @@ export default {
 
                 this.createFolderError = null;
             } catch (err) {
-                console.error(err);
-
-                if (err instanceof Errors.CreateFolderError) {
-                    this.createFolderError = err;
-                } else {
-                    this.createFolderError = new Error("Something went wrong...");
-                }
+                this.createFolderError = err;
             }
         },
 

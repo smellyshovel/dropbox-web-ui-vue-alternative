@@ -2,7 +2,7 @@ import { Dropbox } from "dropbox";
 import IsomorphicFetch from "isomorphic-fetch";
 import AccessToken from "@/../secret/DROPBOX_AUTH_TOKEN.txt";
 import * as Helpers from "./helpers.js";
-import Errors from "@/middleware/errors.js";
+import { CustomError } from "@/middleware/errors.js";
 
 export default {
     connect() {
@@ -43,14 +43,23 @@ export default {
         }
     },
 
+    /*
+        Reasons to throw: bad_name, already_exists, remote
+    */
     async createFolder(name, destination) {
         if (!this.Helpers.nameIsCorrect(name)) {
-            throw new Errors.CreateFolderError(Errors.CreateFolderError.badName(name));
+            throw new CustomError({
+                reason: "bad_name",
+                details: name
+            });
         }
 
         destination.children.forEach(child => {
             if (child.name === name) {
-                throw new Errors.CreateFolderError(Errors.CreateFolderError.alreadyExists(child));
+                throw new CustomError({
+                    reason: "already_exists",
+                    details: child
+                });
             }
         });
 
@@ -62,13 +71,15 @@ export default {
                 autorename: true
             });
         } catch (err) {
-            throw new Errors.CreateFolderError(Errors.CreateFolderError.serverError(err));
+            throw new CustomError ({
+                reason: "remote",
+                details: err
+            });
         }
     },
 
     /*
-        Rejection reasons: Object.<reason<Reason>>, [original<Any>]
-        Reason: <string>. One of ["other"]
+        Reasons to throw: remote_sole, remote_several
     */
     async moveEntries(entries, destination) {
         if (entries.length === 1) {
@@ -82,9 +93,9 @@ export default {
                     autorename: true
                 });
             } catch (err) {
-                return Promise.reject({
-                    reason: "other",
-                    original: err
+                throw new CustomError({
+                    reason: "remote_sole",
+                    details: err
                 });
             }
         } else if (entries.length > 1) {
@@ -99,42 +110,43 @@ export default {
             });
 
             if (result === "complete") { // ended syncronously
-                let atLeastOneFailed = resEntries.some(entry => {
-                    return entry[".tag"] !== "success";
+                resEntries.forEach(entry => {
+                    if (entry[".tag"] !== "success") {
+                        throw new CustomError({
+                            reason: "remote_several",
+                            details: resEntries
+                        });
+                    }
                 });
-
-                if (atLeastOneFailed) {
-                    return Promise.reject({
-                        reason: "other",
-                        original: resEntries
-                    });
-                } else {
-                    return Promise.resolve();
-                }
             } else if (result === "async_job_id") { // ended asyncronously
-                while (true) {
+                let keepFetching = true;
+
+                while (keepFetching) {
                     let res = { ".tag": result, entries: resEntries } = await this.Conn.filesMoveBatchCheckV2({ async_job_id });
 
                     if (result === "complete") {
-                        let atLeastOneFailed = resEntries.some(entry => {
-                            return entry[".tag"] !== "success";
-                        });
+                        keepFetching = false;
 
-                        if (atLeastOneFailed) {
-                            return Promise.reject({
-                                reason: "other",
-                                original: resEntries
-                            });
-                        } else {
-                            return Promise.resolve();
-                        }
+                        resEntries.forEach(entry => {
+                            if (entry[".tag"] !== "success") {
+                                throw new CustomError({
+                                    reason: "remote_several",
+                                    details: resEntries
+                                });
+                            }
+                        });
                     }
                 }
             }
         }
     },
 
+    /*
+        Reasons to throw: not_enough_space, remote_sole, remote_several
+    */
     async copyEntries(entries, destination) {
+        // TODO: check for available space here!
+
         if (entries.length === 1) {
             let fromPath = entries[0].path_lower;
             let toPath = destination.path_lower + "/" + entries[0].name;
@@ -146,7 +158,10 @@ export default {
                     autorename: true
                 });
             } catch (err) {
-                throw new Errors.CopyEntriesError(Errors.CopyEntriesError.serverError(err));
+                throw new CustomError({
+                    reason: "remote_sole",
+                    details: err
+                });
             }
         } else if (entries.length > 1) {
             let relocationPaths = entries.map(entry => ({
@@ -154,28 +169,56 @@ export default {
                 to_path: destination.path_lower + "/" + entry.name
             }));
 
-            let { ".tag": result, async_job_id } = await this.Conn.filesCopyBatchV2({
+            let { ".tag": result, entries: resEntries, async_job_id } = await this.Conn.filesCopyBatchV2({
                 entries: relocationPaths,
                 autorename: true
             });
 
-            if (result === "complete") {
-                return Promise.resolve();
-            } else if (result === "async_job_id") {
-                while (true) {
-                    let { ".tag": result, failed } = await this.Conn.filesCopyBatchCheckV2({ async_job_id });
+            if (result === "complete") { // ended syncronously
+                resEntries.forEach(entry => {
+                    if (entry[".tag"] !== "success") {
+                        throw new CustomError({
+                            reason: "remote_several",
+                            details: resEntries
+                        });
+                    }
+                });
+            } else if (result === "async_job_id") { // ended asyncronously
+                let keepFetching = true;
+
+                while (keepFetching) {
+                    let res = { ".tag": result, entries: resEntries } = await this.Conn.filesCopyBatchCheckV2({ async_job_id });
 
                     if (result === "complete") {
-                        return Promise.resolve();
-                    } else if (result === "failed") {
-                        throw new Errors.CopyEntriesError(Errors.CopyEntriesError.serverError(failed));
+                        keepFetching = false;
+
+                        resEntries.forEach(entry => {
+                            if (entry[".tag"] !== "success") {
+                                throw new CustomError({
+                                    reason: "remote_several",
+                                    details: resEntries
+                                });
+                            }
+                        });
                     }
                 }
             }
         }
     },
 
+    /*
+        Reasons to throw: bad_name, already_exists, remote
+    */
     async renameEntry(entry, name) {
+        if (!this.Helpers.nameIsCorrect(name)) {
+            throw new CustomError({
+                reason: "bad_name",
+                details: name
+            });
+        }
+
+        // TODO: check if alreadyExists somehow
+
         let fromPath = entry.path_lower;
         let toPath = fromPath.split("/");
         toPath.pop();
@@ -185,14 +228,20 @@ export default {
         try {
             await this.Conn.filesMoveV2({
                 from_path: fromPath,
-                to_path: toPath,
+                topath: toPath,
                 autorename: true
             });
         } catch (err) {
-            throw new Errors.RenameEntryError(Errors.RenameEntryError.serverError(err));
+            throw new CustomError({
+                reason: "remote",
+                details: err
+            });
         }
     },
 
+    /*
+        Reasons to throw: remote_sole, remote_several
+    */
     async deleteEntries(entries) {
         if (entries.length === 1) {
             let path = entries[0].path_lower;
@@ -200,27 +249,44 @@ export default {
             try {
                 await this.Conn.filesDeleteV2({ path });
             } catch (err) {
-                throw new Errors.DeleteEntriesError(Errors.DeleteEntriesError.serverError(err));
+                throw new CustomError({
+                    reason: "remote_sole",
+                    details: err
+                });
             }
         } else if (entries.length > 1) {
             let paths = entries.map(entry => ({
                 path: entry.path_lower,
             }));
 
-            let { ".tag": result, async_job_id } = await this.Conn.filesDeleteBatch({
-                entries: paths
-            });
+            let { ".tag": result, entries: resEntries, async_job_id } = await this.Conn.filesDeleteBatch({ entries: paths });
 
             if (result === "complete") {
-                return Promise.resolve();
+                resEntries.forEach(entry => {
+                    if (entry[".tag"] !== "success") {
+                        throw new CustomError({
+                            reason: "remote_several",
+                            details: resEntries
+                        });
+                    }
+                });
             } else if (result === "async_job_id") {
-                while (true) {
-                    let { ".tag": result, failed } = await this.Conn.filesDeleteBatchCheck({ async_job_id });
+                let keepFetching = true;
+
+                while (keepFetching) {
+                    let res = { ".tag": result, entries: resEntries } = await this.Conn.filesDeleteBatchCheck({ async_job_id });
 
                     if (result === "complete") {
-                        return Promise.resolve();
-                    } else if (result === "failed") {
-                        throw new Errors.DeleteEntriesError(Errors.DeleteEntriesError.serverError(failed));
+                        keepFetching = false;
+
+                        resEntries.forEach(entry => {
+                            if (entry[".tag"] !== "success") {
+                                throw new CustomError({
+                                    reason: "remote_several",
+                                    details: resEntries
+                                });
+                            }
+                        });
                     }
                 }
             }

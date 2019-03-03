@@ -1,5 +1,5 @@
 import API from "@/middleware/api.js";
-import Errors from "@/middleware/errors.js";
+import { handleError } from "@/middleware/errors.js";
 
 export default {
     namespaced: true,
@@ -24,45 +24,54 @@ export default {
             commit("SET_ENTRIES", entries);
         },
 
-        async createFolder({ dispatch, getters }, { name, destination }) {
-            await API.createFolder(name, destination);
-            await dispatch("updateEntries");
+        async createFolder({ dispatch }, { name, destination }) {
+            try {
+                await API.createFolder(name, destination);
+            } catch (err) {
+                handleError("createFolder", err);
+            } finally {
+                dispatch("updateEntries");
+            }
         },
 
         async moveEntries({ dispatch }, { entries, destination }) {
             try {
                 await API.moveEntries(entries, destination);
-            } catch (original) {
-                let error = null;
-
-                switch (original.reason) {
-                    case "other":
-                        error = new Error("A Server Error occurred. Some entries may failed to move")
-                        break;
-                    default:
-                        error = new Error("Something went wrong... Please retry")
-                }
-
-                console.error(error);
-                console.error(original);
+            } catch (err) {
+                handleError("moveEntries", err);
             } finally {
-                await dispatch("updateEntries");
+                dispatch("updateEntries");
             }
         },
 
         async copyEntries({ dispatch }, { entries, destination }) {
-            await API.copyEntries(entries, destination);
-            await dispatch("updateEntries");
+            try {
+                await API.copyEntries(entries, destination);
+            } catch (err) {
+                handleError("copyEntries", err);
+            } finally {
+                dispatch("updateEntries");
+            }
         },
 
         async renameEntry({ dispatch }, { entry, name }) {
-            await API.renameEntry(entry, name);
-            await dispatch("updateEntries");
+            try {
+                await API.renameEntry(entry, name);
+            } catch (err) {
+                handleError("renameEntry", err);
+            } finally {
+                dispatch("updateEntries");
+            }
         },
 
         async deleteEntries({ dispatch }, entries) {
-            await API.deleteEntries(entries);
-            await dispatch("updateEntries");
+            try {
+                await API.deleteEntries(entries);
+            } catch (err) {
+                handleError("deleteEntries", err);
+            } finally {
+                dispatch("updateEntries");
+            }
         },
 
         async download({ commit }, entry) {

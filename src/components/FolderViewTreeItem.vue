@@ -13,9 +13,8 @@
             <div
                 v-if="moveEntriesError"
                 class="error"
-            >
-                {{ moveEntriesError.message }}
-            </div>
+                v-html="moveEntriesError.message"
+            />
 
             <select v-model="moveDest" @change="moveEntry">
                 <option
@@ -31,9 +30,8 @@
             <div
                 v-if="copyEntriesError"
                 class="error"
-            >
-                {{ copyEntriesError.message }}
-            </div>
+                v-html="copyEntriesError.message"
+            />
 
             <select v-model="copyDest" @change="copyEntry">
                 <option
@@ -48,9 +46,8 @@
             <div
                 v-if="renameEntryError"
                 class="error"
-            >
-                {{ renameEntryError.message }}
-            </div>
+                v-html="renameEntryError.message"
+            />
 
             Renaming...
             <form @submit.prevent="renameEntry">
@@ -60,13 +57,17 @@
         </div>
 
         <button @click="deleteEntry">Delete</button>
+        <div
+            v-if="deleteEntriesError"
+            class="error"
+            v-html="deleteEntriesError.message"
+        />
     </div>
 </div>
 </template>
 
 <script>
 import { isFile, isFolder } from "@/middleware/helpers.js";
-import Errors from "@/middleware/errors.js";
 
 export default {
     props: {
@@ -139,13 +140,7 @@ export default {
 
                 this.copyEntriesError = null;
             } catch (err) {
-                console.error(err);
-
-                if (err instanceof Errors.CopyEntriesError) {
-                    this.copyEntriesError = err;
-                } else {
-                    this.copyEntriesError = new Error("Something went wrong...");
-                }
+                this.copyEntriesError = err;
             }
         },
 
@@ -162,13 +157,7 @@ export default {
 
                 this.renameEntryError = null;
             } catch (err) {
-                console.error(err);
-
-                if (err instanceof Errors.RenameEntryError) {
-                    this.renameEntryError = err;
-                } else {
-                    this.renameEntryError = new Error("Something went wrong...");
-                }
+                this.renameEntryError = err;
             }
         },
 
@@ -181,13 +170,7 @@ export default {
 
                     this.deleteEntriesError = null;
                 } catch (err) {
-                    console.error(err);
-
-                    if (err instanceof Errors.DeleteEntriesError) {
-                        this.deleteEntriesError = err;
-                    } else {
-                        this.deleteEntriesError = new Error("Something went wrong...");
-                    }
+                    this.deleteEntriesError = err;
                 }
             }
         }
