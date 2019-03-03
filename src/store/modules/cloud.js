@@ -30,8 +30,24 @@ export default {
         },
 
         async moveEntries({ dispatch }, { entries, destination }) {
-            await API.moveEntries(entries, destination);
-            await dispatch("updateEntries");
+            try {
+                await API.moveEntries(entries, destination);
+            } catch (original) {
+                let error = null;
+
+                switch (original.reason) {
+                    case "other":
+                        error = new Error("A Server Error occurred. Some entries may failed to move")
+                        break;
+                    default:
+                        error = new Error("Something went wrong... Please retry")
+                }
+
+                console.error(error);
+                console.error(original);
+            } finally {
+                await dispatch("updateEntries");
+            }
         },
 
         async copyEntries({ dispatch }, { entries, destination }) {

@@ -122,13 +122,7 @@ export default {
 
                 this.moveEntriesError = null;
             } catch (err) {
-                console.error(err);
-
-                if (err instanceof Errors.MoveEntriesError) {
-                    this.moveEntriesError = err;
-                } else {
-                    this.moveEntriesError = new Error("Something went wrong...");
-                }
+                this.moveEntriesError = err;
             }
         },
 

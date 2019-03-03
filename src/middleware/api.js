@@ -66,6 +66,10 @@ export default {
         }
     },
 
+    /*
+        Rejection reasons: Object.<reason<Reason>>, [original<Any>]
+        Reason: <string>. One of ["other"]
+    */
     async moveEntries(entries, destination) {
         if (entries.length === 1) {
             let fromPath = entries[0].path_lower;
@@ -78,7 +82,10 @@ export default {
                     autorename: true
                 });
             } catch (err) {
-                throw new Errors.MoveEntriesError(Errors.MoveEntriesError.serverError(err));
+                return Promise.reject({
+                    reason: "other",
+                    original: err
+                });
             }
         } else if (entries.length > 1) {
             let relocationPaths = entries.map(entry => ({
@@ -86,21 +93,41 @@ export default {
                 to_path: destination.path_lower + "/" + entry.name
             }));
 
-            let { ".tag": result, async_job_id } = await this.Conn.filesMoveBatchV2({
+            let { ".tag": result, entries: resEntries, async_job_id } = await this.Conn.filesMoveBatchV2({
                 entries: relocationPaths,
                 autorename: true
             });
 
-            if (result === "complete") {
-                return Promise.resolve();
-            } else if (result === "async_job_id") {
+            if (result === "complete") { // ended syncronously
+                let atLeastOneFailed = resEntries.some(entry => {
+                    return entry[".tag"] !== "success";
+                });
+
+                if (atLeastOneFailed) {
+                    return Promise.reject({
+                        reason: "other",
+                        original: resEntries
+                    });
+                } else {
+                    return Promise.resolve();
+                }
+            } else if (result === "async_job_id") { // ended asyncronously
                 while (true) {
-                    let { ".tag": result, failed } = await this.Conn.filesMoveBatchCheckV2({ async_job_id });
+                    let res = { ".tag": result, entries: resEntries } = await this.Conn.filesMoveBatchCheckV2({ async_job_id });
 
                     if (result === "complete") {
-                        return Promise.resolve();
-                    } else if (result === "failed") {
-                        throw new Errors.MoveEntriesError(Errors.MoveEntriesError.serverError(failed));
+                        let atLeastOneFailed = resEntries.some(entry => {
+                            return entry[".tag"] !== "success";
+                        });
+
+                        if (atLeastOneFailed) {
+                            return Promise.reject({
+                                reason: "other",
+                                original: resEntries
+                            });
+                        } else {
+                            return Promise.resolve();
+                        }
                     }
                 }
             }
