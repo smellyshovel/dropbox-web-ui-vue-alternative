@@ -55,8 +55,8 @@ export default {
             await dispatch("updateEntries");
         },
 
-        async deleteEntries({ commit, dispatch }, entriesPaths) {
-            await API.deleteEntries(entriesPaths);
+        async deleteEntries({ commit, dispatch }, entries) {
+            await API.deleteEntries(entries);
             await dispatch("updateEntries");
         },
 

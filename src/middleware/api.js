@@ -176,6 +176,40 @@ export default {
         }
     },
 
+    async deleteEntries(entries) {
+        if (entries.length === 1) {
+            let path = entries[0].path_lower;
+
+            try {
+                await this.Conn.filesDeleteV2({ path });
+            } catch (err) {
+                throw new Errors.DeleteEntriesError(Errors.DeleteEntriesError.serverError(err));
+            }
+        } else if (entries.length > 1) {
+            let paths = entries.map(entry => ({
+                path: entry.path_lower,
+            }));
+
+            let { ".tag": result, async_job_id } = await this.Conn.filesDeleteBatch({
+                entries: paths
+            });
+
+            if (result === "complete") {
+                return Promise.resolve();
+            } else if (result === "async_job_id") {
+                while (true) {
+                    let { ".tag": result, failed } = await this.Conn.filesDeleteBatchCheck({ async_job_id });
+
+                    if (result === "complete") {
+                        return Promise.resolve();
+                    } else if (result === "failed") {
+                        throw new Errors.DeleteEntriesError(Errors.DeleteEntriesError.serverError(failed));
+                    }
+                }
+            }
+        }
+    },
+
     async download(entry) {
         try {
             let { link } = await this.Conn.filesGetTemporaryLink({
@@ -265,23 +299,6 @@ export default {
         }
 
         return Promise.all(UPLOADS)
-    },
-
-    async deleteEntries(entriesPaths) {
-        entriesPaths = entriesPaths.map(entryPath => {
-            return { path: entryPath }
-        });
-
-        let { async_job_id } = await this.Conn.filesDeleteBatch({
-            entries: entriesPaths
-        });
-
-        while (true) {
-            let { ".tag": tag } = await this.Conn.filesDeleteBatchCheck({ async_job_id });
-            if (tag === "complete") {
-                return Promise.resolve();
-            }
-        }
     },
 
     Helpers

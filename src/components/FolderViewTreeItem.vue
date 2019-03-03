@@ -96,6 +96,7 @@ export default {
             renameDialogOpened: false,
             renameName: "",
             renameEntryError: null,
+            deleteEntriesError: null
         };
     },
 
@@ -177,8 +178,24 @@ export default {
             }
         },
 
-        deleteEntry() {
-            this.$store.dispatch("cloud/deleteEntries", [this.entry.path_lower])
+        async deleteEntry() {
+            let conf = confirm("Are you sure?");
+
+            if (conf) {
+                try {
+                    await this.$store.dispatch("cloud/deleteEntries", [this.entry])
+
+                    this.deleteEntriesError = null;
+                } catch (err) {
+                    console.error(err);
+
+                    if (err instanceof Errors.DeleteEntriesError) {
+                        this.deleteEntriesError = err;
+                    } else {
+                        this.deleteEntriesError = new Error("Something went wrong...");
+                    }
+                }
+            }
         }
     }
 }
