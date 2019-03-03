@@ -10,10 +10,17 @@
         <button @click="toggleMoveDialog">Move</button>
         <div v-if="moveDialogOpened">
             Moving...
+            <div
+                v-if="moveEntriesError"
+                class="error"
+            >
+                {{ moveEntriesError.message }}
+            </div>
+
             <select v-model="moveDest" @change="moveEntry">
                 <option
                     v-for="folder in allFolders"
-                    :value="folder.path_lower"
+                    :value="folder"
                 >{{ folder.path_display }}</option>
             </select>
         </div>
@@ -45,6 +52,7 @@
 
 <script>
 import { isFile, isFolder } from "@/middleware/helpers.js";
+import Errors from "@/middleware/errors.js";
 
 export default {
     props: {
@@ -57,7 +65,7 @@ export default {
         },
 
         allFolders() {
-            return this.$store.state.cloud.filesList.filter(entry => {
+            return this.$store.state.cloud.entries.filter(entry => {
                 return isFolder(entry);
             });
         },
@@ -69,6 +77,7 @@ export default {
             copyDest: null,
             moveDialogOpened: false,
             moveDest: null,
+            moveEntriesError: null,
             renameDialogOpened: false,
             renameName: ""
         };
@@ -83,26 +92,27 @@ export default {
             }
         },
 
-        toggleRenameDialog() {
-            this.renameDialogOpened = !this.renameDialogOpened;
-        },
-
-        renameEntry() {
-            this.$store.dispatch("cloud/renameEntries", {
-                entries: [this.entry],
-                names: [this.renameName]
-            })
-        },
-
         toggleMoveDialog() {
             this.moveDialogOpened = !this.moveDialogOpened;
         },
 
-        moveEntry() {
-            this.$store.dispatch("cloud/moveEntries", {
-                entries: [this.entry],
-                destination: this.moveDest
-            })
+        async moveEntry() {
+            try {
+                await this.$store.dispatch("cloud/moveEntries", {
+                    entries: [this.entry],
+                    destination: this.moveDest
+                })
+
+                this.moveEntriesError = null;
+            } catch (err) {
+                console.error(err);
+
+                if (err instanceof Errors.MoveEntriesError) {
+                    this.moveEntriesError = err;
+                } else {
+                    this.moveEntriesError = new Error("Something went wrong...");
+                }
+            }
         },
 
         toggleCopyDialog() {
@@ -116,6 +126,17 @@ export default {
             })
         },
 
+        toggleRenameDialog() {
+            this.renameDialogOpened = !this.renameDialogOpened;
+        },
+
+        renameEntry() {
+            this.$store.dispatch("cloud/renameEntries", {
+                entries: [this.entry],
+                names: [this.renameName]
+            })
+        },
+
         deleteEntry() {
             this.$store.dispatch("cloud/deleteEntries", [this.entry.path_lower])
         }
@@ -126,5 +147,9 @@ export default {
 <style scoped>
 img {
     width: 1rem;
+}
+
+.error {
+    color: red;
 }
 </style>

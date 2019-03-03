@@ -76,6 +76,49 @@ export default {
         }
     },
 
+    async moveEntries(entries, destination) {
+        if (entries.length === 1) {
+            let fromPath = entries[0].path_lower;
+            let toPath = destination.path_lower + "/" + entries[0].name;
+
+            console.log(fromPath, toPath);
+
+            try {
+                await this.Conn.filesMoveV2({
+                    from_path: fromPath,
+                    to_path: toPath,
+                    autorename: true
+                });
+            } catch (err) {
+                throw new Errors.MoveEntriesError(Errors.MoveEntriesError.serverError(err));
+            }
+        } else if (entries.length > 1) {
+            let relocationPaths = entries.map(entry => ({
+                from_path: entry.path_lower,
+                to_path: destination.path_lower + "/" + entry.name
+            }));
+
+            let { ".tag": result, async_job_id } = await this.Conn.filesMoveBatchV2({
+                entries: relocationPaths,
+                autorename: true
+            });
+
+            if (result === "complete") {
+                return Promise.resolve();
+            } else if (result === "async_job_id") {
+                while (true) {
+                    let { ".tag": result, failed } = await this.Conn.filesMoveBatchCheckV2({ async_job_id });
+                    console.log(result);
+                    if (result === "complete") {
+                        return Promise.resolve();
+                    } else if (result === "failed") {
+                        throw new Errors.MoveEntriesError(Errors.MoveEntriesError.serverError(failed));
+                    }
+                }
+            }
+        }
+    },
+
     async download(entry) {
         try {
             let { link } = await this.Conn.filesGetTemporaryLink({
@@ -180,27 +223,6 @@ export default {
                     console.log(entry.path_lower, newPath);
                     return newPath;
                 }()
-            }
-        });
-
-        let { async_job_id } = await this.Conn.filesMoveBatchV2({
-            entries: entriesPaths,
-            autorename: true
-        });
-
-        while (true) {
-            let { ".tag": tag } = await this.Conn.filesMoveBatchCheckV2({ async_job_id });
-            if (tag === "complete") {
-                return Promise.resolve();
-            }
-        }
-    },
-
-    async moveEntries(entries, dest) {
-        let entriesPaths = entries.map(entry => {
-            return {
-                from_path: entry.path_lower,
-                to_path: dest + "/" + entry.name
             }
         });
 

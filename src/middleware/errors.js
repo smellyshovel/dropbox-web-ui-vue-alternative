@@ -21,5 +21,20 @@ export default {
             return `Error processing your request on the server occurred.
                 Detailed explanation is in the console`;
         }
+    },
+
+    MoveEntriesError: class MoveEntriesError extends Error {
+        constructor(message) {
+            super(message);
+        }
+
+        static serverError(error) {
+            if (error) {
+                console.log(error);
+            }
+
+            return `Error processing your request on the server occurred.
+                Detailed explanation is in the console`;
+        }
     }
 }

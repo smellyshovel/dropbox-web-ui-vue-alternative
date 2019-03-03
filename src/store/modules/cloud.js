@@ -40,17 +40,8 @@ export default {
             await dispatch("updateEntries");
         },
 
-        async download({ commit }, entry) {
-            await API.download(entry);
-        },
-
-        async upload({ commit, dispatch }, payload) {
-            await API.uploadFiles(payload.files, payload.destination);
-            await dispatch("updateEntries");
-        },
-
-        async moveEntries({ commit, dispatch }, payload) {
-            await API.moveEntries(payload.entries, payload.destination);
+        async moveEntries({ commit, dispatch }, { entries, destination }) {
+            await API.moveEntries(entries, destination);
             await dispatch("updateEntries");
         },
 
@@ -67,7 +58,16 @@ export default {
         async deleteEntries({ commit, dispatch }, entriesPaths) {
             await API.deleteEntries(entriesPaths);
             await dispatch("updateEntries");
-        }
+        },
+
+        async download({ commit }, entry) {
+            await API.download(entry);
+        },
+
+        async upload({ commit, dispatch }, payload) {
+            await API.uploadFiles(payload.files, payload.destination);
+            await dispatch("updateEntries");
+        },
     },
 
     getters: {
