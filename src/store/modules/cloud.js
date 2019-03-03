@@ -40,22 +40,22 @@ export default {
             await dispatch("updateEntries");
         },
 
-        async moveEntries({ commit, dispatch }, { entries, destination }) {
+        async moveEntries({ dispatch }, { entries, destination }) {
             await API.moveEntries(entries, destination);
             await dispatch("updateEntries");
         },
 
-        async copyEntries({ commit, dispatch }, { entries, destination }) {
+        async copyEntries({ dispatch }, { entries, destination }) {
             await API.copyEntries(entries, destination);
             await dispatch("updateEntries");
         },
 
-        async renameEntry({ commit, dispatch }, { entry, name }) {
+        async renameEntry({ dispatch }, { entry, name }) {
             await API.renameEntry(entry, name);
             await dispatch("updateEntries");
         },
 
-        async deleteEntries({ commit, dispatch }, entries) {
+        async deleteEntries({ dispatch }, entries) {
             await API.deleteEntries(entries);
             await dispatch("updateEntries");
         },
