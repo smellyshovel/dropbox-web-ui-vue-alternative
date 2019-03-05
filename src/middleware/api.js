@@ -69,11 +69,11 @@ export default {
             });
         }
 
-        destination.children.forEach(child => {
-            if (child.name === name) {
+        destination.contents.forEach(existingEntry => {
+            if (existingEntry.name === name) {
                 throw new CustomError({
                     reason: "already_exists",
-                    details: child
+                    details: existingEntry
                 });
             }
         });
@@ -232,7 +232,14 @@ export default {
             });
         }
 
-        // TODO: check if alreadyExists somehow
+        entry.parent.contents.forEach(existingEntry => {
+            if (existingEntry.name === name) {
+                throw new CustomError({
+                    reason: "already_exists",
+                    details: existingEntry
+                });
+            }
+        });
 
         let fromPath = entry.path;
         let toPath = fromPath.split("/");

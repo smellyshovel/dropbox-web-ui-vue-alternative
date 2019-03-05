@@ -32,7 +32,7 @@ export const Messages = {
         },
 
         already_exists(entry) {
-            return `The ${ entry[".tag"] } named "${ entry.name }" already exists. Please, pick a different name`;
+            return `The ${ entry.type } named "${ entry.name }" already exists. Please, pick a different name`;
         },
 
         remote() {
@@ -70,7 +70,7 @@ export const Messages = {
         },
 
         already_exists(entry) {
-            return `The ${ entry[".tag"] } named "${ entry.name }" already exists. Please, pick a different name`;
+            return `The ${ entry.type } named "${ entry.name }" already exists. Please, pick a different name`;
         },
 
         remote() {
