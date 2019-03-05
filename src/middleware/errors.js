@@ -14,6 +14,12 @@ export const Messages = {
         }
     },
 
+    connect: {
+        remote() {
+            return `${ Messages._common.remote }. Couldn't connect to the cloud. ${ Messages._common.retry }`;
+        }
+    },
+
     updateEntries: {
         remote() {
             return `${ Messages._common.remote }. Couldn't get the files. ${ Messages._common.retry }`;

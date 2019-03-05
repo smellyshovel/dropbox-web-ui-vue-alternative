@@ -16,7 +16,11 @@ export default {
 
     actions: {
         async connect() {
-            await API.connect();
+            try {
+                await API.connect();
+            } catch (err) {
+                handleError("connect", err);
+            }
         },
 
         async updateEntries({ commit }) {

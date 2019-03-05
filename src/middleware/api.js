@@ -5,14 +5,14 @@ import * as Helpers from "./helpers.js";
 import { CustomError } from "@/middleware/errors.js";
 
 export default {
+    /*
+        Reasons to throw: remote
+    */
     connect() {
         this.Conn = new Dropbox({
             fetch: IsomorphicFetch,
             accessToken: AccessToken
         });
-
-        // can't use try/catch here 'cause the dumb Dropbox `return`s instead of `throw`ing
-        if (!this.Conn.accessToken) throw new Error("Couldn't connect to the Dropbox");
     },
 
     set Conn(v) {
