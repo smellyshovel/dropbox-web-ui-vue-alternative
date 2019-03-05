@@ -1,28 +1,45 @@
-export function modifyFilesList(filesList) {
-    filesList.unshift({
-        ".tag": "folder",
-        name: "/",
-        path_lower: "",
-        path_display: "",
-        link: "",
-        children: []
+import { Folder, File } from "./entry.js";
+
+export function handleEntries(rawEntries) {
+    let folders = [];
+    let entries = rawEntries.map(rawEntry => {
+        if (rawEntry[".tag"] === "folder") {
+            let folder = new Folder(rawEntry);
+
+            folders.push(folder);
+            return folder;
+        } else if (rawEntry[".tag"] === "file") {
+            return new File(rawEntry);
+        }
     });
 
-    filesList.forEach(entry => {
-        entry.link = entry.path_lower.substr(1);
+    let root = entries.shift();
+
+    entries.forEach(entry => {
+        let parentFolderPath = entry.path.split("/");
+        parentFolderPath.pop();
+        parentFolderPath = parentFolderPath.join("/");
+
+        let parentFolder = folders.find(folder => {
+            return folder.path === parentFolderPath;
+        });
+
+        entry.parent = parentFolder;
+        parentFolder.contents.push(entry);
     });
 
-    filesList.forEach(entry => {
-        if (isFolder(entry)) {
+    entries.unshift(root);
+
+    // temp
+    entries.forEach(entry => {
+        if (entry.type === "folder") {
             entry.thumbnail = require("@/assets/mimetypes/folder.png");
         } else {
             let ext = entry.name.split(".");
 
             if (ext.length > 1) {
                 try {
-                    entry.thumbnail = require(`@/assets/mimetypes/${
-                        ext[ext.length - 1]
-                    }.svg`);
+                    entry.thumbnail = require(`@/assets/mimetypes/${ ext[ext.length - 1] }.svg`);
                 } catch (err) {
                     entry.thumbnail = require("@/assets/mimetypes/unknown.svg");
                 }
@@ -32,43 +49,10 @@ export function modifyFilesList(filesList) {
         }
     });
 
-    return filesList;
-}
-
-export function buildTree(filesList) {
-    let folders = filesList.filter(entry => {
-        return isFolder(entry);
-    });
-
-    let tree = [filesList[0]];
-
-    filesList.forEach(entry => {
-        let path = entry.path_lower.split("/");
-
-        if (path.length === 2) {
-            tree[0].children.push(entry);
-        } else if (path.length > 2) {
-            path.pop();
-
-            let parentFolder = folders.find(folder => {
-                return folder.path_lower === path.join("/");
-            });
-
-            parentFolder.children = parentFolder.children || [];
-            parentFolder.children.push(entry);
-        }
-    });
-}
-
-export function isFolder(entry) {
-    return entry[".tag"] === "folder";
-}
-
-export function isFile(entry) {
-    return entry[".tag"] === "file";
+    return entries;
 }
 
 export function nameIsCorrect(name) {
-    // at least one character long and deny <, >, /, \, :, ?, *, ", |
-    return name.length && !/<|>|\/|\\|:|\?|\*|"|\|/g.test(name);
+    // at least one character long and prohibit <, >, /, \, :, ?, *, ", |
+    return name.length > 0 && !/<|>|\/|\\|:|\?|\*|"|\|/g.test(name);
 }

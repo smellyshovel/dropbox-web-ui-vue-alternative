@@ -20,8 +20,12 @@ export default {
         },
 
         async updateEntries({ commit }) {
-            let entries = await API.getEntries();
-            commit("SET_ENTRIES", entries);
+            try {
+                let entries = await API.getEntries();
+                commit("SET_ENTRIES", entries);
+            } catch (err) {
+                handleError("updateEntries", err);
+            }
         },
 
         async createFolder({ dispatch }, { name, destination }) {
@@ -85,20 +89,10 @@ export default {
     },
 
     getters: {
-        folderByLink: (state) => (link = "") => {
+        folderByLink: (state) => (link) => {
             return state.entries.find(entry => {
-                return API.Helpers.isFolder(entry) && entry.link === link;
+                return entry.link === link;
             });
-        },
-
-        entryByNameInFolder: (state) => (name, folder) => {
-            if (folder.children) {
-                return folder.children.find(child => {
-                    return child.name === name;
-                });
-            }
-
-            return null;
         }
     }
 };

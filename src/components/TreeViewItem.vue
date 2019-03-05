@@ -23,8 +23,6 @@
 </template>
 
 <script>
-import { isFolder, isFile } from "@/middleware/helpers.js";
-
 export default {
     components: {
         TreeView: () => import("./TreeView.vue")
@@ -59,7 +57,7 @@ export default {
 
     computed: {
         subTree() {
-            return this.entry.children;
+            return this.entry.contents;
         },
 
         hasSubTree() {
@@ -69,10 +67,10 @@ export default {
                         return true;
                         break;
                     case "folders":
-                        return isFolder(child);
+                        return child.type === "folder";
                         break;
                     case "files":
-                        return isFile(child);
+                        return child.type === "file";
                         break;
                 }
             });

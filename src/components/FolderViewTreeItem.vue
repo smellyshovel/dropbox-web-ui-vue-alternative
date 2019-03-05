@@ -20,7 +20,7 @@
                 <option
                     v-for="folder in allFolders"
                     :value="folder"
-                >{{ folder.path_display }}</option>
+                >{{ folder.path }}</option>
             </select>
         </div>
 
@@ -37,7 +37,7 @@
                 <option
                     v-for="folder in allFolders"
                     :value="folder"
-                >{{ folder.path_display }}</option>
+                >{{ folder.path }}</option>
             </select>
         </div>
 
@@ -67,8 +67,6 @@
 </template>
 
 <script>
-import { isFile, isFolder } from "@/middleware/helpers.js";
-
 export default {
     props: {
         item: Object
@@ -81,7 +79,7 @@ export default {
 
         allFolders() {
             return this.$store.state.cloud.entries.filter(entry => {
-                return isFolder(entry);
+                return entry.type === "folder";
             });
         },
     },
@@ -103,9 +101,9 @@ export default {
 
     methods: {
         mainAction() {
-            if (isFolder(this.entry)) {
+            if (this.entry.type === "folder") {
                 this.$router.push({ name: "fm", params: { folderLink: this.entry.link } })
-            } else if (isFile(this.entry)) {
+            } else if (this.entry.type === "file") {
                 this.$store.dispatch("cloud/download", this.entry);
             }
         },

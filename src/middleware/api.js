@@ -23,24 +23,39 @@ export default {
         return this._connection;
     },
 
+    /*
+        Reasons to throw: remote
+    */
     async getEntries() {
         try {
-            var { entries } = await this.Conn.filesListFolder({
+            let lastAns = await this.Conn.filesListFolder({
                 path: "",
                 recursive: true
             });
 
-            let filesList = this.Helpers.modifyFilesList(entries);
-            this.Helpers.buildTree(filesList);
-            return filesList;
-        } catch (err) {
-            // the error comming from the API request is not an instance of Error
-            if (err instanceof Error) {
-                throw new Error("There was an error modifying the files list");
-            } else {
-                throw new Error("Couldn't get the files list");
+            var entries = lastAns.entries;
+
+            while (lastAns.has_more) {
+                lastAns = await this.Conn.filesListFolderContinue({ cursor: lastAns.cursor });
+                entries = entries.concat(lastAns.entries);
             }
+        } catch (err) {
+            throw new CustomError({
+                reason: "remote",
+                details: err
+            });
         }
+
+        // pretend that Dropbox has also returned the root folder (as it actually doesn't do)
+        entries.unshift({
+            ".tag": "folder",
+            id: "id:root",
+            name: "/",
+            path_display: "",
+            path_lower: ""
+        });
+
+        return this.Helpers.handleEntries(entries);
     },
 
     /*
@@ -63,7 +78,7 @@ export default {
             }
         });
 
-        let desiredPath = destination.path_lower + "/" + name;
+        let desiredPath = destination.path + "/" + name;
 
         try {
             await this.Conn.filesCreateFolderV2({
@@ -83,8 +98,8 @@ export default {
     */
     async moveEntries(entries, destination) {
         if (entries.length === 1) {
-            let fromPath = entries[0].path_lower;
-            let toPath = destination.path_lower + "/" + entries[0].name;
+            let fromPath = entries[0].path;
+            let toPath = destination.path + "/" + entries[0].name;
 
             try {
                 await this.Conn.filesMoveV2({
@@ -100,8 +115,8 @@ export default {
             }
         } else if (entries.length > 1) {
             let relocationPaths = entries.map(entry => ({
-                from_path: entry.path_lower,
-                to_path: destination.path_lower + "/" + entry.name
+                from_path: entry.path,
+                to_path: destination.path + "/" + entry.name
             }));
 
             let { ".tag": result, entries: resEntries, async_job_id } = await this.Conn.filesMoveBatchV2({
@@ -148,8 +163,8 @@ export default {
         // TODO: check for available space here!
 
         if (entries.length === 1) {
-            let fromPath = entries[0].path_lower;
-            let toPath = destination.path_lower + "/" + entries[0].name;
+            let fromPath = entries[0].path;
+            let toPath = destination.path + "/" + entries[0].name;
 
             try {
                 await this.Conn.filesCopyV2({
@@ -165,8 +180,8 @@ export default {
             }
         } else if (entries.length > 1) {
             let relocationPaths = entries.map(entry => ({
-                from_path: entry.path_lower,
-                to_path: destination.path_lower + "/" + entry.name
+                from_path: entry.path,
+                to_path: destination.path + "/" + entry.name
             }));
 
             let { ".tag": result, entries: resEntries, async_job_id } = await this.Conn.filesCopyBatchV2({
@@ -219,7 +234,7 @@ export default {
 
         // TODO: check if alreadyExists somehow
 
-        let fromPath = entry.path_lower;
+        let fromPath = entry.path;
         let toPath = fromPath.split("/");
         toPath.pop();
         toPath.push(name);
@@ -228,7 +243,7 @@ export default {
         try {
             await this.Conn.filesMoveV2({
                 from_path: fromPath,
-                topath: toPath,
+                to_path: toPath,
                 autorename: true
             });
         } catch (err) {
@@ -244,7 +259,7 @@ export default {
     */
     async deleteEntries(entries) {
         if (entries.length === 1) {
-            let path = entries[0].path_lower;
+            let path = entries[0].path;
 
             try {
                 await this.Conn.filesDeleteV2({ path });
@@ -256,7 +271,7 @@ export default {
             }
         } else if (entries.length > 1) {
             let paths = entries.map(entry => ({
-                path: entry.path_lower,
+                path: entry.path,
             }));
 
             let { ".tag": result, entries: resEntries, async_job_id } = await this.Conn.filesDeleteBatch({ entries: paths });
@@ -296,7 +311,7 @@ export default {
     async download(entry) {
         try {
             let { link } = await this.Conn.filesGetTemporaryLink({
-                path: entry.path_lower
+                path: entry.path
             });
 
             let downloadButton = document.createElement("a");

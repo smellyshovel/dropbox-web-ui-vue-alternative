@@ -20,7 +20,6 @@
 
 <script>
 import TreeViewItem from "@/components/TreeViewItem.vue";
-import { isFolder, isFile } from "@/middleware/helpers.js";
 
 export default {
     components: {
@@ -74,10 +73,10 @@ export default {
                         return true;
                         break;
                     case "folders":
-                        return isFolder(entry);
+                        return entry.type === "folder";
                         break;
                     case "files":
-                        return isFile(entry);
+                        return entry.type === "file";
                         break;
                 }
             });

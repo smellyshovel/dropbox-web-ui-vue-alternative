@@ -62,7 +62,7 @@ export default {
 
     computed: {
         folder() {
-            let folder = this.folderByLink(this.$route.params.folderLink);
+            let folder = this.folderByLink(this.$route.params.folderLink || "");
             if (!folder) this.$router.replace({ name: "fm" });
             return folder;
         },
@@ -72,7 +72,7 @@ export default {
         ]),
 
         tree() {
-            return this.folder.children || [];
+            return this.folder.contents;
         }
     },
 
@@ -88,7 +88,7 @@ export default {
         async upload(event) {
             await this.$store.dispatch("cloud/upload", {
                 files: event.target.files,
-                destination: this.folder.path_lower
+                destination: this.folder.path
             });
         },
 

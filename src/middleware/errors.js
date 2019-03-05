@@ -14,6 +14,12 @@ export const Messages = {
         }
     },
 
+    updateEntries: {
+        remote() {
+            return `${ Messages._common.remote }. Couldn't get the files. ${ Messages._common.retry }`;
+        }
+    },
+
     createFolder: {
         bad_name(name) {
             return `A folder name must be at least 1 character long and must not include any of the following characters: <, >, /, \\, :, ?, *, ", |`;

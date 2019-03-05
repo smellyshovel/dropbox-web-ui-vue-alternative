@@ -1,7 +1,7 @@
 <template>
 <div class="error">
     <h1>A Fatal Error:</h1>
-    <p>{{ error.message }}</p>
+    <p v-html="error.message"></p>
 </div>
 </template>
 
