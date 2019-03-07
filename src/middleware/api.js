@@ -26,6 +26,28 @@ export default {
     /*
         Reasons to throw: remote
     */
+    async getAccountInfo() {
+        try {
+            var spaceUsage = await this.Conn.usersGetSpaceUsage();
+        } catch (err) {
+            throw new CustomError({
+                reason: "remote",
+                details: err
+            });
+        }
+
+        return {
+            spaceUsage: {
+                total: spaceUsage.allocation.allocated,
+                occupied: spaceUsage.used,
+                free: spaceUsage.allocation.allocated - spaceUsage.used
+            }
+        }
+    },
+
+    /*
+        Reasons to throw: remote
+    */
     async getEntries() {
         try {
             let lastAns = await this.Conn.filesListFolder({
@@ -334,8 +356,8 @@ export default {
         }
     },
 
-    async uploadFiles(files, dest) {
-        const STRAIGHT_UPLOAD_FILE_SIZE_LIMIT = 150 * 1024 * 1024;
+    async uploadEntries(files, dest) {
+        const DIRECT_UPLOAD_FILE_SIZE_LIMIT = 150 * 1024 * 1024;
         const SESSION_UPLOAD_MAX_CHUNK_SIZE = 8 * 1024 * 1024;
         const UPLOADS = [];
 
@@ -343,7 +365,7 @@ export default {
             let file = files.item(i),
                 desiredPath = dest + "/" + (file.webkitRelativePath || file.name);
 
-            if (file.size < STRAIGHT_UPLOAD_FILE_SIZE_LIMIT) {
+            if (file.size < DIRECT_UPLOAD_FILE_SIZE_LIMIT) {
                 UPLOADS.push(this.Conn.filesUpload({
                     path: desiredPath,
                     autorename: true,

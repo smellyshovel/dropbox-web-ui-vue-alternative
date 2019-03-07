@@ -20,6 +20,12 @@ export const Messages = {
         }
     },
 
+    updateAccountInfo: {
+        remote() {
+            return `${ Messages._common.remote }. Couldn't get the account information. ${ Messages._common.retry }`;
+        }
+    },
+
     updateEntries: {
         remote() {
             return `${ Messages._common.remote }. Couldn't get the files. ${ Messages._common.retry }`;

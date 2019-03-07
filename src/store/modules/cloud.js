@@ -5,10 +5,15 @@ export default {
     namespaced: true,
 
     state: {
+        accountInfo: null,
         entries: []
     },
 
     mutations: {
+        SET_ACCOUNT_INFO(state, accountInfo) {
+            state.accountInfo = accountInfo;
+        },
+
         SET_ENTRIES(state, entries) {
             state.entries = entries;
         }
@@ -20,6 +25,15 @@ export default {
                 await API.connect();
             } catch (err) {
                 handleError("connect", err);
+            }
+        },
+
+        async updateAccountInfo({ commit }) {
+            try {
+                let accountInfo = await API.getAccountInfo();
+                commit("SET_ACCOUNT_INFO", accountInfo);
+            } catch (err) {
+                handleError("updateAccountInfo", err);
             }
         },
 
@@ -86,10 +100,10 @@ export default {
             await API.download(entry);
         },
 
-        async upload({ commit, dispatch }, payload) {
-            await API.uploadFiles(payload.files, payload.destination);
+        async uploadEntries({ commit, dispatch }, { files, destination }) {
+            await API.uploadEntries(files, destination);
             await dispatch("updateEntries");
-        },
+        }
     },
 
     getters: {

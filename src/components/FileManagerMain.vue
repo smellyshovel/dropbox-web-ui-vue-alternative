@@ -86,7 +86,7 @@ export default {
 
     methods: {
         async upload(event) {
-            await this.$store.dispatch("cloud/upload", {
+            await this.$store.dispatch("cloud/uploadEntries", {
                 files: event.target.files,
                 destination: this.folder.path
             });

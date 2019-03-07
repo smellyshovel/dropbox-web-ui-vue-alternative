@@ -40,6 +40,9 @@ export default {
             this.loading = "Connecting to the cloud...";
             await this.$store.dispatch("cloud/connect");
 
+            this.loading = "Retrieving the account information...";
+            await this.$store.dispatch("cloud/updateAccountInfo");
+
             this.loading = "Updating the files list...";
             await this.$store.dispatch("cloud/updateEntries");
         } catch (err) {
