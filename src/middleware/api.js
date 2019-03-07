@@ -203,7 +203,8 @@ export default {
     /*
         Reasons to throw: not_enough_space, remote_sole, remote_several
     */
-    async copyEntries(entries, destination, spaceUsage) {
+    async copyEntries(entries, destination, conflictResolver, spaceUsage) {
+        // validations
         let entriesSize = entries.reduce((acc, curr) => {
             return acc + curr.size;
         }, 0);
@@ -213,6 +214,27 @@ export default {
                 reason: "not_enough_space",
                 details: spaceUsage.free
             });
+        }
+
+        // checking for naming conflicts
+        let conflicts = entries.map(entry => {
+            return {
+                source: entry,
+                target: destination.contents.find(destinationEntry => destinationEntry.name === entry.name)
+            }
+        }).filter(item => item.target);
+
+        for (let i = 0; i < conflicts.length; i++) {
+            let { strategy, sameForTheRest } = await conflictResolver(conflicts[i], conflicts.length);
+
+            if (sameForTheRest) {
+                conflictResolver = { strategy, sameForTheRest: false };
+            }
+
+            if (strategy === "skip") {
+                let indexOfEntryToSkip = entries.indexOf(conflicts[i].source);
+                entries.splice(indexOfEntryToSkip, 1);
+            } // no need to do anything in case of "autorename" because it would be handled automatically by Dropbox (see `autorename: true` below)
         }
 
         if (entries.length === 1) {

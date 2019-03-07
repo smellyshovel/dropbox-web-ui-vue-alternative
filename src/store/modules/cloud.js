@@ -66,9 +66,9 @@ export default {
             }
         },
 
-        async copyEntries({ state, dispatch }, { entries, destination }) {
+        async copyEntries({ state, dispatch }, { entries, destination, conflictResolver }) {
             try {
-                await API.copyEntries(entries, destination, state.accountInfo.spaceUsage);
+                await API.copyEntries(entries, destination, conflictResolver, state.accountInfo.spaceUsage);
             } catch (err) {
                 handleError("copyEntries", err);
             } finally {

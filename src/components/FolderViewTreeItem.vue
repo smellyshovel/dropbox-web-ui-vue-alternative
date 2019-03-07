@@ -45,6 +45,23 @@
         <div v-if="copyDialogOpened">
             Copying...
             <div
+                v-if="copyConflict"
+                class="conflict"
+            >
+                {{ copyConflict.conflict.target.type }} called "{{ copyConflict.conflict.target.name }}" already exists. What to do?
+                <form @submit.prevent="copyConflictResolver({ strategy: copyConflictResolutionStrategy, sameForTheRest: copyConflictResolutionStrategySameForTheRest || false });">
+                    <input type="radio" value="autorename" v-model="copyConflictResolutionStrategy"> Autorename
+                    <br>
+                    <input type="radio" value="skip" v-model="copyConflictResolutionStrategy"> Skip moving this {{ copyConflict.conflict.source.type }}
+                    <br>
+                    <div v-if="copyConflict.totalNumberOfConflicts > 1">
+                        <input v-if="" type="checkbox" :value="true" v-model="copyConflictResolutionStrategySameForTheRest"> Apply for the rest {{ copyConflict.totalNumberOfConflicts }} conflicts
+                        <br>
+                    </div>
+                    <input type="submit">
+                </form>
+            </div>
+            <div
                 v-if="copyEntriesError"
                 class="error"
                 v-html="copyEntriesError.message"
@@ -111,6 +128,10 @@ export default {
             moveDest: null,
             moveEntriesError: null,
             copyDialogOpened: false,
+            copyConflict: null,
+            copyConflictResolver: null,
+            copyConflictResolutionStrategy: null,
+            copyConflictResolutionStrategySameForTheRest: null,
             copyDest: null,
             copyEntriesError: null,
             renameDialogOpened: false,
@@ -138,8 +159,6 @@ export default {
                 conflict,
                 totalNumberOfConflicts
             };
-
-            console.log(this.moveConflict);
 
             return new Promise((resolve, reject) => {
                 this.moveConflictResolver = resolve;
@@ -171,11 +190,30 @@ export default {
             this.copyDialogOpened = !this.copyDialogOpened;
         },
 
+        async resolveCopyConflict(conflict, totalNumberOfConflicts) {
+            this.copyConflict = {
+                conflict,
+                totalNumberOfConflicts
+            };
+
+            return new Promise((resolve, reject) => {
+                this.copyConflictResolver = resolve;
+            })
+                .then((res) => {
+                    this.copyConflict = null;
+                    this.copyConflictResolver = null;
+                    this.copyConflictResolutionStrategy = null;
+                    this.copyConflictResolutionStrategySameForTheRest = null;
+                    return res;
+                });
+        },
+
         async copyEntry() {
             try {
                 await this.$store.dispatch("cloud/copyEntries", {
                     entries: [this.entry],
-                    destination: this.copyDest
+                    destination: this.copyDest,
+                    conflictResolver: this.resolveCopyConflict
                 })
 
                 this.copyEntriesError = null;
@@ -225,5 +263,10 @@ img {
 
 .error {
     color: red;
+}
+
+.conflict {
+    background-color: rgb(159, 23, 68);
+    color: white;
 }
 </style>
