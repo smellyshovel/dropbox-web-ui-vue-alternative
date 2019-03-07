@@ -24,7 +24,7 @@
                         <input v-if="" type="checkbox" :value="true" v-model="moveConflictResolutionStrategySameForTheRest"> Apply for the rest {{ moveConflict.totalNumberOfConflicts }} conflicts
                         <br>
                     </div>
-                    <input type="submit">
+                    <input type="submit"> <input type="button" value="Cancel" @click="moveConflictResolver({ strategy: 'cancel' })">
                 </form>
             </div>
             <div
@@ -58,7 +58,7 @@
                         <input v-if="" type="checkbox" :value="true" v-model="copyConflictResolutionStrategySameForTheRest"> Apply for the rest {{ copyConflict.totalNumberOfConflicts }} conflicts
                         <br>
                     </div>
-                    <input type="submit">
+                    <input type="submit"> <input type="button" value="Cancel" @click="copyConflictResolver({ strategy: 'cancel' })">
                 </form>
             </div>
             <div

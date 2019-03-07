@@ -131,6 +131,10 @@ export default {
         for (let i = 0; i < conflicts.length; i++) {
             let { strategy, sameForTheRest } = await conflictResolver(conflicts[i], conflicts.length);
 
+            if (strategy === "cancel") {
+                return;
+            }
+
             if (sameForTheRest) {
                 conflictResolver = { strategy, sameForTheRest: false };
             }
@@ -226,6 +230,10 @@ export default {
 
         for (let i = 0; i < conflicts.length; i++) {
             let { strategy, sameForTheRest } = await conflictResolver(conflicts[i], conflicts.length);
+
+            if (strategy === "cancel") {
+                return;
+            }
 
             if (sameForTheRest) {
                 conflictResolver = { strategy, sameForTheRest: false };
