@@ -181,8 +181,17 @@ export default {
     /*
         Reasons to throw: not_enough_space, remote_sole, remote_several
     */
-    async copyEntries(entries, destination) {
-        // TODO: check for available space here!
+    async copyEntries(entries, destination, spaceUsage) {
+        let entriesSize = entries.reduce((acc, curr) => {
+            return acc + curr.size;
+        }, 0);
+
+        if (entriesSize > spaceUsage.free) {
+            throw new CustomError({
+                reason: "not_enough_space",
+                details: spaceUsage.free
+            });
+        }
 
         if (entries.length === 1) {
             let fromPath = entries[0].path;
