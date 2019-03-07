@@ -117,8 +117,30 @@ export default {
 
     /*
         Reasons to throw: remote_sole, remote_several
+        Conflict resolving strategies: autorename, skip
     */
-    async moveEntries(entries, destination) {
+    async moveEntries(entries, destination, conflictResolver) {
+        // checking for naming conflicts
+        let conflicts = entries.map(entry => {
+            return {
+                source: entry,
+                target: destination.contents.find(destinationEntry => destinationEntry.name === entry.name)
+            }
+        }).filter(item => item.target);
+
+        for (let i = 0; i < conflicts.length; i++) {
+            let { strategy, sameForTheRest } = await conflictResolver(conflicts[i], conflicts.length);
+
+            if (sameForTheRest) {
+                conflictResolver = { strategy, sameForTheRest: false };
+            }
+
+            if (strategy === "skip") {
+                let indexOfEntryToSkip = entries.indexOf(conflicts[i].source);
+                entries.splice(indexOfEntryToSkip, 1);
+            } // no need to do anything in case of "autorename" because it would be handled automatically by Dropbox (see `autorename: true` below)
+        }
+
         if (entries.length === 1) {
             let fromPath = entries[0].path;
             let toPath = destination.path + "/" + entries[0].name;

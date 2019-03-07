@@ -56,9 +56,9 @@ export default {
             }
         },
 
-        async moveEntries({ dispatch }, { entries, destination }) {
+        async moveEntries({ dispatch }, { entries, destination, conflictResolver }) {
             try {
-                await API.moveEntries(entries, destination);
+                await API.moveEntries(entries, destination, conflictResolver);
             } catch (err) {
                 handleError("moveEntries", err);
             } finally {

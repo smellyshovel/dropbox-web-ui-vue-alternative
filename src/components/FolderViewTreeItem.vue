@@ -4,12 +4,29 @@
         @dblclick="mainAction()"
     >
         <img :src="entry.thumbnail">
-        {{ entry.name }}
+        {{ entry.name }} [{{ entry.size }}]
     </div>
     <div>
         <button @click="toggleMoveDialog">Move</button>
         <div v-if="moveDialogOpened">
             Moving...
+            <div
+                v-if="moveConflict"
+                class="conflict"
+            >
+                {{ moveConflict.conflict.target.type }} called "{{ moveConflict.conflict.target.name }}" already exists. What to do?
+                <form @submit.prevent="moveConflictResolver({ strategy: moveConflictResolutionStrategy, sameForTheRest: moveConflictResolutionStrategySameForTheRest || false });">
+                    <input type="radio" value="autorename" v-model="moveConflictResolutionStrategy"> Autorename
+                    <br>
+                    <input type="radio" value="skip" v-model="moveConflictResolutionStrategy"> Skip moving this {{ moveConflict.conflict.source.type }}
+                    <br>
+                    <div v-if="moveConflict.totalNumberOfConflicts > 1">
+                        <input v-if="" type="checkbox" :value="true" v-model="moveConflictResolutionStrategySameForTheRest"> Apply for the rest {{ moveConflict.totalNumberOfConflicts }} conflicts
+                        <br>
+                    </div>
+                    <input type="submit">
+                </form>
+            </div>
             <div
                 v-if="moveEntriesError"
                 class="error"
@@ -87,6 +104,10 @@ export default {
     data() {
         return {
             moveDialogOpened: false,
+            moveConflict: null,
+            moveConflictResolver: null,
+            moveConflictResolutionStrategy: null,
+            moveConflictResolutionStrategySameForTheRest: null,
             moveDest: null,
             moveEntriesError: null,
             copyDialogOpened: false,
@@ -112,11 +133,32 @@ export default {
             this.moveDialogOpened = !this.moveDialogOpened;
         },
 
+        async resolveMoveConflict(conflict, totalNumberOfConflicts) {
+            this.moveConflict = {
+                conflict,
+                totalNumberOfConflicts
+            };
+
+            console.log(this.moveConflict);
+
+            return new Promise((resolve, reject) => {
+                this.moveConflictResolver = resolve;
+            })
+                .then((res) => {
+                    this.moveConflict = null;
+                    this.moveConflictResolver = null;
+                    this.moveConflictResolutionStrategy = null;
+                    this.moveConflictResolutionStrategySameForTheRest = null;
+                    return res;
+                });
+        },
+
         async moveEntry() {
             try {
                 await this.$store.dispatch("cloud/moveEntries", {
                     entries: [this.entry],
-                    destination: this.moveDest
+                    destination: this.moveDest,
+                    conflictResolver: this.resolveMoveConflict
                 })
 
                 this.moveEntriesError = null;
