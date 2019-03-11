@@ -285,7 +285,7 @@ export default {
                 let keepFetching = true;
 
                 while (keepFetching) {
-                    let res = { ".tag": result, entries: resEntries } = await this.Conn.filesCopyBatchCheckV2({ async_job_id });
+                    let res = { ".tag": result, entries: resEntries } = await this.Conn.filesCopyBatchCheckV2({ async_job_id }); // TODO: do I really need res here?
 
                     if (result === "complete") {
                         keepFetching = false;
@@ -398,21 +398,55 @@ export default {
         }
     },
 
-    async download(entry) {
-        try {
-            let { link } = await this.Conn.filesGetTemporaryLink({
-                path: entry.path
+    async downloadEntries(entries, asZip) {
+        if (asZip) {
+            const TEMP_FOLDER_PATH = "/__temp__downloading__";
+
+            let { metadata: folder } = await this.Conn.filesCreateFolderV2({
+                path: TEMP_FOLDER_PATH,
+                autorename: true
             });
 
-            let downloadButton = document.createElement("a");
-            downloadButton.setAttribute("href", link);
-            downloadButton.click();
-        } catch (err) {
-            // the error comming from the API request is not an instance of Error
-            if (err instanceof Error) {
-                throw new Error("There was an error processing your download");
-            } else {
-                throw new Error("Couldn't download the file");
+            let relocationPaths = entries.map(entry => ({
+                from_path: entry.path,
+                to_path: folder.path_lower + "/" + entry.name
+            }));
+
+            let { ".tag": result, async_job_id } = await this.Conn.filesCopyBatchV2({
+                entries: relocationPaths,
+                autorename: true
+            });
+
+            let startDownloading = async () => {
+                let { fileBlob } = await this.Conn.filesDownloadZip({ path: folder.path_lower });
+
+                var a = document.createElement("a");
+                a.style.display = "none";
+                document.body.appendChild(a);
+
+                let url = window.URL.createObjectURL(fileBlob);
+                a.href = url;
+                a.download = "DOWNLOAD.zip";
+                a.click();
+                window.URL.revokeObjectURL(url);
+
+                await this.Conn.filesDeleteV2({ path: folder.path_lower });
+            }
+
+            if (result === "complete") { // ended syncronously
+                startDownloading();
+            } else if (result === "async_job_id") { // ended asyncronously
+                let keepFetching = true;
+
+                while (keepFetching) {
+                    let { ".tag": result } = await this.Conn.filesMoveBatchCheckV2({ async_job_id });
+
+                    if (result === "complete") {
+                        keepFetching = false;
+
+                        startDownloading();
+                    }
+                }
             }
         }
     },

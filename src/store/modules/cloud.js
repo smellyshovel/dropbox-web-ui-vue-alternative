@@ -96,8 +96,12 @@ export default {
             }
         },
 
-        async download({ commit }, entry) {
-            await API.download(entry);
+        async downloadEntries({ dispatch }, { entries, asZip }) {
+            try {
+                await API.downloadEntries(entries, asZip);
+            } catch (err) {
+                handleError("downloadEntries", err);
+            }
         },
 
         async uploadEntries({ commit, dispatch }, { files, destination }) {

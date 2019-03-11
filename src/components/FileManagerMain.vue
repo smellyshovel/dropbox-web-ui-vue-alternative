@@ -1,5 +1,27 @@
 <template>
 <main>
+    <button @click="toggleDownloadDialog">Download entries</button>
+    <div v-if="downloadDialogOpened">
+        <div
+            v-if="downloadError"
+            class="error"
+            v-html="downloadError.message"
+        />
+        <form @submit.prevent="downloadEntries">
+            <select
+                multiple
+                v-model="downloadEntriesChosen"
+            >
+                <option
+                    v-for="entry in folder.contents"
+                    :value="entry"
+                >{{ entry.path }}</option>
+            </select>
+            <input type="checkbox" v-model="downloadAsZip" id="download-zip"> <label for="download-zip">As zip</label>
+            <input type="submit">
+        </form>
+    </div>
+
     <folder-path :path="folder.link" />
 
     <label for="upload-files">Upload Files</label>
@@ -80,11 +102,26 @@ export default {
         return {
             createFolderDialogOpened: false,
             folderToCreateName: "",
-            createFolderError: null
+            createFolderError: null,
+            downloadDialogOpened: false,
+            downloadAsZip: false,
+            downloadError: null,
+            downloadEntriesChosen: []
         }
     },
 
     methods: {
+        async toggleDownloadDialog() {
+            this.downloadDialogOpened = !this.downloadDialogOpened;
+        },
+
+        async downloadEntries() {
+            await this.$store.dispatch("cloud/downloadEntries", {
+                entries: this.downloadEntriesChosen,
+                asZip: this.downloadAsZip
+            })
+        },
+
         async upload(event) {
             await this.$store.dispatch("cloud/uploadEntries", {
                 files: event.target.files,
