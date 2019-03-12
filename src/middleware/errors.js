@@ -106,6 +106,20 @@ export const Messages = {
         remote_zip() {
             return `${ Messages._common.remote }. The archive may not download. ${ Messages._common.retry }`;
         }
+    },
+
+    uploadEntries: {
+        not_enough_space(space) {
+            return `Not enough space. Available space is ${ space }. Nothing's uploaded`;
+        },
+
+        remote_sole() {
+            return `${ Messages._common.remote }. The entry may not upload. ${ Messages._common.retry }`;
+        },
+
+        remote_several() {
+            return `${ Messages._common.remote }. Some entries probably won't upload. ${ Messages._common.retry }`;
+        }
     }
 }
 

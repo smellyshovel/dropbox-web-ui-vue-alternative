@@ -472,19 +472,65 @@ export default {
         }
     },
 
-    async uploadEntries(files, dest) {
-        const DIRECT_UPLOAD_FILE_SIZE_LIMIT = 150 * 1024 * 1024;
-        const SESSION_UPLOAD_MAX_CHUNK_SIZE = 8 * 1024 * 1024;
+    /*
+        Reasons to throw: not_enough_space, remote_sole, remote_several
+    */
+    async uploadEntries(originalFiles, destination, conflictResolver, spaceUsage) {
+        let files = [];
+        for (let i = 0; i < originalFiles.length; i++) {
+            files.push(originalFiles.item(i));
+        }
+
+        // validations
+        let filesSize = Array.from(files).reduce((acc, curr) => {
+            return acc + curr.size;
+        }, 0);
+
+        if (filesSize > spaceUsage.free) {
+            throw new CustomError({
+                reason: "not_enough_space",
+                details: spaceUsage.free
+            });
+        }
+
+        // checking for naming conflicts
+        let conflicts = Array.from(files).map(file => {
+            return {
+                source: file,
+                target: destination.contents.find(destinationEntry => destinationEntry.name === file.name)
+            }
+        }).filter(item => item.target);
+
+        for (let i = 0; i < conflicts.length; i++) {
+            let { strategy, sameForTheRest } = await conflictResolver(conflicts[i], conflicts.length);
+
+            if (strategy === "cancel") {
+                return;
+            }
+
+            if (sameForTheRest) {
+                conflictResolver = () => ({ strategy, sameForTheRest: false });
+            }
+
+            if (strategy === "skip") {
+                let indexOfEntryToSkip = files.indexOf(conflicts[i].source);
+                files.splice(indexOfEntryToSkip, 1);
+            } // no need to do anything in case of "autorename" because it would be handled automatically by Dropbox (see `autorename: true` below)
+        }
+
+        const DIRECT_UPLOAD_FILE_SIZE_LIMIT = 150 * 1024 * 1024; // 150MB
+        const SESSION_UPLOAD_MAX_CHUNK_SIZE = 8 * 1024 * 1024; // 8MB
         const UPLOADS = [];
 
-        for (let i = 0; i < files.length; i++) {
-            let file = files.item(i),
-                desiredPath = dest + "/" + (file.webkitRelativePath || file.name);
+        files.forEach(file => {
+            let desiredPath = destination.path + "/" + (file.webkitRelativePath || file.name);
 
             if (file.size < DIRECT_UPLOAD_FILE_SIZE_LIMIT) {
                 UPLOADS.push(this.Conn.filesUpload({
                     path: desiredPath,
+                    mode: "add",
                     autorename: true,
+                    strict_conflict: true,
                     contents: file
                 }));
             } else {
@@ -524,8 +570,9 @@ export default {
 
                         var commit = {
                             path: desiredPath,
-                            mode: 'add',
+                            mode: "add",
                             autorename: true,
+                            strict_conflict: true,
                             mute: false
                         };
 
@@ -539,9 +586,16 @@ export default {
 
                 UPLOADS.push(task);
             }
-        }
+        });
 
-        return Promise.all(UPLOADS)
+        try {
+            await Promise.all(UPLOADS);
+        } catch (err) {
+            throw new CustomError({
+                reason: UPLOADS.length === 1 ? "remote_sole" : "remote_several",
+                details: err
+            });
+        }
     },
 
     Helpers

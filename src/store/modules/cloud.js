@@ -104,9 +104,14 @@ export default {
             }
         },
 
-        async uploadEntries({ commit, dispatch }, { files, destination }) {
-            await API.uploadEntries(files, destination);
-            await dispatch("updateEntries");
+        async uploadEntries({ state, dispatch }, { files, destination, conflictResolver}) {
+            try {
+                await API.uploadEntries(files, destination, conflictResolver, state.accountInfo.spaceUsage);
+            } catch (err) {
+                handleError("uploadEntries", err);
+            } finally {
+                dispatch("updateEntries");
+            }
         }
     },
 

@@ -24,6 +24,26 @@
 
     <folder-path :path="folder.link" />
 
+    <div class="error" v-if="uploadError" v-html="uploadError.message" />
+
+    <div
+        v-if="uploadConflict"
+        class="conflict"
+    >
+        {{ uploadConflict.conflict.target.type }} called "{{ uploadConflict.conflict.target.name }}" already exists. What to do?
+        <form @submit.prevent="uploadConflictResolver({ strategy: uploadConflictResolutionStrategy, sameForTheRest: uploadConflictResolutionStrategySameForTheRest || false });">
+            <input type="radio" value="autorename" v-model="uploadConflictResolutionStrategy"> Autorename
+            <br>
+            <input type="radio" value="skip" v-model="uploadConflictResolutionStrategy"> Skip this entry
+            <br>
+            <div v-if="uploadConflict.totalNumberOfConflicts > 1">
+                <input v-if="" type="checkbox" :value="true" v-model="uploadConflictResolutionStrategySameForTheRest"> Apply for the rest {{ uploadConflict.totalNumberOfConflicts }} conflicts
+                <br>
+            </div>
+            <input type="submit"> <input type="button" value="Cancel" @click="uploadConflictResolver({ strategy: 'cancel' })">
+        </form>
+    </div>
+
     <label for="upload-files">Upload Files</label>
     <input
         id="upload-files"
@@ -106,7 +126,12 @@ export default {
             downloadDialogOpened: false,
             downloadAsZip: false,
             downloadError: null,
-            downloadEntriesChosen: []
+            downloadEntriesChosen: [],
+            uploadError: null,
+            uploadConflict: null,
+            uploadConflictResolver: null,
+            uploadConflictResolutionStrategy: null,
+            uploadConflictResolutionStrategySameForTheRest: null
         }
     },
 
@@ -126,11 +151,34 @@ export default {
             }
         },
 
+        async resolveUploadConflict(conflict, totalNumberOfConflicts) {
+            this.uploadConflict = {
+                conflict,
+                totalNumberOfConflicts
+            };
+
+            return new Promise((resolve, reject) => {
+                this.uploadConflictResolver = resolve;
+            })
+                .then((res) => {
+                    this.uploadConflict = null;
+                    this.uploadConflictResolver = null;
+                    this.uploadConflictResolutionStrategy = null;
+                    this.uploadConflictResolutionStrategySameForTheRest = null;
+                    return res;
+                });
+        },
+
         async upload(event) {
-            await this.$store.dispatch("cloud/uploadEntries", {
-                files: event.target.files,
-                destination: this.folder.path
-            });
+            try {
+                await this.$store.dispatch("cloud/uploadEntries", {
+                    files: event.target.files,
+                    destination: this.folder,
+                    conflictResolver: this.resolveUploadConflict
+                });
+            } catch (err) {
+                this.uploadError = err;
+            }
         },
 
         async update() {
