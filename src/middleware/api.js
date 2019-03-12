@@ -136,7 +136,7 @@ export default {
             }
 
             if (sameForTheRest) {
-                conflictResolver = { strategy, sameForTheRest: false };
+                conflictResolver = () => ({ strategy, sameForTheRest: false });
             }
 
             if (strategy === "skip") {
@@ -206,6 +206,7 @@ export default {
 
     /*
         Reasons to throw: not_enough_space, remote_sole, remote_several
+        Conflict resolving strategies: autorename, skip
     */
     async copyEntries(entries, destination, conflictResolver, spaceUsage) {
         // validations
@@ -236,7 +237,7 @@ export default {
             }
 
             if (sameForTheRest) {
-                conflictResolver = { strategy, sameForTheRest: false };
+                conflictResolver = () => ({ strategy, sameForTheRest: false });
             }
 
             if (strategy === "skip") {
@@ -474,6 +475,7 @@ export default {
 
     /*
         Reasons to throw: not_enough_space, remote_sole, remote_several
+        Conflict resolving strategies: autorename, skip
     */
     async uploadEntries(originalFiles, destination, conflictResolver, spaceUsage) {
         let files = [];
