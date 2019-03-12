@@ -116,10 +116,14 @@ export default {
         },
 
         async downloadEntries() {
-            await this.$store.dispatch("cloud/downloadEntries", {
-                entries: this.downloadEntriesChosen,
-                asZip: this.downloadAsZip
-            })
+            try {
+                await this.$store.dispatch("cloud/downloadEntries", {
+                    entries: this.downloadEntriesChosen,
+                    asZip: this.downloadAsZip
+                })
+            } catch (err) {
+                this.downloadError = err;
+            }
         },
 
         async upload(event) {

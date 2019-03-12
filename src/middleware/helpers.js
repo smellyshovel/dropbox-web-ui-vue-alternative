@@ -52,6 +52,28 @@ export function handleEntries(rawEntries) {
     return entries;
 }
 
+export function downloadBlob(blob, name) {
+    let invisibleLink = document.createElement("a");
+    invisibleLink.style.display = "none";
+    document.body.appendChild(invisibleLink);
+
+    let blobURL = window.URL.createObjectURL(blob);
+    invisibleLink.href = blobURL;
+    invisibleLink.download = name;
+    invisibleLink.click();
+
+    window.URL.revokeObjectURL(blobURL);
+    invisibleLink.remove();
+}
+
+export function extractContentsRecursively(entry) {
+    return entry.contents.map(e => {
+        if (e.type === "folder") {
+            return extractContentsRecursively(e);
+        } else return e;
+    }).reduce((acc, curr) => acc.concat(curr), []);
+}
+
 export function nameIsCorrect(name) {
     // at least one character long and prohibit <, >, /, \, :, ?, *, ", |
     return name.length > 0 && !/<|>|\/|\\|:|\?|\*|"|\|/g.test(name);

@@ -345,7 +345,7 @@ export default {
     },
 
     /*
-        Reasons to throw: remote_sole, remote_several
+        Reasons to throw: remote_sole, remote_several, remote_zip
     */
     async deleteEntries(entries) {
         if (entries.length === 1) {
@@ -400,10 +400,10 @@ export default {
 
     async downloadEntries(entries, asZip) {
         if (asZip) {
-            const TEMP_FOLDER_PATH = "/__temp__downloading__";
+            const TEMP_FOLDER_DESIRED_PATH = "/__temp__downloading__";
 
             let { metadata: folder } = await this.Conn.filesCreateFolderV2({
-                path: TEMP_FOLDER_PATH,
+                path: TEMP_FOLDER_DESIRED_PATH,
                 autorename: true
             });
 
@@ -417,24 +417,23 @@ export default {
                 autorename: true
             });
 
-            let startDownloading = async () => {
-                let { fileBlob } = await this.Conn.filesDownloadZip({ path: folder.path_lower });
+            const downloadZip = async () => {
+                try {
+                    var { fileBlob } = await this.Conn.filesDownloadZip({ pth: folder.path_lower });
+                } catch (err) {
+                    throw new CustomError({
+                        reason: "remote_zip",
+                        details: err
+                    });
+                } finally {
+                    await this.Conn.filesDeleteV2({ path: folder.path_lower });
+                }
 
-                var a = document.createElement("a");
-                a.style.display = "none";
-                document.body.appendChild(a);
-
-                let url = window.URL.createObjectURL(fileBlob);
-                a.href = url;
-                a.download = "DOWNLOAD.zip";
-                a.click();
-                window.URL.revokeObjectURL(url);
-
-                await this.Conn.filesDeleteV2({ path: folder.path_lower });
-            }
+                this.Helpers.downloadBlob(fileBlob, "DOWNLOAD.zip");
+            };
 
             if (result === "complete") { // ended syncronously
-                startDownloading();
+                await downloadZip();
             } else if (result === "async_job_id") { // ended asyncronously
                 let keepFetching = true;
 
@@ -444,10 +443,32 @@ export default {
                     if (result === "complete") {
                         keepFetching = false;
 
-                        startDownloading();
+                        await downloadZip();
                     }
                 }
             }
+
+
+        } else {
+            let filesToDownload = entries.map(entry => {
+                if (entry.type === "folder") {
+                    return this.Helpers.extractContentsRecursively(entry);
+                } else return entry;
+            }).reduce((acc, curr) => acc.concat(curr), []);
+
+
+            await Promise.all(filesToDownload.map(async file => {
+                try {
+                    var { fileBlob, name } = await this.Conn.filesDownload({ path: file.path });
+                } catch (err) {
+                    throw new CustomError({
+                        reason: filesToDownload.length === 1 ? "remote_sole" : "remote_several",
+                        details: err
+                    });
+                }
+
+                this.Helpers.downloadBlob(fileBlob, name);
+            }));
         }
     },
 

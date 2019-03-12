@@ -92,6 +92,20 @@ export const Messages = {
         remote_several() {
             return `${ Messages._common.remote }. Some entries may not have been deleted. ${ Messages._common.retry }`;
         }
+    },
+
+    downloadEntries: {
+        remote_sole() {
+            return `${ Messages._common.remote }. The entry may not download. ${ Messages._common.retry }`;
+        },
+
+        remote_several() {
+            return `${ Messages._common.remote }. Some entries probably won't download. ${ Messages._common.retry }`;
+        },
+
+        remote_zip() {
+            return `${ Messages._common.remote }. The archive may not download. ${ Messages._common.retry }`;
+        }
     }
 }
 
