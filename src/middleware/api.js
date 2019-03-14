@@ -8,15 +8,15 @@ export default {
     /*
         Reasons to throw: remote
     */
-    connect() {
+    async connect() {
         this.Conn = new Dropbox({
             fetch: IsomorphicFetch,
             accessToken: AccessToken
         });
     },
 
-    set Conn(v) {
-        this._connection = v;
+    set Conn(val) {
+        this._connection = val;
     },
 
     get Conn() {
@@ -145,7 +145,7 @@ export default {
             } // no need to do anything in case of "autorename" because it would be handled automatically by Dropbox (see `autorename: true` below)
         }
 
-        if (entries.length === 1) {
+        if (entries.length === 1) { // speed up the process if there's a sole entry to move
             let fromPath = entries[0].path;
             let toPath = destination.path + "/" + entries[0].name;
 
@@ -346,7 +346,7 @@ export default {
     },
 
     /*
-        Reasons to throw: remote_sole, remote_several, remote_zip
+        Reasons to throw: remote_sole, remote_several
     */
     async deleteEntries(entries) {
         if (entries.length === 1) {
@@ -399,6 +399,9 @@ export default {
         }
     },
 
+    /*
+        Reasons to throw: remote_sole, remote_several, remote_zip
+    */
     async downloadEntries(entries, asZip) {
         if (asZip) {
             const TEMP_FOLDER_DESIRED_PATH = "/__temp__downloading__";
