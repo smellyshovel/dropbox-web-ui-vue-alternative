@@ -15,6 +15,8 @@
             Nothing to show
         </template>
     </tree-view>
+
+    You have {{ spaceUsage.free }} left out of {{ spaceUsage.total }}
 </aside>
 </template>
 
@@ -29,6 +31,10 @@ export default {
     },
 
     computed: {
+        spaceUsage() {
+            return this.$store.state.cloud.accountInfo.spaceUsage;
+        },
+
         tree() {
             return this.$store.state.cloud.entries[0].contents;
         }

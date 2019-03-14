@@ -1,5 +1,6 @@
 import API from "@/middleware/api.js";
 import { handleError } from "@/middleware/errors.js";
+import { File, Folder } from "@/middleware/entry.js";
 
 export default {
     namespaced: true,
@@ -16,6 +17,22 @@ export default {
 
         SET_ENTRIES(state, entries) {
             state.entries = entries;
+        },
+
+        ADD_FAKE_ENTRIES(state, entries) {
+            entries.forEach(entry => {
+                let parentFolderPath = entry.path.split("/");
+                parentFolderPath.pop();
+                parentFolderPath = parentFolderPath.join("/");
+
+                let parentFolder = state.entries.find(entry => {
+                    return entry.path === parentFolderPath;
+                });
+
+                entry.parent = parentFolder;
+                parentFolder.contents.push(entry);
+                state.entries.push(entry);
+            });
         }
     },
 
@@ -46,55 +63,110 @@ export default {
             }
         },
 
-        async createFolder({ dispatch }, { name, destination }) {
+        async createFolder({ commit, dispatch }, { name, destination }) {
             try {
+                commit("ADD_FAKE_ENTRIES", [
+                    new Folder({
+                        name,
+                        path: destination.path + "/" + name
+                    }, true)
+                ]);
+
                 await API.createFolder(name, destination);
             } catch (err) {
                 handleError("createFolder", err);
             } finally {
-                dispatch("updateEntries");
+                await dispatch("updateEntries");
             }
         },
 
-        async moveEntries({ dispatch }, { entries, destination, conflictResolver }) {
+        async moveEntries({ commit, dispatch }, { entries, destination, conflictResolver }) {
             try {
+                entries.forEach(entry => {
+                    entry.isFake = true;
+                });
+
+                commit("ADD_FAKE_ENTRIES", entries.map(entry => {
+                    if (entry.type === "folder") {
+                        return new Folder({
+                            id: entry.id,
+                            name: entry.name,
+                            path: destination.path + "/" + entry.name
+                        }, true);
+                    } else if (entry.type === "file") {
+                        return new File({
+                            id: entry.id,
+                            name: entry.name,
+                            path: destination.path + "/" + entry.name,
+                            lastModified: entry.lastModified,
+                            size: entry.size
+                        }, true);
+                    }
+                }));
+
                 await API.moveEntries(entries, destination, conflictResolver);
             } catch (err) {
                 handleError("moveEntries", err);
             } finally {
-                dispatch("updateEntries");
+                await dispatch("updateEntries");
             }
         },
 
-        async copyEntries({ state, dispatch }, { entries, destination, conflictResolver }) {
+        async copyEntries({ state, commit, dispatch }, { entries, destination, conflictResolver }) {
             try {
+                commit("ADD_FAKE_ENTRIES", entries.map(entry => {
+                    if (entry.type === "folder") {
+                        return new Folder({
+                            id: entry.id,
+                            name: entry.name,
+                            path: destination.path + "/" + entry.name
+                        }, true);
+                    } else if (entry.type === "file") {
+                        return new File({
+                            id: entry.id,
+                            name: entry.name,
+                            path: destination.path + "/" + entry.name,
+                            lastModified: entry.lastModified,
+                            size: entry.size
+                        }, true);
+                    }
+                }));
+
                 await API.copyEntries(entries, destination, conflictResolver, state.accountInfo.spaceUsage);
             } catch (err) {
                 handleError("copyEntries", err);
             } finally {
                 await dispatch("updateAccountInfo");
-                dispatch("updateEntries");
+                await dispatch("updateEntries");
             }
         },
 
-        async renameEntry({ dispatch }, { entry, name }) {
+        async renameEntry({ commit, dispatch }, { entry, name }) {
             try {
+                entry.name = name;
+                entry.updateThumbnail();
+                entry.isFake = true;
+
                 await API.renameEntry(entry, name);
             } catch (err) {
                 handleError("renameEntry", err);
             } finally {
-                dispatch("updateEntries");
+                await dispatch("updateEntries");
             }
         },
 
-        async deleteEntries({ dispatch }, entries) {
+        async deleteEntries({ commit, dispatch }, entries) {
             try {
+                entries.forEach(entry => {
+                    entry.isFake = true;
+                });
+
                 await API.deleteEntries(entries);
             } catch (err) {
                 handleError("deleteEntries", err);
             } finally {
                 await dispatch("updateAccountInfo");
-                dispatch("updateEntries");
+                await dispatch("updateEntries");
             }
         },
 

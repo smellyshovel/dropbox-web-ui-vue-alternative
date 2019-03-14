@@ -2,31 +2,50 @@
 <div>
     <div
         @dblclick="mainAction()"
+        :class="{fake: entry.isFake}"
     >
         <img :src="entry.thumbnail">
         {{ entry.name }} [{{ entry.size }}]
     </div>
-    <div>
+    <div
+        v-if="moveConflict"
+        class="conflict"
+    >
+        {{ moveConflict.conflict.target.type }} called "{{ moveConflict.conflict.target.name }}" already exists. What to do?
+        <form @submit.prevent="moveConflictResolver({ strategy: moveConflictResolutionStrategy, sameForTheRest: moveConflictResolutionStrategySameForTheRest || false });">
+            <input type="radio" value="autorename" v-model="moveConflictResolutionStrategy"> Autorename
+            <br>
+            <input type="radio" value="skip" v-model="moveConflictResolutionStrategy"> Skip moving this {{ moveConflict.conflict.source.type }}
+            <br>
+            <div v-if="moveConflict.totalNumberOfConflicts > 1">
+                <input v-if="" type="checkbox" :value="true" v-model="moveConflictResolutionStrategySameForTheRest"> Apply for the rest {{ moveConflict.totalNumberOfConflicts }} conflicts
+                <br>
+            </div>
+            <input type="submit"> <input type="button" value="Cancel" @click="moveConflictResolver({ strategy: 'cancel' })">
+        </form>
+    </div>
+    <div
+        v-if="copyConflict"
+        class="conflict"
+    >
+        {{ copyConflict.conflict.target.type }} called "{{ copyConflict.conflict.target.name }}" already exists. What to do?
+        <form @submit.prevent="copyConflictResolver({ strategy: copyConflictResolutionStrategy, sameForTheRest: copyConflictResolutionStrategySameForTheRest || false });">
+            <input type="radio" value="autorename" v-model="copyConflictResolutionStrategy"> Autorename
+            <br>
+            <input type="radio" value="skip" v-model="copyConflictResolutionStrategy"> Skip moving this {{ copyConflict.conflict.source.type }}
+            <br>
+            <div v-if="copyConflict.totalNumberOfConflicts > 1">
+                <input v-if="" type="checkbox" :value="true" v-model="copyConflictResolutionStrategySameForTheRest"> Apply for the rest {{ copyConflict.totalNumberOfConflicts }} conflicts
+                <br>
+            </div>
+            <input type="submit"> <input type="button" value="Cancel" @click="copyConflictResolver({ strategy: 'cancel' })">
+        </form>
+    </div>
+    <div v-if="!entry.isFake">
         <button @click="toggleMoveDialog">Move</button>
         <div v-if="moveDialogOpened">
             Moving...
-            <div
-                v-if="moveConflict"
-                class="conflict"
-            >
-                {{ moveConflict.conflict.target.type }} called "{{ moveConflict.conflict.target.name }}" already exists. What to do?
-                <form @submit.prevent="moveConflictResolver({ strategy: moveConflictResolutionStrategy, sameForTheRest: moveConflictResolutionStrategySameForTheRest || false });">
-                    <input type="radio" value="autorename" v-model="moveConflictResolutionStrategy"> Autorename
-                    <br>
-                    <input type="radio" value="skip" v-model="moveConflictResolutionStrategy"> Skip moving this {{ moveConflict.conflict.source.type }}
-                    <br>
-                    <div v-if="moveConflict.totalNumberOfConflicts > 1">
-                        <input v-if="" type="checkbox" :value="true" v-model="moveConflictResolutionStrategySameForTheRest"> Apply for the rest {{ moveConflict.totalNumberOfConflicts }} conflicts
-                        <br>
-                    </div>
-                    <input type="submit"> <input type="button" value="Cancel" @click="moveConflictResolver({ strategy: 'cancel' })">
-                </form>
-            </div>
+
             <div
                 v-if="moveEntriesError"
                 class="error"
@@ -44,23 +63,7 @@
         <button @click="toggleCopyDialog">Copy</button>
         <div v-if="copyDialogOpened">
             Copying...
-            <div
-                v-if="copyConflict"
-                class="conflict"
-            >
-                {{ copyConflict.conflict.target.type }} called "{{ copyConflict.conflict.target.name }}" already exists. What to do?
-                <form @submit.prevent="copyConflictResolver({ strategy: copyConflictResolutionStrategy, sameForTheRest: copyConflictResolutionStrategySameForTheRest || false });">
-                    <input type="radio" value="autorename" v-model="copyConflictResolutionStrategy"> Autorename
-                    <br>
-                    <input type="radio" value="skip" v-model="copyConflictResolutionStrategy"> Skip moving this {{ copyConflict.conflict.source.type }}
-                    <br>
-                    <div v-if="copyConflict.totalNumberOfConflicts > 1">
-                        <input v-if="" type="checkbox" :value="true" v-model="copyConflictResolutionStrategySameForTheRest"> Apply for the rest {{ copyConflict.totalNumberOfConflicts }} conflicts
-                        <br>
-                    </div>
-                    <input type="submit"> <input type="button" value="Cancel" @click="copyConflictResolver({ strategy: 'cancel' })">
-                </form>
-            </div>
+
             <div
                 v-if="copyEntriesError"
                 class="error"
@@ -257,6 +260,10 @@ export default {
 </script>
 
 <style scoped>
+.fake {
+    color: rgb(71, 71, 71);
+}
+
 img {
     width: 1rem;
 }

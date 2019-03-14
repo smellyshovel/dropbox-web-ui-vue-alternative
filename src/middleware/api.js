@@ -92,7 +92,7 @@ export default {
         }
 
         destination.contents.forEach(existingEntry => {
-            if (existingEntry.name === name) {
+            if (!existingEntry.isFake && existingEntry.name === name) {
                 throw new CustomError({
                     reason: "already_exists",
                     details: existingEntry
@@ -124,7 +124,7 @@ export default {
         let conflicts = entries.map(entry => {
             return {
                 source: entry,
-                target: destination.contents.find(destinationEntry => destinationEntry.name === entry.name)
+                target: destination.contents.find(destinationEntry => !destinationEntry.isFake && destinationEntry.name === entry.name)
             }
         }).filter(item => item.target);
 
@@ -225,7 +225,7 @@ export default {
         let conflicts = entries.map(entry => {
             return {
                 source: entry,
-                target: destination.contents.find(destinationEntry => destinationEntry.name === entry.name)
+                target: destination.contents.find(destinationEntry => !destinationEntry.isFake && destinationEntry.name === entry.name)
             }
         }).filter(item => item.target);
 
@@ -317,7 +317,7 @@ export default {
         }
 
         entry.parent.contents.forEach(existingEntry => {
-            if (existingEntry.name === name) {
+            if (!existingEntry.isFake && existingEntry.name === name) {
                 throw new CustomError({
                     reason: "already_exists",
                     details: existingEntry
