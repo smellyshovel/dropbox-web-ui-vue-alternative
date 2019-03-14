@@ -72,6 +72,7 @@ export default {
             } catch (err) {
                 handleError("copyEntries", err);
             } finally {
+                await dispatch("updateAccountInfo");
                 dispatch("updateEntries");
             }
         },
@@ -92,6 +93,7 @@ export default {
             } catch (err) {
                 handleError("deleteEntries", err);
             } finally {
+                await dispatch("updateAccountInfo");
                 dispatch("updateEntries");
             }
         },
@@ -110,6 +112,7 @@ export default {
             } catch (err) {
                 handleError("uploadEntries", err);
             } finally {
+                await dispatch("updateAccountInfo");
                 dispatch("updateEntries");
             }
         }
