@@ -1,5 +1,6 @@
 class Entry {
-    constructor({ type, id, name, path, lastModified, size }) {
+    constructor({ fake, type, id, name, path, lastModified, size }) {
+        this._fake = fake;
         this.type = type;
         this.id = id;
         this.name = name;
@@ -8,6 +9,16 @@ class Entry {
         this._size = size;
 
         this.parent = null;
+
+        this.updateThumbnail();
+    }
+
+    set isFake(val) {
+        this._fake = val;
+    }
+
+    get isFake() {
+        return this._fake;
     }
 
     get link() {
@@ -15,15 +26,34 @@ class Entry {
         link.shift();
         return link.join("");
     }
+
+    updateThumbnail() {
+        if (this.type === "folder") {
+            this.thumbnail = require("@/assets/mimetypes/folder.png");
+        } else {
+            let ext = this.name.split(".");
+
+            if (ext.length > 1) {
+                try {
+                    this.thumbnail = require(`@/assets/mimetypes/${ ext[ext.length - 1] }.svg`);
+                } catch (err) {
+                    this.thumbnail = require("@/assets/mimetypes/unknown.svg");
+                }
+            } else {
+                this.thumbnail = require("@/assets/mimetypes/unknown.svg");
+            }
+        }
+    }
 }
 
 export class Folder extends Entry {
-    constructor(rawEntry) {
+    constructor(rawEntry, isFake = false) {
         super({
+            fake: isFake,
             type: "folder",
-            id: rawEntry.id,
+            id: rawEntry.id || "id:" + (Math.random() * 999999 | 0),
             name: rawEntry.name,
-            path: rawEntry.path_lower
+            path: "path_lower" in rawEntry ? rawEntry.path_lower : rawEntry.path
         });
 
         this.contents = [];
@@ -43,14 +73,15 @@ export class Folder extends Entry {
 }
 
 export class File extends Entry {
-    constructor(rawEntry) {
+    constructor(rawEntry, isFake = false) {
         super({
+            fake: isFake,
             type: "file",
-            id: rawEntry.id,
+            id: rawEntry.id || "id:" + (Math.random() * 999999 | 0),
             name: rawEntry.name,
-            path: rawEntry.path_lower,
-            lastModified: new Date(rawEntry.server_modified),
-            size: rawEntry.size
+            path: rawEntry.path_lower || rawEntry.path ,
+            lastModified: new Date(rawEntry.server_modified || 0),
+            size: rawEntry.size || 0
         });
     }
 

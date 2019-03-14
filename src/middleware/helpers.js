@@ -30,25 +30,6 @@ export function handleEntries(rawEntries) {
 
     entries.unshift(root);
 
-    // temp
-    entries.forEach(entry => {
-        if (entry.type === "folder") {
-            entry.thumbnail = require("@/assets/mimetypes/folder.png");
-        } else {
-            let ext = entry.name.split(".");
-
-            if (ext.length > 1) {
-                try {
-                    entry.thumbnail = require(`@/assets/mimetypes/${ ext[ext.length - 1] }.svg`);
-                } catch (err) {
-                    entry.thumbnail = require("@/assets/mimetypes/unknown.svg");
-                }
-            } else {
-                entry.thumbnail = require("@/assets/mimetypes/unknown.svg");
-            }
-        }
-    });
-
     return entries;
 }
 
