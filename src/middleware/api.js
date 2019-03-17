@@ -502,7 +502,7 @@ export default {
         let conflicts = Array.from(files).map(file => {
             return {
                 source: file,
-                target: destination.contents.find(destinationEntry => destinationEntry.name === file.name)
+                target: destination.contents.find(destinationEntry => !destinationEntry.isFake && destinationEntry.name === file.name)
             }
         }).filter(item => item.target);
 

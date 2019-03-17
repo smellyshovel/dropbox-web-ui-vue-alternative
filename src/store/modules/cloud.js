@@ -143,9 +143,9 @@ export default {
 
         async renameEntry({ commit, dispatch }, { entry, name }) {
             try {
+                entry.isFake = true;
                 entry.name = name;
                 entry.updateThumbnail();
-                entry.isFake = true;
 
                 await API.renameEntry(entry, name);
             } catch (err) {
@@ -178,8 +178,35 @@ export default {
             }
         },
 
-        async uploadEntries({ state, dispatch }, { files, destination, conflictResolver}) {
+        async uploadEntries({ state, commit, dispatch }, { files, destination, conflictResolver}) {
             try {
+                commit("ADD_FAKE_ENTRIES", Array.from(files).map(file => {
+                    let folderPath = file.webkitRelativePath.split("/");
+                    folderPath.pop();
+                    folderPath = folderPath.join("/");
+
+                    return destination.path + "/" + folderPath;
+                }).filter((folderPath, index, folderPaths) => { // unique
+                    return folderPaths.indexOf(folderPath) === index;
+                }).map(folderPath => {
+                    let folderName = folderPath.split("/");
+                    folderName = folderName[folderName.length - 1];
+
+                    return new Folder({
+                        name: folderName,
+                        path: folderPath.toLowerCase()
+                    }, true);
+                }));
+
+                commit("ADD_FAKE_ENTRIES", Array.from(files).map(file => {
+                    return new File({
+                        name: file.name,
+                        path: (destination.path + "/" + file.webkitRelativePath).toLowerCase(),
+                        lastModified: file.lastModified,
+                        size: file.size
+                    }, true);
+                }));
+
                 await API.uploadEntries(files, destination, conflictResolver, state.accountInfo.spaceUsage);
             } catch (err) {
                 handleError("uploadEntries", err);
