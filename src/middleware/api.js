@@ -84,22 +84,6 @@ export default {
         Reasons to throw: bad_name, already_exists, remote
     */
     async createFolder(name, destination) {
-        if (!this.Helpers.nameIsCorrect(name)) {
-            throw new CustomError({
-                reason: "bad_name",
-                details: name
-            });
-        }
-
-        destination.contents.forEach(existingEntry => {
-            if (!existingEntry.isFake && existingEntry.name === name) {
-                throw new CustomError({
-                    reason: "already_exists",
-                    details: existingEntry
-                });
-            }
-        });
-
         let desiredPath = destination.path + "/" + name;
 
         try {

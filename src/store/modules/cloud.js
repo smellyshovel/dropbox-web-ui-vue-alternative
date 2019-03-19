@@ -131,6 +131,8 @@ export default {
 
         async createFolder({ commit, dispatch }, { name, destination }) {
             try {
+                API.Helpers.checkCreateFolderForEarlyErrors(name, destination);
+
                 commit("CREATE_FOLDER", { name, destination });
                 await API.createFolder(name, destination);
             } catch (err) {

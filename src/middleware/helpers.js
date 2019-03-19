@@ -1,4 +1,5 @@
 import { Folder, File } from "./entry.js";
+import { CustomError } from "@/middleware/errors.js";
 
 export function handleEntries(rawEntries) {
     let folders = [];
@@ -58,4 +59,22 @@ export function extractContentsRecursively(entry) {
 export function nameIsCorrect(name) {
     // at least one character long and prohibit <, >, /, \, :, ?, *, ", |
     return name.length > 0 && !/<|>|\/|\\|:|\?|\*|"|\|/g.test(name);
+}
+
+export function checkCreateFolderForEarlyErrors(name, destination) {
+    if (!nameIsCorrect(name)) {
+        throw new CustomError({
+            reason: "bad_name",
+            details: name
+        });
+    }
+
+    destination.contents.forEach(existingEntry => {
+        if (!existingEntry.isFake && existingEntry.name === name) {
+            throw new CustomError({
+                reason: "already_exists",
+                details: existingEntry
+            });
+        }
+    });
 }
