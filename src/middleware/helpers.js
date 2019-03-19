@@ -56,7 +56,7 @@ export function extractContentsRecursively(entry) {
     }).reduce((acc, curr) => acc.concat(curr), []);
 }
 
-export function nameIsCorrect(name) {
+function nameIsCorrect(name) {
     // at least one character long and prohibit <, >, /, \, :, ?, *, ", |
     return name.length > 0 && !/<|>|\/|\\|:|\?|\*|"|\|/g.test(name);
 }
@@ -77,4 +77,43 @@ export function checkCreateFolderForEarlyErrors(name, destination) {
             });
         }
     });
+}
+
+export function checkMoveEntriesForEarlyErrors(entries, destination) {
+    // no checks here
+}
+
+export function checkCopyEntriesForEarlyErrors(entries, destination, spaceUsage) {
+    let entriesSize = entries.reduce((acc, curr) => {
+        return acc + curr.size;
+    }, 0);
+
+    if (entriesSize > spaceUsage.free) {
+        throw new CustomError({
+            reason: "not_enough_space",
+            details: spaceUsage.free
+        });
+    }
+}
+
+export function checkRenameEntryForEarlyErrors(entry, name) {
+    if (!nameIsCorrect(name)) {
+        throw new CustomError({
+            reason: "bad_name",
+            details: name
+        });
+    }
+
+    entry.parent.contents.forEach(existingEntry => {
+        if (!existingEntry.isFake && existingEntry.name === name) {
+            throw new CustomError({
+                reason: "already_exists",
+                details: existingEntry
+            });
+        }
+    });
+}
+
+export function checkDeleteEntriesForEarlyErrors(entries) {
+    // no checks here
 }

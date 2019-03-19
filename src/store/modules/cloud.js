@@ -144,6 +144,8 @@ export default {
 
         async moveEntries({ commit, dispatch }, { entries, destination, conflictResolver }) {
             try {
+                API.Helpers.checkMoveEntriesForEarlyErrors(entries, destination);
+
                 commit("MOVE_ENTRIES", { entries, destination });
                 await API.moveEntries(entries, destination, conflictResolver);
             } catch (err) {
@@ -155,8 +157,10 @@ export default {
 
         async copyEntries({ state, commit, dispatch }, { entries, destination, conflictResolver }) {
             try {
+                API.Helpers.checkCopyEntriesForEarlyErrors(entries, destination, state.accountInfo.spaceUsage);
+
                 commit("COPY_ENTRIES", { entries, destination });
-                await API.copyEntries(entries, destination, conflictResolver, state.accountInfo.spaceUsage);
+                await API.copyEntries(entries, destination, conflictResolver);
             } catch (err) {
                 handleError("copyEntries", err);
             } finally {
@@ -167,6 +171,8 @@ export default {
 
         async renameEntry({ commit, dispatch }, { entry, name }) {
             try {
+                API.Helpers.checkRenameEntryForEarlyErrors(entry, name);
+
                 // the entry will later be modified so initiate renaming with the original entry first and only later await for the result
                 let res = API.renameEntry(entry, name);
                 commit("RENAME_ENTRY", { entry, name });
@@ -180,6 +186,8 @@ export default {
 
         async deleteEntries({ commit, dispatch }, entries) {
             try {
+                API.Helpers.checkDeleteEntriesForEarlyErrors(entries);
+
                 commit("DELETE_ENTRIES", entries);
                 await API.deleteEntries(entries);
             } catch (err) {

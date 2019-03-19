@@ -193,18 +193,6 @@ export default {
         Conflict resolving strategies: autorename, skip
     */
     async copyEntries(entries, destination, conflictResolver, spaceUsage) {
-        // validations
-        let entriesSize = entries.reduce((acc, curr) => {
-            return acc + curr.size;
-        }, 0);
-
-        if (entriesSize > spaceUsage.free) {
-            throw new CustomError({
-                reason: "not_enough_space",
-                details: spaceUsage.free
-            });
-        }
-
         // checking for naming conflicts
         let conflicts = entries.map(entry => {
             return {
@@ -293,22 +281,6 @@ export default {
         Reasons to throw: bad_name, already_exists, remote
     */
     async renameEntry(entry, name) {
-        if (!this.Helpers.nameIsCorrect(name)) {
-            throw new CustomError({
-                reason: "bad_name",
-                details: name
-            });
-        }
-
-        entry.parent.contents.forEach(existingEntry => {
-            if (!existingEntry.isFake && existingEntry.name === name) {
-                throw new CustomError({
-                    reason: "already_exists",
-                    details: existingEntry
-                });
-            }
-        });
-
         let fromPath = entry.path;
         let toPath = fromPath.split("/");
         toPath.pop();
