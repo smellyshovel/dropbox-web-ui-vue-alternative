@@ -1,6 +1,36 @@
 import API from "@/middleware/api.js";
 import { handleError } from "@/middleware/errors.js";
 import { File, Folder } from "@/middleware/entry.js";
+import { cloneDeep, cloneDeepWith } from "lodash";
+
+function duplicate(state, entries, parent) {
+    return entries.map(entry => {
+        if (entry.type === "folder") {
+            var newEntry = new Folder({
+                name: entry.name,
+                path: (parent.path + "/" + entry.name).toLowerCase()
+            }, true);
+
+            if (entry.contents.length) {
+                let contents = duplicate(state, entry.contents, newEntry);
+                newEntry.contents = contents;
+            }
+        } else if (entry.type === "file") {
+            var newEntry = new File({
+                name: entry.name,
+                path: (parent.path + "/" + entry.name).toLowerCase(),
+                lastModified: entry.lastModified,
+                size: entry.size
+            }, true);
+        }
+
+        newEntry.parent = parent;
+        parent.contents.push(newEntry);
+        state.entries.push(newEntry);
+
+        return newEntry;
+    })
+}
 
 export default {
     namespaced: true,
@@ -19,19 +49,22 @@ export default {
             state.entries = entries;
         },
 
-        ADD_FAKE_ENTRIES(state, entries) {
+        CREATE_FOLDER(state, { name, destination }) {
+            let newFolder = new Folder({
+                name,
+                path: (destination.path + "/" + name).toLowerCase()
+            }, true);
+
+            newFolder.parent = destination;
+            destination.contents.push(newFolder);
+            state.entries.push(newFolder);
+        },
+
+        MOVE_ENTRIES(state, { entries, destination }) {
+            duplicate(state, entries, destination);
+
             entries.forEach(entry => {
-                let parentFolderPath = entry.path.split("/");
-                parentFolderPath.pop();
-                parentFolderPath = parentFolderPath.join("/");
-
-                let parentFolder = state.entries.find(entry => {
-                    return entry.path === parentFolderPath;
-                });
-
-                entry.parent = parentFolder;
-                parentFolder.contents.push(entry);
-                state.entries.push(entry);
+                entry.isFake = true;
             });
         }
     },
@@ -65,13 +98,7 @@ export default {
 
         async createFolder({ commit, dispatch }, { name, destination }) {
             try {
-                commit("ADD_FAKE_ENTRIES", [
-                    new Folder({
-                        name,
-                        path: destination.path + "/" + name
-                    }, true)
-                ]);
-
+                commit("CREATE_FOLDER", { name, destination });
                 await API.createFolder(name, destination);
             } catch (err) {
                 handleError("createFolder", err);
@@ -82,28 +109,7 @@ export default {
 
         async moveEntries({ commit, dispatch }, { entries, destination, conflictResolver }) {
             try {
-                entries.forEach(entry => {
-                    entry.isFake = true;
-                });
-
-                commit("ADD_FAKE_ENTRIES", entries.map(entry => {
-                    if (entry.type === "folder") {
-                        return new Folder({
-                            id: entry.id,
-                            name: entry.name,
-                            path: destination.path + "/" + entry.name
-                        }, true);
-                    } else if (entry.type === "file") {
-                        return new File({
-                            id: entry.id,
-                            name: entry.name,
-                            path: destination.path + "/" + entry.name,
-                            lastModified: entry.lastModified,
-                            size: entry.size
-                        }, true);
-                    }
-                }));
-
+                commit("MOVE_ENTRIES", { entries, destination });
                 await API.moveEntries(entries, destination, conflictResolver);
             } catch (err) {
                 handleError("moveEntries", err);
@@ -131,7 +137,7 @@ export default {
                         }, true);
                     }
                 }));
-
+                // await new Promise(res => { setTimeout(res, 10000) });
                 await API.copyEntries(entries, destination, conflictResolver, state.accountInfo.spaceUsage);
             } catch (err) {
                 handleError("copyEntries", err);
