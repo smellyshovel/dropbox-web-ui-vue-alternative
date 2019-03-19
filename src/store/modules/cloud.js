@@ -1,9 +1,9 @@
 import API from "@/middleware/api.js";
 import { handleError } from "@/middleware/errors.js";
 import { File, Folder } from "@/middleware/entry.js";
-import { cloneDeep, cloneDeepWith } from "lodash";
 
-function duplicate(state, entries, parent) {
+// clone entries to a new destination
+function duplicate(entries, parent) {
     return entries.map(entry => {
         if (entry.type === "folder") {
             var newEntry = new Folder({
@@ -12,7 +12,7 @@ function duplicate(state, entries, parent) {
             }, true);
 
             if (entry.contents.length) {
-                let contents = duplicate(state, entry.contents, newEntry);
+                let contents = duplicate(entry.contents, newEntry);
                 newEntry.contents = contents;
             }
         } else if (entry.type === "file") {
@@ -26,10 +26,19 @@ function duplicate(state, entries, parent) {
 
         newEntry.parent = parent;
         parent.contents.push(newEntry);
-        state.entries.push(newEntry);
-
         return newEntry;
     })
+}
+
+// apply customiser to all the passed entries and their contents
+function avalanche(entries, customiser) {
+    entries.forEach(entry => {
+        customiser(entry);
+
+        if (entry.type === "folder" && entry.contents.length) {
+            avalanche(entry.contents, customiser);
+        }
+    });
 }
 
 export default {
@@ -61,9 +70,33 @@ export default {
         },
 
         MOVE_ENTRIES(state, { entries, destination }) {
-            duplicate(state, entries, destination);
+            duplicate(entries, destination).forEach(duplicate => {
+                state.entries.push(duplicate);
+            });
 
             entries.forEach(entry => {
+                entry.isFake = true;
+            });
+        },
+
+        COPY_ENTRIES(state, { entries, destination }) {
+            duplicate(entries, destination).forEach(duplicate => {
+                state.entries.push(duplicate);
+            });
+        },
+
+        RENAME_ENTRY(state, { entry, name }) {
+            entry.name = name;
+            entry.updateThumbnail();
+
+            avalanche([entry], entry => {
+                entry.path = (entry.parent.path + "/" + entry.name).toLowerCase();
+                entry.isFake = true;
+            });
+        },
+
+        DELETE_ENTRIES(state, entries) {
+            avalanche(entries, entry => {
                 entry.isFake = true;
             });
         }
@@ -120,24 +153,7 @@ export default {
 
         async copyEntries({ state, commit, dispatch }, { entries, destination, conflictResolver }) {
             try {
-                commit("ADD_FAKE_ENTRIES", entries.map(entry => {
-                    if (entry.type === "folder") {
-                        return new Folder({
-                            id: entry.id,
-                            name: entry.name,
-                            path: destination.path + "/" + entry.name
-                        }, true);
-                    } else if (entry.type === "file") {
-                        return new File({
-                            id: entry.id,
-                            name: entry.name,
-                            path: destination.path + "/" + entry.name,
-                            lastModified: entry.lastModified,
-                            size: entry.size
-                        }, true);
-                    }
-                }));
-                // await new Promise(res => { setTimeout(res, 10000) });
+                commit("COPY_ENTRIES", { entries, destination });
                 await API.copyEntries(entries, destination, conflictResolver, state.accountInfo.spaceUsage);
             } catch (err) {
                 handleError("copyEntries", err);
@@ -149,11 +165,10 @@ export default {
 
         async renameEntry({ commit, dispatch }, { entry, name }) {
             try {
-                entry.isFake = true;
-                entry.name = name;
-                entry.updateThumbnail();
-
-                await API.renameEntry(entry, name);
+                // the entry will later be modified so initiate renaming with the original entry first and only later await for the result
+                let res = API.renameEntry(entry, name);
+                commit("RENAME_ENTRY", { entry, name });
+                await res;
             } catch (err) {
                 handleError("renameEntry", err);
             } finally {
@@ -163,10 +178,7 @@ export default {
 
         async deleteEntries({ commit, dispatch }, entries) {
             try {
-                entries.forEach(entry => {
-                    entry.isFake = true;
-                });
-
+                commit("DELETE_ENTRIES", entries);
                 await API.deleteEntries(entries);
             } catch (err) {
                 handleError("deleteEntries", err);
