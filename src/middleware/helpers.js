@@ -117,3 +117,33 @@ export function checkRenameEntryForEarlyErrors(entry, name) {
 export function checkDeleteEntriesForEarlyErrors(entries) {
     // no checks here
 }
+
+export async function resolveConflicts(entries, destination, conflictResolver) {
+    let conflicts = entries.map(entry => ({
+        source: entry,
+        target: destination.contents.find(destinationEntry => !destinationEntry.isFake && destinationEntry.name === entry.name)
+    }));
+
+    let resolutionStrategies = [];
+
+    for (let conflict of conflicts) {
+        if (!conflict.target) {
+            resolutionStrategies.push(null);
+            continue;
+        }
+
+        let { strategy, sameForTheRest } = await conflictResolver(conflict, conflicts.length);
+
+        if (strategy === "cancel") {
+            return "cancel";
+        }
+
+        if (sameForTheRest) {
+            conflictResolver = () => ({ strategy, sameForTheRest: false });
+        }
+
+        resolutionStrategies.push(strategy);
+    }
+
+    return resolutionStrategies;
+}

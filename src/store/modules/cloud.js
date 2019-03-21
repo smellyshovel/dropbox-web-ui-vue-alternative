@@ -3,7 +3,14 @@ import { handleError } from "@/middleware/errors.js";
 import { File, Folder } from "@/middleware/entry.js";
 
 // clone entries to a new destination
-function duplicate(entries, parent) {
+function duplicate(entries, parent, resolutionStrategies) {
+    entries = entries.reduce((acc, curr, index) => {
+        if (resolutionStrategies[index] !== "skip") {
+            acc.push(curr);
+            return acc;
+        } else return acc;
+    }, []);
+
     return entries.map(entry => {
         if (entry.type === "folder") {
             var newEntry = new Folder({
@@ -69,8 +76,8 @@ export default {
             state.entries.push(newFolder);
         },
 
-        MOVE_ENTRIES(state, { entries, destination }) {
-            duplicate(entries, destination).forEach(duplicate => {
+        MOVE_ENTRIES(state, { entries, destination, resolutionStrategies }) {
+            duplicate(entries, destination, resolutionStrategies).forEach(duplicate => {
                 state.entries.push(duplicate);
             });
 
@@ -79,8 +86,8 @@ export default {
             });
         },
 
-        COPY_ENTRIES(state, { entries, destination }) {
-            duplicate(entries, destination).forEach(duplicate => {
+        COPY_ENTRIES(state, { entries, destination, resolutionStrategies }) {
+            duplicate(entries, destination, resolutionStrategies).forEach(duplicate => {
                 state.entries.push(duplicate);
             });
         },
@@ -146,8 +153,11 @@ export default {
             try {
                 API.Helpers.checkMoveEntriesForEarlyErrors(entries, destination);
 
-                commit("MOVE_ENTRIES", { entries, destination });
-                await API.moveEntries(entries, destination, conflictResolver);
+                let resolutionStrategies = await API.Helpers.resolveConflicts(entries, destination, conflictResolver);
+                if (resolutionStrategies === "cancel") return;
+
+                commit("MOVE_ENTRIES", { entries, destination, resolutionStrategies });
+                await API.moveEntries(entries, destination, resolutionStrategies);
             } catch (err) {
                 handleError("moveEntries", err);
             } finally {
@@ -159,8 +169,11 @@ export default {
             try {
                 API.Helpers.checkCopyEntriesForEarlyErrors(entries, destination, state.accountInfo.spaceUsage);
 
-                commit("COPY_ENTRIES", { entries, destination });
-                await API.copyEntries(entries, destination, conflictResolver);
+                let resolutionStrategies = await API.Helpers.resolveConflicts(entries, destination, conflictResolver);
+                if (resolutionStrategies === "cancel") return;
+
+                commit("COPY_ENTRIES", { entries, destination, resolutionStrategies });
+                await API.copyEntries(entries, destination, resolutionStrategies);
             } catch (err) {
                 handleError("copyEntries", err);
             } finally {
