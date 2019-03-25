@@ -3,14 +3,7 @@ import { handleError } from "@/middleware/errors.js";
 import { File, Folder } from "@/middleware/entry.js";
 
 // clone entries to a new destination
-function duplicate(entries, parent, resolutionStrategies) {
-    entries = entries.reduce((acc, curr, index) => {
-        if (resolutionStrategies[index] !== "skip") {
-            acc.push(curr);
-            return acc;
-        } else return acc;
-    }, []);
-
+function duplicate(entries, parent) {
     return entries.map(entry => {
         if (entry.type === "folder") {
             var newEntry = new Folder({
@@ -135,7 +128,14 @@ export default {
         },
 
         MOVE_ENTRIES(state, { entries, destination, resolutionStrategies }) {
-            duplicate(entries, destination, resolutionStrategies).forEach(duplicate => {
+            entries = entries.reduce((acc, curr, index) => {
+                if (resolutionStrategies[index] !== "skip") {
+                    acc.push(curr);
+                    return acc;
+                } else return acc;
+            }, []);
+
+            duplicate(entries, destination).forEach(duplicate => {
                 state.entries.push(duplicate);
             });
 
@@ -145,7 +145,14 @@ export default {
         },
 
         COPY_ENTRIES(state, { entries, destination, resolutionStrategies }) {
-            duplicate(entries, destination, resolutionStrategies).forEach(duplicate => {
+            entries = entries.reduce((acc, curr, index) => {
+                if (resolutionStrategies[index] !== "skip") {
+                    acc.push(curr);
+                    return acc;
+                } else return acc;
+            }, []);
+
+            duplicate(entries, destination).forEach(duplicate => {
                 state.entries.push(duplicate);
             });
         },
