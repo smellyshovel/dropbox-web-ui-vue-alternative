@@ -343,7 +343,7 @@ export default {
 
             const downloadZip = async () => {
                 try {
-                    var { fileBlob } = await this.Conn.filesDownloadZip({ pth: folder.path_lower });
+                    var { fileBlob } = await this.Conn.filesDownloadZip({ path: folder.path_lower });
                 } catch (err) {
                     throw new CustomError({
                         reason: "remote_zip",
