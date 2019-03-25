@@ -408,16 +408,12 @@ export default {
             return entry.path;
         });
 
-        console.log(entriesPaths);
-
         files = files.filter(file => {
             file.path = destination.path + "/" + (file.webkitRelativePath || file.name);
             return entriesPaths.some(entryPath => {
                 return file.path.toLowerCase().startsWith(entryPath);
             });
         });
-
-        console.log(files);
 
         const DIRECT_UPLOAD_FILE_SIZE_LIMIT = 150 * 1024 * 1024; // 150MB
         const SESSION_UPLOAD_MAX_CHUNK_SIZE = 8 * 1024 * 1024; // 8MB
