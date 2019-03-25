@@ -48,6 +48,64 @@ function avalanche(entries, customiser) {
     });
 }
 
+// build a tree structure from native FileList and return it
+function restoreStructureFromFiles(files, destination) {
+    if (files[0].webkitRelativePath) { // if uploading a folder
+        return files.map(file => {
+            let folderPath = file.webkitRelativePath.split("/");
+            folderPath.pop();
+            folderPath = folderPath.join("/");
+
+            return destination.path + "/" + folderPath;
+        }).filter((folderPath, index, folderPaths) => { // unique
+            return folderPaths.indexOf(folderPath) === index;
+        }).map(folderPath => {
+            let folderName = folderPath.split("/");
+            folderName = folderName[folderName.length - 1];
+
+            return new Folder({
+                name: folderName,
+                path: folderPath.toLowerCase()
+            }, true);
+        }).concat(files.map((file, i, folders) => {
+            return new File({
+                name: file.name,
+                path: (destination.path + "/" + file.webkitRelativePath).toLowerCase(),
+                lastModified: file.lastModified,
+                size: file.size
+            }, true);
+        })).reduce((acc, curr, i, list) => {
+            let parentFolderPath = curr.path.split("/");
+            parentFolderPath.pop();
+            parentFolderPath = parentFolderPath.join("/");
+
+            curr.parent = list.find(entry => {
+                return entry.path === parentFolderPath;
+            }) || destination;
+
+            if (curr.parent === destination) {
+                acc.push(curr);
+                return acc;
+            } else {
+                curr.parent.contents.push(curr);
+                return acc;
+            }
+        }, []);
+    } else { // if uploading (possibly multiple) files
+        return files.map(file => {
+            let newFile = new File({
+                name: file.name,
+                path: (destination.path + "/" + file.webkitRelativePath).toLowerCase(),
+                lastModified: file.lastModified,
+                size: file.size
+            }, true);
+
+            newFile.parent = destination;
+            return newFile;
+        });
+    }
+}
+
 export default {
     namespaced: true,
 
@@ -105,6 +163,25 @@ export default {
         DELETE_ENTRIES(state, entries) {
             avalanche(entries, entry => {
                 entry.isFake = true;
+            });
+        },
+
+        DOWNLOAD_ENTRIES(state, entries) {
+            // nothing to do here (yet?) - exists for consistency
+        },
+
+        UPLOAD_ENTRIES(state, { entries, destination, resolutionStrategies }) {
+            entries = entries.reduce((acc, curr, index) => {
+                if (resolutionStrategies[index] !== "skip") {
+                    acc.push(curr);
+                    return acc;
+                } else return acc;
+            }, []);
+
+            destination.contents = destination.contents.concat(entries);
+
+            avalanche(entries, entry => {
+                state.entries.push(entry);
             });
         }
     },
@@ -213,6 +290,8 @@ export default {
 
         async downloadEntries({ dispatch }, { entries, asZip }) {
             try {
+                API.Helpers.checkDownloadEntriesForEarlyErrors(entries, asZip);
+
                 await API.downloadEntries(entries, asZip);
             } catch (err) {
                 handleError("downloadEntries", err);
@@ -221,34 +300,16 @@ export default {
 
         async uploadEntries({ state, commit, dispatch }, { files, destination, conflictResolver}) {
             try {
-                commit("ADD_FAKE_ENTRIES", Array.from(files).map(file => {
-                    let folderPath = file.webkitRelativePath.split("/");
-                    folderPath.pop();
-                    folderPath = folderPath.join("/");
+                files = Array.from(files); if (files.length < 1) return;
+                let entries = restoreStructureFromFiles(files, destination);
 
-                    return destination.path + "/" + folderPath;
-                }).filter((folderPath, index, folderPaths) => { // unique
-                    return folderPaths.indexOf(folderPath) === index;
-                }).map(folderPath => {
-                    let folderName = folderPath.split("/");
-                    folderName = folderName[folderName.length - 1];
+                API.Helpers.checkUploadEntriesForEarlyErrors(entries, destination, state.accountInfo.spaceUsage);
 
-                    return new Folder({
-                        name: folderName,
-                        path: folderPath.toLowerCase()
-                    }, true);
-                }));
+                let resolutionStrategies = await API.Helpers.resolveConflicts(entries, destination, conflictResolver);
+                if (resolutionStrategies === "cancel") return;
 
-                commit("ADD_FAKE_ENTRIES", Array.from(files).map(file => {
-                    return new File({
-                        name: file.name,
-                        path: (destination.path + "/" + file.webkitRelativePath).toLowerCase(),
-                        lastModified: file.lastModified,
-                        size: file.size
-                    }, true);
-                }));
-
-                await API.uploadEntries(files, destination, conflictResolver, state.accountInfo.spaceUsage);
+                commit("UPLOAD_ENTRIES", { entries, destination, resolutionStrategies });
+                await API.uploadEntries(files, entries, destination, resolutionStrategies);
             } catch (err) {
                 handleError("uploadEntries", err);
             } finally {

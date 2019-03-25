@@ -118,6 +118,23 @@ export function checkDeleteEntriesForEarlyErrors(entries) {
     // no checks here
 }
 
+export function checkDownloadEntriesForEarlyErrors(entries, asZip) {
+    // no checks here
+}
+
+export function checkUploadEntriesForEarlyErrors(entries, destination, spaceUsage) {
+    let filesSize = entries.reduce((acc, curr) => {
+        return acc + curr.size;
+    }, 0);
+
+    if (filesSize > spaceUsage.free) {
+        throw new CustomError({
+            reason: "not_enough_space",
+            details: spaceUsage.free
+        });
+    }
+}
+
 export async function resolveConflicts(entries, destination, conflictResolver) {
     let conflicts = entries.map(entry => ({
         source: entry,
