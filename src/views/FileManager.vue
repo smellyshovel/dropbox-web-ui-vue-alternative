@@ -36,10 +36,20 @@ export default {
     },
 
     async created() {
-        try {
-            this.loading = "Connecting to the cloud...";
-            await this.$store.dispatch("cloud/connect");
+        if (!this.$store.getters["cloud/connection"]) {
+            this.$router.replace({
+                name: "home",
+                params: {
+                    redirected: true,
+                    redirectionDetails: {
+                        type: "error",
+                        message: "Connect to Dropbox first"
+                    }
+                }
+            });
+        }
 
+        try {
             this.loading = "Retrieving the account information...";
             await this.$store.dispatch("cloud/updateAccountInfo");
 

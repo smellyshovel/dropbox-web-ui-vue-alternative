@@ -1,26 +1,44 @@
 import { Dropbox } from "dropbox";
 import IsomorphicFetch from "isomorphic-fetch";
-import AccessToken from "@/../secret/DROPBOX_AUTH_TOKEN.txt";
 import * as Helpers from "./helpers.js";
 import { CustomError } from "@/middleware/errors.js";
+
+let Connection = null;
 
 export default {
     /*
         Reasons to throw: remote
     */
-    async connect() {
-        this.Conn = new Dropbox({
+    async connect(token) {
+        Connection = new Dropbox({
             fetch: IsomorphicFetch,
-            accessToken: AccessToken
+            accessToken: token
         });
-    },
 
-    set Conn(val) {
-        this._connection = val;
+        // check if the token is OK by performing some API method
+        try {
+            await Connection.usersGetCurrentAccount()
+        } catch (err) {
+            throw new CustomError({
+                reason: "remote",
+                details: err
+            });
+        }
+
+        return Connection;
     },
 
     get Conn() {
-        return this._connection;
+        if (!Connection) {
+            let { accessToken: token } = JSON.parse(localStorage.getItem("connection"));
+
+            Connection = new Dropbox({
+                fetch: IsomorphicFetch,
+                accessToken: token
+            });
+        }
+
+        return Connection;
     },
 
     /*
