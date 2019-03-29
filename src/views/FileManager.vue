@@ -76,14 +76,15 @@ export default {
 
 <style scoped>
 #fm {
-    width: 100%;
-    height: 100%;
     display: grid;
     grid-template-areas:
         "sidebar header"
         "sidebar main";
-    grid-template-columns: 300px auto;
-    grid-template-rows: 50px auto;
+    grid-template-rows: 64px auto;
+    grid-template-columns: 256px auto;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
     user-select: none;
 }
 
