@@ -1,7 +1,9 @@
 <template>
-<div class="loading">
-    <h1>Loading...</h1>
-    <p>{{ loading }}</p>
+<div id="loading-screen">
+    <div class="container">
+        <h1>Loading...</h1>
+        <p>{{ loading }}</p>
+    </div>
 </div>
 </template>
 
@@ -17,8 +19,30 @@ export default {
 </script>
 
 <style scoped>
-.loading {
-    background-color: #007dff;
-    color: #fff;
+#loading-screen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgb(119, 50, 251);
+}
+
+.container {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+    max-width: 80%;
+    height: 100vh;
+}
+
+h1 {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+p {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.75);
 }
 </style>
