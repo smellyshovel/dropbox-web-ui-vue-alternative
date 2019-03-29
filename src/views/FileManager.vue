@@ -37,7 +37,7 @@ export default {
 
     async created() {
         try {
-            this.loading = "Connecting to the cloud...";
+            this.loading = "Connecting to the cloud";
             await this.$store.dispatch("cloud/connect", this.$store.getters["cloud/token"]);
         } catch (err) {
             return this.$router.replace({
@@ -53,10 +53,10 @@ export default {
         }
 
         try {
-            this.loading = "Retrieving the account information...";
+            this.loading = "Retrieving the account information";
             await this.$store.dispatch("cloud/updateAccountInfo");
 
-            this.loading = "Updating the files list...";
+            this.loading = "Updating the files list";
             await this.$store.dispatch("cloud/updateEntries");
         } catch (err) {
             this.error = err;
