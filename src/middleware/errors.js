@@ -15,7 +15,11 @@ export const Messages = {
     },
 
     connect: {
-        remote() {
+        no_token() {
+            return `No token provided. Please, connect your Dropbox account first`;
+        },
+
+        bad_token() {
             return `${ Messages._common.remote }. Couldn't connect to the cloud. ${ Messages._common.retry }`;
         }
     },
@@ -142,7 +146,7 @@ export function handleError(action, error) {
         var handledError = error.create(action);
         console.error(handledError);
 
-        if (error.details) {
+        if ("details" in error) {
             console.error("Details:", error.details);
         }
     } else { // something really went wrong
