@@ -69,7 +69,7 @@ export default {
         },
 
         connected() {
-            return !!this.$store.getters["cloud/connection"];
+            return this.$store.getters["cloud/connected"];
         }
     }
 }

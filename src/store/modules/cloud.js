@@ -108,8 +108,8 @@ export default {
     },
 
     mutations: {
-        SAVE_CONNECTION(state, connection) {
-            localStorage.setItem("connection", JSON.stringify(connection));
+        SAVE_TOKEN(state, token) {
+            localStorage.setItem("token", token);
         },
 
         SET_ACCOUNT_INFO(state, accountInfo) {
@@ -200,8 +200,8 @@ export default {
     actions: {
         async connect({ commit }, token) {
             try {
-                let connection = await API.connect(token);
-                commit("SAVE_CONNECTION", connection);
+                await API.connect(token);
+                commit("SAVE_TOKEN", token);
             } catch (err) {
                 handleError("connect", err);
             }
@@ -332,8 +332,13 @@ export default {
     },
 
     getters: {
-        connection: () => {
-            return JSON.parse(localStorage.getItem("connection"));
+        // only used to tweak the UI
+        connected: (state, getters) => {
+            return !!getters.token;
+        },
+
+        token: () => {
+            return localStorage.getItem("token");
         },
 
         folderByLink: (state) => (link) => {

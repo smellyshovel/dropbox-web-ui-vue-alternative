@@ -5,15 +5,16 @@
 <script>
 export default {
     async created() {
+        // parse the OAuth2 response (comes in the form of /auth#key1=val1&key2=val2)
+        // and and handle it
         let resp = this.$route.hash.replace(/#/, "");
 
         let params = resp.split("&").reduce((acc, pair) => {
-            let keyValuePair = pair.split("=");
-            acc[keyValuePair[0]] = keyValuePair[1];
+            acc[pair.split("=")[0]] = pair.split("=")[1];
             return acc;
         }, {});
 
-        const redirect = (message) => {
+        const redirectHome = (message) => {
             this.$router.replace({
                 name: "home",
                 params: {
@@ -27,16 +28,16 @@ export default {
         };
 
         if ("error" in params) {
-            redirect(decodeURIComponent(params.error_description).replace(/\+/g, " "));
+            redirectHome(decodeURIComponent(params.error_description).replace(/\+/g, " "));
         } else if ("access_token" in params) {
             try {
                 await this.$store.dispatch("cloud/connect", params.access_token);
                 this.$router.replace({ name: "fm" });
             } catch (err) {
-                redirect(err.message);
+                redirectHome(err.message);
             }
         } else {
-            redirect("No token provided");
+            redirectHome("No token provided");
         }
     }
 }

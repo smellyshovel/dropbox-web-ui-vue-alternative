@@ -1,5 +1,4 @@
 import { Dropbox } from "dropbox";
-import IsomorphicFetch from "isomorphic-fetch";
 import * as Helpers from "./helpers.js";
 import { CustomError } from "@/middleware/errors.js";
 
@@ -7,34 +6,33 @@ let Connection = null;
 
 export default {
     /*
-        Reasons to throw: remote
+        Reasons to throw: no_token, bad_token
     */
     async connect(token) {
+        if (Connection) return;
+
+        if (!token) {
+            throw new CustomError({
+                reason: "no_token",
+                details: {
+                    argToken: token,
+                    localStorageToken: localStorage.getItem("token")
+                }
+            })
+        }
+
         Connection = new Dropbox({
-            fetch: IsomorphicFetch,
+            fetch: fetch,
             accessToken: token
         });
 
         // check if the token is OK by performing some API method
         try {
-            await Connection.usersGetCurrentAccount()
+            await Connection.usersGetCurrentAccount();
         } catch (err) {
             throw new CustomError({
-                reason: "remote",
+                reason: "bad_token",
                 details: err
-            });
-        }
-
-        return Connection;
-    },
-
-    get Conn() {
-        if (!Connection) {
-            let { accessToken: token } = JSON.parse(localStorage.getItem("connection"));
-
-            Connection = new Dropbox({
-                fetch: IsomorphicFetch,
-                accessToken: token
             });
         }
 
@@ -46,7 +44,7 @@ export default {
     */
     async getAccountInfo() {
         try {
-            var spaceUsage = await this.Conn.usersGetSpaceUsage();
+            var spaceUsage = await Connection.usersGetSpaceUsage();
         } catch (err) {
             throw new CustomError({
                 reason: "remote",
@@ -68,7 +66,7 @@ export default {
     */
     async getEntries() {
         try {
-            let lastAns = await this.Conn.filesListFolder({
+            let lastAns = await Connection.filesListFolder({
                 path: "",
                 recursive: true
             });
@@ -76,7 +74,7 @@ export default {
             var entries = lastAns.entries;
 
             while (lastAns.has_more) {
-                lastAns = await this.Conn.filesListFolderContinue({ cursor: lastAns.cursor });
+                lastAns = await Connection.filesListFolderContinue({ cursor: lastAns.cursor });
                 entries = entries.concat(lastAns.entries);
             }
         } catch (err) {
@@ -105,7 +103,7 @@ export default {
         let desiredPath = destination.path + "/" + name;
 
         try {
-            await this.Conn.filesCreateFolderV2({
+            await Connection.filesCreateFolderV2({
                 path: desiredPath,
                 autorename: true
             });
@@ -134,7 +132,7 @@ export default {
             let toPath = destination.path + "/" + entries[0].name;
 
             try {
-                await this.Conn.filesMoveV2({
+                await Connection.filesMoveV2({
                     from_path: fromPath,
                     to_path: toPath,
                     autorename: true
@@ -151,7 +149,7 @@ export default {
                 to_path: destination.path + "/" + entry.name
             }));
 
-            let { ".tag": result, entries: resEntries, async_job_id } = await this.Conn.filesMoveBatchV2({
+            let { ".tag": result, entries: resEntries, async_job_id } = await Connection.filesMoveBatchV2({
                 entries: relocationPaths,
                 autorename: true
             });
@@ -169,7 +167,7 @@ export default {
                 let keepFetching = true;
 
                 while (keepFetching) {
-                    let res = { ".tag": result, entries: resEntries } = await this.Conn.filesMoveBatchCheckV2({ async_job_id });
+                    let res = { ".tag": result, entries: resEntries } = await Connection.filesMoveBatchCheckV2({ async_job_id });
 
                     if (result === "complete") {
                         keepFetching = false;
@@ -205,7 +203,7 @@ export default {
             let toPath = destination.path + "/" + entries[0].name;
 
             try {
-                await this.Conn.filesCopyV2({
+                await Connection.filesCopyV2({
                     from_path: fromPath,
                     to_path: toPath,
                     autorename: true
@@ -222,7 +220,7 @@ export default {
                 to_path: destination.path + "/" + entry.name
             }));
 
-            let { ".tag": result, entries: resEntries, async_job_id } = await this.Conn.filesCopyBatchV2({
+            let { ".tag": result, entries: resEntries, async_job_id } = await Connection.filesCopyBatchV2({
                 entries: relocationPaths,
                 autorename: true
             });
@@ -240,7 +238,7 @@ export default {
                 let keepFetching = true;
 
                 while (keepFetching) {
-                    let res = { ".tag": result, entries: resEntries } = await this.Conn.filesCopyBatchCheckV2({ async_job_id }); // TODO: do I really need res here?
+                    let res = { ".tag": result, entries: resEntries } = await Connection.filesCopyBatchCheckV2({ async_job_id }); // TODO: do I really need res here?
 
                     if (result === "complete") {
                         keepFetching = false;
@@ -270,7 +268,7 @@ export default {
         toPath = toPath.join("/");
 
         try {
-            await this.Conn.filesMoveV2({
+            await Connection.filesMoveV2({
                 from_path: fromPath,
                 to_path: toPath,
                 autorename: true
@@ -291,7 +289,7 @@ export default {
             let path = entries[0].path;
 
             try {
-                await this.Conn.filesDeleteV2({ path });
+                await Connection.filesDeleteV2({ path });
             } catch (err) {
                 throw new CustomError({
                     reason: "remote_sole",
@@ -303,7 +301,7 @@ export default {
                 path: entry.path,
             }));
 
-            let { ".tag": result, entries: resEntries, async_job_id } = await this.Conn.filesDeleteBatch({ entries: paths });
+            let { ".tag": result, entries: resEntries, async_job_id } = await Connection.filesDeleteBatch({ entries: paths });
 
             if (result === "complete") {
                 resEntries.forEach(entry => {
@@ -318,7 +316,7 @@ export default {
                 let keepFetching = true;
 
                 while (keepFetching) {
-                    let res = { ".tag": result, entries: resEntries } = await this.Conn.filesDeleteBatchCheck({ async_job_id });
+                    let res = { ".tag": result, entries: resEntries } = await Connection.filesDeleteBatchCheck({ async_job_id });
 
                     if (result === "complete") {
                         keepFetching = false;
@@ -344,7 +342,7 @@ export default {
         if (asZip) {
             const TEMP_FOLDER_DESIRED_PATH = "/__temp__downloading__";
 
-            let { metadata: folder } = await this.Conn.filesCreateFolderV2({
+            let { metadata: folder } = await Connection.filesCreateFolderV2({
                 path: TEMP_FOLDER_DESIRED_PATH,
                 autorename: true
             });
@@ -354,21 +352,21 @@ export default {
                 to_path: folder.path_lower + "/" + entry.name
             }));
 
-            let { ".tag": result, async_job_id } = await this.Conn.filesCopyBatchV2({
+            let { ".tag": result, async_job_id } = await Connection.filesCopyBatchV2({
                 entries: relocationPaths,
                 autorename: true
             });
 
             const downloadZip = async () => {
                 try {
-                    var { fileBlob } = await this.Conn.filesDownloadZip({ path: folder.path_lower });
+                    var { fileBlob } = await Connection.filesDownloadZip({ path: folder.path_lower });
                 } catch (err) {
                     throw new CustomError({
                         reason: "remote_zip",
                         details: err
                     });
                 } finally {
-                    await this.Conn.filesDeleteV2({ path: folder.path_lower });
+                    await Connection.filesDeleteV2({ path: folder.path_lower });
                 }
 
                 this.Helpers.downloadBlob(fileBlob, "DOWNLOAD.zip");
@@ -380,7 +378,7 @@ export default {
                 let keepFetching = true;
 
                 while (keepFetching) {
-                    let { ".tag": result } = await this.Conn.filesMoveBatchCheckV2({ async_job_id });
+                    let { ".tag": result } = await Connection.filesMoveBatchCheckV2({ async_job_id });
 
                     if (result === "complete") {
                         keepFetching = false;
@@ -399,7 +397,7 @@ export default {
 
             await Promise.all(filesToDownload.map(async file => {
                 try {
-                    var { fileBlob, name } = await this.Conn.filesDownload({ path: file.path });
+                    var { fileBlob, name } = await Connection.filesDownload({ path: file.path });
                 } catch (err) {
                     throw new CustomError({
                         reason: filesToDownload.length === 1 ? "remote_sole" : "remote_several",
@@ -441,7 +439,7 @@ export default {
             let desiredPath = file.path;
 
             if (file.size < DIRECT_UPLOAD_FILE_SIZE_LIMIT) {
-                UPLOADS.push(this.Conn.filesUpload({
+                UPLOADS.push(Connection.filesUpload({
                     path: desiredPath,
                     mode: "add",
                     autorename: true,
@@ -460,7 +458,7 @@ export default {
 
                 let task = fileBlobs.reduce(async (sessionId, blob, index, items) => {
                     if (index === 1) {
-                        return (await this.Conn.filesUploadSessionStart({
+                        return (await Connection.filesUploadSessionStart({
                             close: false,
                             contents: blob
                         })).session_id;
@@ -470,7 +468,7 @@ export default {
                             offset: (index - 1) * SESSION_UPLOAD_MAX_CHUNK_SIZE,
                         };
 
-                        await this.Conn.filesUploadSessionAppendV2({
+                        await Connection.filesUploadSessionAppendV2({
                             cursor: cursor,
                             close: false,
                             contents: blob
@@ -491,7 +489,7 @@ export default {
                             mute: false
                         };
 
-                        return this.Conn.filesUploadSessionFinish({
+                        return Connection.filesUploadSessionFinish({
                             cursor: cursor,
                             commit: commit,
                             contents: blob

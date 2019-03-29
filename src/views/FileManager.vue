@@ -36,14 +36,17 @@ export default {
     },
 
     async created() {
-        if (!this.$store.getters["cloud/connection"]) {
-            this.$router.replace({
+        try {
+            this.loading = "Connecting to the cloud...";
+            await this.$store.dispatch("cloud/connect", this.$store.getters["cloud/token"]);
+        } catch (err) {
+            return this.$router.replace({
                 name: "home",
                 params: {
                     redirected: true,
                     redirectionDetails: {
                         type: "error",
-                        message: "Connect to Dropbox first"
+                        message: err.message
                     }
                 }
             });
