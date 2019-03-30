@@ -1,5 +1,58 @@
 <template>
 <main>
+    <header class="toolbar">
+        <folder-path
+            class="folder-path"
+            :folder="folder"
+        />
+
+        <section class="actions">
+            <input
+                id="create-folder"
+                type="file" multiple
+                @input="createFolder"
+                hidden
+            >
+            <label
+                for="create-folder-button"
+                class="button create-folder"
+            >
+                <span class="icon"></span>
+                <span class="text">Create Folder</span>
+            </label>
+
+            <input
+                id="upload-files"
+                type="file" multiple
+                @input="upload($event)"
+                hidden
+            >
+            <label
+                for="upload-files"
+                class="button upload-files"
+            >
+                <span class="icon"></span>
+                <span class="text">Upload Files</span>
+            </label>
+
+            <input
+                id="upload-folder"
+                type="file" webkitdirectory
+                @input="upload($event)"
+                hidden
+            >
+            <label
+                for="upload-folder"
+                class="button upload-folder"
+            >
+                <span class="icon"></span>
+                <span class="text">Upload Folder</span>
+            </label>
+        </section>
+        <section class="view-settings">
+            settings
+        </section>
+    </header>
     <button @click="toggleDownloadDialog">Download entries</button>
     <div v-if="downloadDialogOpened">
         <div
@@ -21,8 +74,6 @@
             <input type="submit">
         </form>
     </div>
-
-    <folder-path :path="folder.link" />
 
     <div class="error" v-if="uploadError" v-html="uploadError.message" />
 
@@ -90,9 +141,10 @@
 </template>
 
 <script>
+import FolderPath from "@/components/FolderPath.vue";
 import TreeView from "@/components/TreeView.vue";
 import TreeItem from "@/components/FolderViewTreeItem.vue";
-import FolderPath from "@/components/FolderPath.vue";
+
 import { mapGetters } from "vuex";
 
 export default {
@@ -206,7 +258,82 @@ export default {
 </script>
 
 <style scoped>
-.error {
-    color: red;
+main {
+    border: 1px solid black;
 }
+
+.toolbar {
+    padding: 0.5rem;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.toolbar .folder-path {
+    margin-right: auto;
+}
+
+.toolbar .actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.actions .button {
+    margin: 0 0.25rem;
+    padding: 0.25rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    color: rgba(0, 0, 0, 0.75);
+    border: 2px solid rgb(126, 87, 194);
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.actions .button:hover {
+    background-color: rgb(126, 87, 194);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.actions .button .icon {
+    margin-right: 0.25rem;
+    padding: 0.25rem;
+    width: 1rem;
+    height: 1rem;
+    background-color: white;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 1rem;
+    border-radius: 2.5px;
+}
+
+.button.create-folder .icon {
+    background-image: url("/src/assets/icons/create-folder-gray.svg");
+}
+
+.button.create-folder:hover .icon {
+    background-image: url("/src/assets/icons/create-folder-purple.svg");
+}
+
+.button.upload-files .icon {
+    background-image: url("/src/assets/icons/upload-files-gray.svg");
+}
+
+.button.upload-files:hover .icon {
+    background-image: url("/src/assets/icons/upload-files-purple.svg");
+}
+
+.button.upload-folder .icon {
+    background-image: url("/src/assets/icons/upload-folder-gray.svg");
+}
+
+.button.upload-folder:hover .icon {
+    background-image: url("/src/assets/icons/upload-folder-purple.svg");
+}
+
+
+    /* background: url("/src/assets/icons/create-folder-inactive.svg"); */
+
 </style>

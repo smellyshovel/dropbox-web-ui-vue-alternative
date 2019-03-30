@@ -1,0 +1,24 @@
+<svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" width="16" height="16" version="1.1" inkscape:version="0.48.5 r10040" sodipodi:docname="folder-documents.svg" inkscape:export-filename="/media/Data/Main/Visuals/Icons/Numix/Desktop/repos/numix-wiki/Gjorgi/Numix-folders/48/New/folder-144.png" inkscape:export-xdpi="270" inkscape:export-ydpi="270"><rect id="backgroundrect" width="100%" height="100%" x="0" y="0" fill="none" stroke="none"/>
+  <defs id="defs4"/>
+  <sodipodi:namedview id="base" pagecolor="#ffffff" bordercolor="#666666" borderopacity="1.0" inkscape:pageopacity="0.0" inkscape:pageshadow="2" inkscape:zoom="65.782651" inkscape:cx="4.063793" inkscape:cy="10.502998" inkscape:document-units="px" inkscape:current-layer="layer1" showgrid="true" inkscape:window-width="1920" inkscape:window-height="1052" inkscape:window-x="0" inkscape:window-y="28" inkscape:window-maximized="1" showguides="true" inkscape:guide-bbox="true">
+    <inkscape:grid type="xygrid" id="grid2985" empspacing="5" visible="true" enabled="true" snapvisiblegridlinesonly="true"/>
+  </sodipodi:namedview>
+  <metadata id="metadata7">
+    <rdf:RDF>
+      <cc:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+        <dc:title/>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  
+<g class="currentLayer" style=""><title>Layer 1</title>
+    <g id="g3768" style="opacity: 1; fill-opacity: 1;" class="" fill-opacity="1" fill="#bdbdbd">
+      <path sodipodi:nodetypes="ssssssccsccccccc" inkscape:connector-curvature="0" id="rect2991-3" d="M4,0 C2.8920000000000003,0 2,0.892000000000053 2,2 l0,12 c0,1.108 0.8920000000000005,2 2,2 l8,0 c1.108,0 2,-0.8920000000000005 2,-2 L14,5 L9,0 zm0,2 l6,0 l1,1 l1,1 l0,10 l-8,0 z" style="fill-opacity: 1; stroke: none;" fill="#bdbdbd"/>
+      <path sodipodi:nodetypes="cccc" inkscape:connector-curvature="0" id="path2997" d="m9,0 l0,5 l5,0 z" style="fill-opacity: 1; stroke: none;" fill="#bdbdbd"/>
+      <rect ry="0.25" rx="0.25" y="7" x="5" height="1" width="4" id="rect3767" style="fill-opacity: 1; stroke: none;" fill="#bdbdbd"/>
+      <rect style="fill-opacity: 1; stroke: none;" id="rect3771" width="6" height="1" x="5" y="9" rx="0.25" ry="0.25" fill="#bdbdbd"/>
+      <rect ry="0.25" rx="0.25" y="11" x="5" height="1" width="6" id="rect3775" style="fill-opacity: 1; stroke: none;" fill="#bdbdbd"/>
+    </g>
+  </g></svg>

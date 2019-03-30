@@ -1,48 +1,58 @@
 <template>
-    <h1>
+    <div class="container">
         <span
-            v-for="(chunk, index) in pathChunks"
-            :key="index"
+            class="container"
+            v-for="(folder, index) in foldersChain"
+            :key="folder.name"
         >
-            <span
-                v-if="index < pathChunks.length - 1"
+            <router-link
+                :to="folderLink(folder)"
+                class="folder-name"
+                :class="{ 'is-root': isRoot(folder) }"
             >
-                <router-link :to="getLinkPath(index)">{{ chunk }}</router-link>
-                >
-            </span>
+                <span v-if="!isRoot(folder)">{{ folder.name }}</span>
+            </router-link>
 
             <span
-                v-else
-            >
-                {{ chunk }}
-            </span>
+                v-if="index < foldersChain.length - 1"
+                class="separator"
+            />
         </span>
-    </h1>
+    </div>
 </template>
 
 <script>
+import { Folder } from "@/middleware/entry.js";
+
 export default {
     props: {
-        path: String
+        folder: Folder
     },
 
     computed: {
-        pathChunks() {
-            if (this.path === "") return ["☁"];
-            let path = ("☁/" + this.path).split("/");
-            return path;
-        }
+        foldersChain() {
+            let foldersChain = [this.folder];
+            let parent = this.folder.parent;
+
+            while (parent) {
+                foldersChain.push(parent);
+                parent = parent.parent;
+            }
+
+            return foldersChain.reverse();
+        },
     },
 
     methods: {
-        getLinkPath(index) {
-            let path = this.path.split("/");
-            path = path.slice(0, index);
+        isRoot(folder) {
+            return folder.path === "";
+        },
 
-            if (path.length === 0) {
-                return "/fm";
+        folderLink(folder) {
+            if (this.isRoot(folder)) {
+                return { name: "fm" };
             } else {
-                return "/fm/" + path.join("/");
+                return { name: "fm", params: { folderLink: folder.link } };
             }
         }
     }
@@ -50,4 +60,48 @@ export default {
 </script>
 
 <style scoped>
+.container {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.folder-name {
+    padding: 0 0.25rem;
+    display: block;
+    color: rgba(0, 0, 0, 0.75);
+    text-decoration: none;
+    border-bottom: 2px solid #bdbdbd;
+}
+
+.folder-name:hover {
+    color: rgb(126, 87, 194);
+    border-bottom: 2px solid rgb(126, 87, 194);
+}
+
+.folder-name.is-root {
+    padding: 0.25rem;
+    width: 1rem;
+    height: 1rem;
+    background-image: url("/src/assets/icons/cloud-gray.svg");
+    background-repeat: no-repeat;
+    background-size: 1.25rem;
+    background-position: center;
+    border-bottom: none;
+}
+
+.folder-name.is-root:hover {
+    background-image: url("/src/assets/icons/cloud-purple.svg");
+}
+
+.separator {
+    display: block;
+    width: 1rem;
+    height: 1rem;
+    background-image: url("/src/assets/icons/folder-path-separator.svg");
+    background-repeat: no-repeat;
+    background-size: 0.75rem;
+    background-position: center;
+}
 </style>
