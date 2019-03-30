@@ -97,11 +97,10 @@ export default {
 
 .separator {
     display: block;
-    width: 1rem;
-    height: 1rem;
+    width: 0.75rem;
+    height: 0.75rem;
     background-image: url("/src/assets/icons/folder-path-separator.svg");
     background-repeat: no-repeat;
-    background-size: 0.75rem;
     background-position: center;
 }
 </style>
