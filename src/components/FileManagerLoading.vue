@@ -25,7 +25,7 @@ export default {
     align-items: center;
     width: 100vw;
     height: 100vh;
-    background-color: rgb(119, 50, 251);
+    background-color: rgb(126, 87, 194);
 }
 
 .container {
