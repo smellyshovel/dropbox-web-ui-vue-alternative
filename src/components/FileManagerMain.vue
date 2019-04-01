@@ -50,7 +50,8 @@
             </label>
         </section>
         <section class="view-settings">
-            settings
+            <div class="button list"></div>
+            <div class="button grid"></div>
         </section>
     </header>
     <button @click="toggleDownloadDialog">Download entries</button>
@@ -331,6 +332,38 @@ main {
 
 .button.upload-folder:hover .icon {
     background-image: url("/src/assets/icons/upload-folder-purple.svg");
+}
+
+.toolbar .view-settings {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.view-settings .button {
+    margin: 0 0.25rem;
+    display: block;
+    width: 1.25rem;
+    height: 1.25rem;
+    background-repeat: no-repeat;
+    background-size: 1.25rem;
+    cursor: pointer;
+}
+
+.button.list {
+    background-image: url("/src/assets/icons/view-list-gray.svg");
+}
+
+.button.list:hover {
+    background-image: url("/src/assets/icons/view-list-purple.svg");
+}
+
+.button.grid {
+    background-image: url("/src/assets/icons/view-grid-gray.svg");
+}
+
+.button.grid:hover {
+    background-image: url("/src/assets/icons/view-grid-purple.svg");
 }
 
 
