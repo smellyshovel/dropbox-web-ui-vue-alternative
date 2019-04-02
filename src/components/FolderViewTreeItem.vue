@@ -3,6 +3,7 @@
     @dblclick="mainAction"
     :class="{ selected: isSelected }"
     class="entry"
+    v-context-menu="appropriateContextMenu"
 >
     <div
         class="mimetype-icon"
@@ -57,6 +58,20 @@ export default {
 
         modificationDate() {
             return this.entry.lastModified.toLocaleDateString();
+        },
+
+        appropriateContextMenu() {
+            let selectedEntries = this.$store.state.selections.selected.map(selected => {
+                return selected.entry;
+            });
+
+            let prefix = "#cm-folder-view-"
+
+            if (selectedEntries.length === 1) {
+                return prefix + "single";
+            } else if (selectedEntries.length > 1) {
+                return prefix + "multiple";
+            }
         }
     },
 

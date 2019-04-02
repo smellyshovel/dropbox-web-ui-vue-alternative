@@ -6,6 +6,9 @@ import store from "./store/";
 
 Vue.config.productionTip = false;
 
+import VCCM from "vue-custom-context-menu";
+Vue.use(VCCM);
+
 new Vue({
     router,
     store,

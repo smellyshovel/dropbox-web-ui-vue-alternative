@@ -1,9 +1,9 @@
 <template>
 <li
     :class="{ selected: isSelected }"
-    @click.exact.stop="select"
-    @click.ctrl.exact.stop="ctrlSelect"
-    @click.shift.exact.stop="shiftSelect"
+    @mousedown.exact.stop="select($event)"
+    @mousedown.ctrl.exact.stop="ctrlSelect"
+    @mousedown.shift.exact.stop="shiftSelect"
 >
 
     <slot :item="this" />
@@ -83,8 +83,18 @@ export default {
             this.subTreeOpened = !this.subTreeOpened;
         },
 
-        select() {
-            this.$store.dispatch("selections/setSingle", this);
+        select(event) {
+            let alreadySelected = this.$store.state.selections.selected.includes(this);
+            let rightClick = event.which === 3;
+
+            if (rightClick) {
+                if (!alreadySelected) {
+                    this.$store.dispatch("selections/setSingle", this);
+                }
+            } else {
+                this.$store.dispatch("selections/setSingle", this);
+            }
+
         },
 
         ctrlSelect() {
