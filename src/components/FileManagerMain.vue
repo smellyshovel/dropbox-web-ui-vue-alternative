@@ -50,94 +50,31 @@
             </label>
         </section>
         <section class="view-settings">
-            <div class="button list"></div>
-            <div class="button grid"></div>
+            <div
+                @click="listView = 'list'"
+                class="button list"
+            />
+            <div
+                @click="listView = 'grid'"
+                class="button grid"
+            />
         </section>
     </header>
-    <button @click="toggleDownloadDialog">Download entries</button>
-    <div v-if="downloadDialogOpened">
-        <div
-            v-if="downloadError"
-            class="error"
-            v-html="downloadError.message"
-        />
-        <form @submit.prevent="downloadEntries">
-            <select
-                multiple
-                v-model="downloadEntriesChosen"
-            >
-                <option
-                    v-for="entry in folder.contents"
-                    :value="entry"
-                >{{ entry.path }}</option>
-            </select>
-            <input type="checkbox" v-model="downloadAsZip" id="download-zip"> <label for="download-zip">As zip</label>
-            <input type="submit">
-        </form>
+
+    <div class="folder-view">
+        <tree-view
+            :tree="tree"
+            :view="listView"
+        >
+            <template v-slot:default="{ item }">
+                <tree-item :item="item" />
+            </template>
+
+            <template v-slot:empty>
+                The folder's empty
+            </template>
+        </tree-view>
     </div>
-
-    <div class="error" v-if="uploadError" v-html="uploadError.message" />
-
-    <div
-        v-if="uploadConflict"
-        class="conflict"
-    >
-        {{ uploadConflict.conflict.target.type }} called "{{ uploadConflict.conflict.target.name }}" already exists. What to do?
-        <form @submit.prevent="uploadConflictResolver({ strategy: uploadConflictResolutionStrategy, sameForTheRest: uploadConflictResolutionStrategySameForTheRest || false });">
-            <input type="radio" value="autorename" v-model="uploadConflictResolutionStrategy"> Autorename
-            <br>
-            <input type="radio" value="skip" v-model="uploadConflictResolutionStrategy"> Skip this entry
-            <br>
-            <div v-if="uploadConflict.totalNumberOfConflicts > 1">
-                <input v-if="" type="checkbox" :value="true" v-model="uploadConflictResolutionStrategySameForTheRest"> Apply for the rest {{ uploadConflict.totalNumberOfConflicts }} conflicts
-                <br>
-            </div>
-            <input type="submit"> <input type="button" value="Cancel" @click="uploadConflictResolver({ strategy: 'cancel' })">
-        </form>
-    </div>
-
-    <label for="upload-files">Upload Files</label>
-    <input
-        id="upload-files"
-        type="file" multiple
-        @change="upload($event)"
-        hidden
-    >
-
-    <label for="upload-dir">Upload Folder</label>
-    <input
-        id="upload-dir"
-        type="file" webkitdirectory
-        @change="upload($event)"
-        hidden
-    >
-
-    <button @click="toggleCreateFolderDialog">Create Folder</button>
-    <div v-if="createFolderDialogOpened">
-        <div
-            v-if="createFolderError"
-            class="error"
-            v-html="createFolderError.message"
-        />
-        <form @submit.prevent="createFolder">
-            <input type="text" v-model="folderToCreateName">
-            <input type="submit">
-        </form>
-    </div>
-
-    <input type="button" value="Update" @click="update">
-
-    <tree-view
-        :tree="tree"
-    >
-        <template v-slot:default="{ item }">
-            <tree-item :item="item" />
-        </template>
-
-        <template v-slot:empty>
-            The folder's empty
-        </template>
-    </tree-view>
 </main>
 </template>
 
@@ -173,6 +110,8 @@ export default {
 
     data() {
         return {
+            listView: "list",
+
             createFolderDialogOpened: false,
             folderToCreateName: "",
             createFolderError: null,
@@ -260,10 +199,13 @@ export default {
 
 <style scoped>
 main {
-    border: 1px solid black;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
 }
 
 .toolbar {
+    /* position: fixed; */
     padding: 0.5rem;
     display: flex;
     justify-content: flex-end;
@@ -308,6 +250,10 @@ main {
     background-repeat: no-repeat;
     background-size: 1rem;
     border-radius: 2.5px;
+}
+
+.actions .button .text {
+    text-align: center;
 }
 
 .button.create-folder .icon {
@@ -366,7 +312,10 @@ main {
     background-image: url("/src/assets/icons/view-grid-purple.svg");
 }
 
-
-    /* background: url("/src/assets/icons/create-folder-inactive.svg"); */
-
+.folder-view {
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
 </style>

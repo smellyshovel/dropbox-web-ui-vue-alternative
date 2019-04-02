@@ -1,27 +1,11 @@
-<svg width="64" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" height="64" xmlns:xlink="http://www.w3.org/1999/xlink">
- <defs>
-  <linearGradient id="a" y1="17" x1="40" y2="31" gradientUnits="userSpaceOnUse" x2="54">
-   <stop stop-color="#060606"/>
-   <stop offset="1" stop-opacity="0"/>
-  </linearGradient>
-  <linearGradient id="b" y1="392.36" y2="336.36" gradientUnits="userSpaceOnUse" x2="0" gradientTransform="translate(-48-332.36)">
-   <stop stop-color="#ffffff" stop-opacity="0"/>
-   <stop offset="1" stop-color="#ffffff" stop-opacity=".2"/>
-  </linearGradient>
-  <path id="c" d="m10 61v-58h30l14 14v44h-14z"/>
- </defs>
- <g color-rendering="auto" color-interpolation-filters="linearRGB" shape-rendering="auto" image-rendering="auto" text-rendering="auto" color-interpolation="sRGB" color="#000000">
-  <use fill="#555555" xlink:href="#c"/>
-  <g transform="scale(1-1)">
-   <rect opacity=".4" x="10" y="-4" width="30" fill="#ffffff" height="1"/>
-   <rect opacity=".35" x="10" y="-61" width="44" height="1"/>
-  </g>
-  <path opacity=".5" fill="#ffffff" fill-rule="evenodd" d="m54 17l-14-14v14z"/>
- </g>
- <path opacity=".4" fill="url(#a)" fill-rule="evenodd" d="m40 17l14 14v-14z"/>
- <g color-rendering="auto" color-interpolation-filters="linearRGB" shape-rendering="auto" image-rendering="auto" text-rendering="auto" color-interpolation="sRGB" color="#000000">
-  <path fill="#343434" d="m20 24v22h26v-22zm18 1c.552 0 1 .448 1 1 0 .552-.448 1-1 1-.552 0-1-.448-1-1 0-.552.448-1 1-1m3 0c.552 0 1 .448 1 1 0 .552-.448 1-1 1-.552 0-1-.448-1-1 0-.552.448-1 1-1m3 0c.552 0 1 .448 1 1 0 .552-.448 1-1 1-.552 0-1-.448-1-1 0-.552.448-1 1-1m-23 3h24v17h-24zm8.799 4l2.713 4.721-3.094 5.279h1.184l2.502-4.416 2.5 4.416h1.131c.013-.01.027-.019.039-.029l-3.057-5.25 2.697-4.721h-1.211l-2.1 3.857-2.1-3.857z"/>
-  <path fill="#e0e0e0" d="m19 23v22h26v-22zm18 1c.552 0 1 .448 1 1 0 .552-.448 1-1 1-.552 0-1-.448-1-1 0-.552.448-1 1-1m3 0c.552 0 1 .448 1 1 0 .552-.448 1-1 1-.552 0-1-.448-1-1 0-.552.448-1 1-1m3 0c.552 0 1 .448 1 1 0 .552-.448 1-1 1-.552 0-1-.448-1-1 0-.552.448-1 1-1m-23 3h24v17h-24zm8.799 4l2.713 4.721-3.094 5.279h1.184l2.502-4.416 2.5 4.416h1.131c.013-.01.027-.019.039-.029l-3.057-5.25 2.697-4.721h-1.211l-2.1 3.857-2.1-3.857z"/>
- </g>
- <use fill="url(#b)" xlink:href="#c"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+ <path d="m 2.668 0 c -0.344 0 -0.668 0.338 -0.668 0.697 l 0 14.607 c 0 0.338 0.344 0.697 0.668 0.697 l 10.664 0 c 0.324 0 0.668 -0.359 0.668 -0.697 l 0 -11.304 -4 -4 z" style="fill:#dcdcdc;fill-opacity:1"/>
+ <path d="m 10.583 3.332 0.015 0.02 0.04 -0.02 z m 0.03 0.668 3.387 3.664 0 -3.664 z" style="fill:#000;fill-opacity:0.196"/>
+ <path d="m 10 0 3.996 4 -3.384 0 c -0.299 0 -0.613 -0.317 -0.613 -0.616 z" style="fill:#fff;fill-opacity:0.392"/>
+ <rect width="1" height="2" x="5" y="5" style="fill:#555;fill-opacity:1;stroke:none;fill-rule:evenodd"/>
+ <rect width="1" height="2" x="5" y="8" style="fill:#555;fill-opacity:1;stroke:none;fill-rule:evenodd"/>
+ <rect width="1" height="2" x="5" y="11" style="fill:#555;fill-opacity:1;stroke:none;fill-rule:evenodd"/>
+ <rect width="2" height="2" x="7" y="8" style="fill:#555;fill-opacity:1;stroke:none;fill-rule:evenodd"/>
+ <rect width="2" height="2" x="7" y="11" style="fill:#555;fill-opacity:1;stroke:none;fill-rule:evenodd"/>
+ <rect width="1" height="2" x="10" y="11" style="fill:#555;fill-opacity:1;stroke:none;fill-rule:evenodd"/>
 </svg>

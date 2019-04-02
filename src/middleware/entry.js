@@ -29,7 +29,7 @@ class Entry {
 
     updateThumbnail() {
         if (this.type === "folder") {
-            this.thumbnail = require("@/assets/mimetypes/folder.png");
+            this.thumbnail = require("@/assets/mimetypes/folder.svg");
         } else {
             let ext = this.name.split(".");
 

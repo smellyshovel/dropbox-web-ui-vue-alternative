@@ -1,26 +1,6 @@
-<svg width="64" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" height="64" xmlns:xlink="http://www.w3.org/1999/xlink">
- <defs>
-  <linearGradient id="a" y1="17" x1="40" y2="31" gradientUnits="userSpaceOnUse" x2="54" gradientTransform="translate(180 750.36)">
-   <stop stop-color="#060606"/>
-   <stop offset="1" stop-opacity="0"/>
-  </linearGradient>
-  <linearGradient id="b" y1="392.36" y2="320.48" x2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(1 0 0 .84587 140 469.63)">
-   <stop stop-color="#ffffff" stop-opacity="0"/>
-   <stop offset="1" stop-color="#ffffff" stop-opacity=".2"/>
-  </linearGradient>
-  <path color-rendering="auto" color-interpolation-filters="linearRGB" shape-rendering="auto" image-rendering="auto" text-rendering="auto" id="c" color-interpolation="sRGB" color="#000000" d="m178 803.36v-50h42l14 14v36h-14z"/>
- </defs>
- <g transform="translate(-174-742.36)">
-  <use fill="#8542c2" xlink:href="#c"/>
-  <g color-rendering="auto" color-interpolation-filters="linearRGB" shape-rendering="auto" image-rendering="auto" text-rendering="auto" color-interpolation="sRGB" color="#000000">
-   <rect opacity=".25" x="178" y="802.36" width="56" height="1"/>
-   <rect opacity=".5" x="178" y="753.36" width="42" fill="#ffffff" height="1"/>
-  </g>
-  <g fill-rule="evenodd">
-   <path opacity=".5" fill="#ffffff" d="m234 767.36l-14-14v14z"/>
-   <path opacity=".2" fill="url(#a)" d="m220 767.36l14 14v-14z"/>
-  </g>
-  <path opacity=".75" color-interpolation-filters="linearRGB" color="#000000" image-rendering="auto" color-rendering="auto" stroke-width="2" d="m195.05 763.71v1.828h1v-1.828zm-2.793 1.156l-.707.707 1.293 1.293.707-.707zm6.586 0l-1.293 1.293.707.707 1.293-1.293zm-3.344 1.5c-1.381 0-2.5 1.119-2.5 2.5 0 1.381 1.119 2.5 2.5 2.5 1.381 0 2.5-1.119 2.5-2.5 0-1.381-1.119-2.5-2.5-2.5m0 1c.828 0 1.5.672 1.5 1.5 0 .828-.672 1.5-1.5 1.5-.828 0-1.5-.672-1.5-1.5 0-.828.672-1.5 1.5-1.5m-5.105 1v1h1.828v-1zm8.484 0v1h1.828v-1zm14.12 5l-2 2h-.008l-8.592 8.58v.019l-4.6-4.6-9 9h1.406l6.119-6.082 1.409-1.404 1.564 1.418 3.102 3.068 4-4 2.951-2.936 3.648-3.462 3.637 3.515 7.957 7.883h1.406zm-20.16-2.5l-1.293 1.293.707.707 1.293-1.293zm5.414 0l-.707.707 1.293 1.293.707-.707zm-3.207 1.328v1.828h1v-1.828z" color-interpolation="sRGB" text-rendering="auto" fill="#ffffff" shape-rendering="auto"/>
-  <use fill="url(#b)" xlink:href="#c"/>
- </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+ <path d="m 2.668 0 c -0.344 0 -0.668 0.338 -0.668 0.697 l 0 14.607 c 0 0.338 0.344 0.697 0.668 0.697 l 10.664 0 c 0.324 0 0.668 -0.359 0.668 -0.697 l 0 -11.304 -4 -4 z" style="fill:#38a34e;fill-opacity:1"/>
+ <path d="m 10.583 3.332 0.015 0.02 0.04 -0.02 z m 0.03 0.668 3.387 3.664 0 -3.664 z" style="fill:#000;fill-opacity:0.196"/>
+ <path d="m 10 0 3.996 4 -3.384 0 c -0.299 0 -0.613 -0.317 -0.613 -0.616 z" style="fill:#fff;fill-opacity:0.392"/>
+ <path d="m 5.391 6 c -0.211 0.022 -0.396 0.242 -0.391 0.479 l 0 5.05 c 0.004 0.246 0.202 0.47 0.426 0.466 l 5.165 0 c 0.22 -0.004 0.409 -0.224 0.413 -0.466 l 0 -5.05 c 0 -0.246 -0.193 -0.475 -0.413 -0.479 z m 0.609 1 4 0 l 0 3 -1.01 -1.574 -0.897 0.831 -1.174 -1.477 -0.921 1.22 z" style="fill:#fff"/>
 </svg>

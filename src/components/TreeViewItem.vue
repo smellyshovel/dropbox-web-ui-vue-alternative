@@ -1,15 +1,12 @@
 <template>
 <li
-
+    :class="{ selected: isSelected }"
     @click.exact.stop="select"
     @click.ctrl.exact.stop="ctrlSelect"
     @click.shift.exact.stop="shiftSelect"
 >
-    <div
-        :class="{selected: isSelected}"
-    >
-        <slot :item="this"></slot>
-    </div>
+
+    <slot :item="this" />
 
     <tree-view
         v-if="hasSubTree && subTreeOpened"
@@ -108,11 +105,24 @@ export default {
 </script>
 
 <style scoped>
-li {
-  padding: 0.5rem;
+.list li .list {
+    margin-left: 1rem;
 }
 
-.selected {
-    background-color: #f2f2f2;
+.grid li {
+    box-sizing: border-box;
+    padding: 0.5rem;
+    width: 128px;
+    height: 128px;
+    border: 2px solid #bdbdbd;
+    border-radius: 5px;
+}
+
+div {
+    height: 100%;
+}
+
+.grid .selected {
+    border-color: rgb(126, 87, 194);
 }
 </style>

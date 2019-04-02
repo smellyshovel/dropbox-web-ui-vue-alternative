@@ -1,9 +1,12 @@
 <template>
-<ol v-if="normalizedTree.length">
+<ol
+    v-if="normalizedTree.length"
+    :class="[view]"
+>
     <tree-view-item
-        ref="items"
         v-for="entry in normalizedTree"
         :key="entry.id"
+        ref="items"
 
         :entry="entry"
     >
@@ -14,7 +17,7 @@
 </ol>
 
 <div v-else>
-    <slot name="empty"></slot>
+    <slot name="empty" />
 </div>
 </template>
 
@@ -39,6 +42,11 @@ export default {
         deepness: {
             type: Number,
             default: 1
+        },
+        view: {
+            type: String,
+            default: "list",
+            validator: value => ["list", "grid"].includes(value)
         }
     },
 
@@ -79,6 +87,9 @@ export default {
                         return entry.type === "file";
                         break;
                 }
+            }).sort((a, b) => {
+                let types = [a.type === "folder" ? 10 : 0, b.type === "folder" ? 10 : 0];
+                return types[1] - types[0] || a.name.localeCompare(b.name);
             });
         }
     }
@@ -87,12 +98,22 @@ export default {
 
 <style scoped>
 ol {
-    list-style: none;
-    padding: 0;
     margin: 0;
+    padding: 0;
+    list-style: none;
 }
 
-li > ol {
-    padding-left: 1rem;
+.list {
+    display: flex;
+    flex-flow: column;
+}
+
+.grid {
+    display: grid;
+    grid-template-rows: 128px;
+    grid-template-columns: repeat(auto-fill, minmax(128px, auto));
+    gap: 1rem;
+    justify-content: left;
+    align-items: center;
 }
 </style>
