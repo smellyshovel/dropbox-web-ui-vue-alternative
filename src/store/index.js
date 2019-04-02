@@ -4,11 +4,11 @@ import Vuex from "vuex";
 Vue.use(Vuex);
 
 import cloud from "./modules/cloud.js";
-import selections from "./modules/selections.js";
+import ui from "./modules/ui.js";
 
 export default new Vuex.Store({
     modules: {
         cloud,
-        selections
+        ui
     }
 });

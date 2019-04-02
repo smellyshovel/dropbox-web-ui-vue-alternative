@@ -61,7 +61,7 @@ export default {
         },
 
         appropriateContextMenu() {
-            let selectedEntries = this.$store.state.selections.selected.map(selected => {
+            let selectedEntries = this.$store.state.ui.selections.selected.map(selected => {
                 return selected.entry;
             });
 

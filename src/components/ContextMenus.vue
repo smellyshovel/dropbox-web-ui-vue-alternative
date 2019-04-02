@@ -69,7 +69,7 @@ export default {
         },
 
         selectedEntries() {
-            return this.$store.state.selections.selected.map(selected => selected.entry);
+            return this.$store.state.ui.selections.selected.map(selected => selected.entry);
         }
     },
 

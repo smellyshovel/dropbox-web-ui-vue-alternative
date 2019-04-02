@@ -74,7 +74,7 @@ export default {
         },
 
         isSelected() {
-            return this.$store.getters["selections/isSelected"](this);
+            return this.$store.getters["ui/selections/isSelected"](this);
         }
     },
 
@@ -84,28 +84,28 @@ export default {
         },
 
         select(event) {
-            let alreadySelected = this.$store.state.selections.selected.includes(this);
+            let alreadySelected = this.$store.state.ui.selections.selected.includes(this);
             let rightClick = event.which === 3;
 
             if (rightClick) {
                 if (!alreadySelected) {
-                    this.$store.dispatch("selections/setSingle", this);
+                    this.$store.dispatch("ui/selections/setSingle", this);
                 }
             } else {
-                this.$store.dispatch("selections/setSingle", this);
+                this.$store.dispatch("ui/selections/setSingle", this);
             }
 
         },
 
         ctrlSelect() {
-            this.$store.dispatch("selections/toggle", this);
+            this.$store.dispatch("ui/selections/toggle", this);
         },
 
         shiftSelect() {
             // ctrl-select instead of shift-select for nested trees
             if (this.deepness !== 1) return this.ctrlSelect();
 
-            this.$store.dispatch("selections/setRange", {
+            this.$store.dispatch("ui/selections/setRange", {
                 target: this,
                 bank: this.$parent.$refs.items
             });

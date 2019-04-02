@@ -13,6 +13,11 @@
     id="fm"
     v-else
 >
+    <file-picker
+        id="fm-file-picker"
+        v-if="showFilePicker"
+    />
+
     <file-manager-header id="fm-header" />
     <file-manager-sidebar id="fm-sidebar" />
     <file-manager-main id="fm-main" />
@@ -26,13 +31,17 @@ import FileManagerHeader from "@/components/FileManagerHeader.vue";
 import FileManagerSidebar from "@/components/FileManagerSidebar.vue";
 import FileManagerMain from "@/components/FileManagerMain.vue";
 
+import FilePicker from "@/components/FilePicker.vue";
+
 export default {
     components: {
         FileManagerLoading,
         FileManagerError,
         FileManagerHeader,
         FileManagerSidebar,
-        FileManagerMain
+        FileManagerMain,
+
+        FilePicker
     },
 
     async created() {
@@ -70,6 +79,12 @@ export default {
             loading: true,
             error: null
         };
+    },
+
+    computed: {
+        showFilePicker() {
+            return this.$store.state.ui.filePicker.show;
+        }
     }
 };
 </script>
