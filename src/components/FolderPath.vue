@@ -6,7 +6,7 @@
             :key="folder.name"
         >
             <router-link
-                @click.native="handleClick($event, folder)"
+                @click.native.stop="handleClick($event, folder)"
                 to=""
                 class="folder-name"
                 :class="{ 'is-root': isRoot(folder) }"

@@ -37,7 +37,10 @@
             id="cm-folder-view-multiple"
         >
             <cm-item v-context-menu="'#cm-folder-view-download-options'">Download</cm-item>
-            <cm-item>Move</cm-item>
+            <cm-item :action="move">
+                <span class="icon move"></span>
+                <span class="text">Move</span>
+            </cm-item>
             <cm-item>Copy</cm-item>
             <cm-item>Delete</cm-item>
         </context-menu>
@@ -80,9 +83,9 @@ export default {
             }
         },
 
-        downloadPlain() {
+        async downloadPlain() {
             try {
-                this.$store.dispatch("cloud/downloadEntries", {
+                await this.$store.dispatch("cloud/downloadEntries", {
                     entries: this.selectedEntries,
                     asZip: false
                 });
@@ -91,9 +94,9 @@ export default {
             }
         },
 
-        downloadZip() {
+        async downloadZip() {
             try {
-                this.$store.dispatch("cloud/downloadEntries", {
+                await this.$store.dispatch("cloud/downloadEntries", {
                     entries: this.selectedEntries,
                     asZip: true
                 });
@@ -102,14 +105,19 @@ export default {
             }
         },
 
-        move() {
+        async move() {
             try {
-                this.$store.dispatch("cloud/downloadEntries", {
+                await this.$store.dispatch("cloud/moveEntries", {
                     entries: this.selectedEntries,
-                    asZip: true
+                    destination: await this.$store.dispatch("ui/filePicker/pickFolder", {
+                        purpose: "move",
+                        entries: this.selectedEntries
+                    })
                 });
             } catch (err) {
-                console.error(err);
+                if (err !== "file_picker_cancel") {
+                    console.error(err);
+                }
             }
         }
     }
