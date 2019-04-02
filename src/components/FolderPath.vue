@@ -6,7 +6,8 @@
             :key="folder.name"
         >
             <router-link
-                :to="folderLink(folder)"
+                @click.native="handleClick($event, folder)"
+                to=""
                 class="folder-name"
                 :class="{ 'is-root': isRoot(folder) }"
             >
@@ -26,7 +27,8 @@ import { Folder } from "@/middleware/entry.js";
 
 export default {
     props: {
-        folder: Folder
+        folder: Folder,
+        dontGo: Boolean
     },
 
     computed: {
@@ -54,6 +56,15 @@ export default {
             } else {
                 return { name: "fm", params: { folderLink: folder.link } };
             }
+        },
+
+        handleClick(event, folder) {
+            if (this.dontGo) {
+                this.$emit("click", event, folder);
+                return;
+            }
+
+            this.$router.push(this.folderLink(folder));
         }
     }
 }
