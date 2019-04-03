@@ -2,8 +2,8 @@
 <li
     :class="{ selected: isSelected }"
     @mousedown.exact.stop="select($event)"
-    @mousedown.ctrl.exact.stop="ctrlSelect"
-    @mousedown.shift.exact.stop="shiftSelect"
+    @mousedown.ctrl.exact.stop="ctrlSelect($event)"
+    @mousedown.shift.exact.stop="shiftSelect($event)"
 >
 
     <slot :item="this" />
@@ -39,6 +39,7 @@ export default {
     inject: {
         "mode": "providedMode",
         "deepness": "providedDeepness",
+        "selectMode": "providedSelectMode",
         "level": {
             default: 1
         }
@@ -84,6 +85,8 @@ export default {
         },
 
         select(event) {
+            if (this.selectMode === "disabled") return;
+
             let alreadySelected = this.$store.state.ui.selections.selected.includes(this);
             let rightClick = event.which === 3;
 
@@ -97,18 +100,30 @@ export default {
 
         },
 
-        ctrlSelect() {
-            this.$store.dispatch("ui/selections/toggle", this);
+        ctrlSelect(event) {
+            if (this.selectMode === "disabled") return;
+
+            if (this.selectMode === "multiple") {
+                this.$store.dispatch("ui/selections/toggle", this);
+            } else if (this.selectMode === "single") {
+                this.select(event);
+            }
         },
 
-        shiftSelect() {
-            // ctrl-select instead of shift-select for nested trees
-            if (this.deepness !== 1) return this.ctrlSelect();
+        shiftSelect(event) {
+            if (this.selectMode === "disabled") return;
+            
+            if (this.selectMode === "multiple") {
+                // ctrl-select instead of shift-select for nested trees
+                if (this.deepness !== 1) return this.ctrlSelect();
 
-            this.$store.dispatch("ui/selections/setRange", {
-                target: this,
-                bank: this.$parent.$refs.items
-            });
+                this.$store.dispatch("ui/selections/setRange", {
+                    target: this,
+                    bank: this.$parent.$refs.items
+                });
+            } else if (this.selectMode === "single") {
+                this.select(event);
+            }
         }
     }
 };

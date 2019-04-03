@@ -47,13 +47,19 @@ export default {
             type: String,
             default: "list",
             validator: value => ["list", "grid"].includes(value)
+        },
+        selectMode: {
+            type: String,
+            default: "multiple",
+            validator: value => ["single", "multiple", "disabled"].includes(value)
         }
     },
 
     provide() {
         return {
             providedMode: this.resolvedMode,
-            providedDeepness: this.resolvedDeepness
+            providedDeepness: this.resolvedDeepness,
+            providedSelectMode: this.resolvedSelectMode
         }
     },
 
@@ -65,12 +71,17 @@ export default {
         injectedDeepness: {
             from: "providedDeepness",
             default: null
+        },
+        injectedSelectMode: {
+            from: "providedSelectMode",
+            default: null
         }
     },
 
     data() { return {
         resolvedMode: this.injectedMode || this.mode,
-        resolvedDeepness: this.injectedDeepness || this.deepness
+        resolvedDeepness: this.injectedDeepness || this.deepness,
+        resolvedSelectMode: this.injectedSelectMode || this.selectMode
     }},
 
     computed: {
