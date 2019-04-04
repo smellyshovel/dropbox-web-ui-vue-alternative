@@ -193,8 +193,10 @@ export default {
 }
 
 .footer .accept:disabled, .footer .accept:disabled:hover {
+    background-color: white;
     color: #d2d2d2;
     border-color: #f2f2f2;
+    cursor: not-allowed;
 }
 
 </style>
