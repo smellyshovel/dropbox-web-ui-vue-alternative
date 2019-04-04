@@ -23,7 +23,7 @@
                 <span class="icon rename"></span>
                 <span class="text">Rename</span>
             </cm-item>
-            <cm-item>
+            <cm-item :action="remove">
                 <span class="icon delete"></span>
                 <span class="text">Delete</span>
             </cm-item>
@@ -48,7 +48,7 @@
                 <span class="icon copy"></span>
                 <span class="text">Copy</span>
             </cm-item>
-            <cm-item>
+            <cm-item :action="remove">
                 <span class="icon delete"></span>
                 <span class="text">Delete</span>
             </cm-item>
@@ -143,6 +143,16 @@ export default {
                 if (err !== "file_picker_cancel") {
                     console.error(err);
                 }
+            }
+        },
+
+        async remove() {
+            if (!confirm("Are you sure?")) return;
+
+            try {
+                await this.$store.dispatch("cloud/deleteEntries", this.selectedEntries);
+            } catch (err) {
+                console.error(err);
             }
         }
     }
