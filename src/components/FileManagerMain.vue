@@ -128,6 +128,17 @@ export default {
             } catch (err) {
                 console.error(err);
             }
+        },
+
+        async upload(event) {
+            try {
+                this.$store.dispatch("cloud/uploadEntries", {
+                    files: event.target.files,
+                    destination: this.folder
+                })
+            } catch (err) {
+                console.error(err);
+            }
         }
     }
 }
