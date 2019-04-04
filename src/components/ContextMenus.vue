@@ -36,13 +36,22 @@
         <context-menu
             id="cm-folder-view-multiple"
         >
-            <cm-item v-context-menu="'#cm-folder-view-download-options'">Download</cm-item>
+            <cm-item v-context-menu="'#cm-folder-view-download-options'">
+                <span class="icon download"></span>
+                <span class="text">Download</span>
+            </cm-item>
             <cm-item :action="move">
                 <span class="icon move"></span>
                 <span class="text">Move</span>
             </cm-item>
-            <cm-item>Copy</cm-item>
-            <cm-item>Delete</cm-item>
+            <cm-item>
+                <span class="icon copy"></span>
+                <span class="text">Copy</span>
+            </cm-item>
+            <cm-item>
+                <span class="icon delete"></span>
+                <span class="text">Delete</span>
+            </cm-item>
         </context-menu>
 
         <context-menu
@@ -72,7 +81,7 @@ export default {
         },
 
         selectedEntries() {
-            return this.$store.state.ui.selections.selected.map(selected => selected.entry);
+            return this.$store.getters["ui/selections/allSelected"].map(selected => selected.entry);
         }
     },
 

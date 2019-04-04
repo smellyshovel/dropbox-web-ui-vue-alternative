@@ -57,7 +57,7 @@ export default {
     },
 
     actions: {
-        async pickFolder({ commit, getters }, { purpose, entries }) {
+        async pickFolder({ commit, getters, dispatch }, { purpose, entries }) {
             commit("SET_PURPOSE", purpose);
 
             let currentFolder = entries.map(entry => {
@@ -95,6 +95,7 @@ export default {
             })
                 .finally(() => {
                     commit("CLEAR_STATE");
+                    dispatch("ui/selections/clear", null, { root: true });
                 });
         },
 

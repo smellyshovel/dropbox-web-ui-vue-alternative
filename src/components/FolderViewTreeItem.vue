@@ -1,9 +1,35 @@
 <template>
 <div
+    v-if="!entry.isFake"
     @dblclick="mainAction"
     :class="{ selected: isSelected }"
     class="entry"
     v-context-menu="appropriateContextMenu"
+>
+    <div
+        class="mimetype-icon"
+        :style="{ backgroundImage: thumbnail }"
+    />
+
+    <span class="name">
+        {{ entry.name }}
+    </span>
+
+    <span class="size">
+        {{ normalizedSize }}
+    </span>
+
+    <span class="modification-date">
+        {{ modificationDate }}
+    </span>
+</div>
+
+<div
+    v-else
+    @dblclick="mainAction"
+    :class="{ selected: isSelected}"
+    class="entry disabled"
+    v-context-menu.disabled
 >
     <div
         class="mimetype-icon"
@@ -61,7 +87,7 @@ export default {
         },
 
         appropriateContextMenu() {
-            let selectedEntries = this.$store.state.ui.selections.selected.map(selected => {
+            let selectedEntries = this.$store.getters["ui/selections/allSelected"].map(selected => {
                 return selected.entry;
             });
 
@@ -106,6 +132,14 @@ export default {
     background-color: #f2f2f2;
 }
 
+.list .entry.disabled {
+    color: #bdbdbd;
+}
+
+.list .entry.disabled:hover {
+    background-color: white;
+}
+
 .list .selected .entry {
     background-color: rgb(126, 87, 194);
     color: rgba(255, 255, 255, 0.85);
@@ -127,9 +161,18 @@ export default {
     border-radius: 5px;
 }
 
+.list .disabled .mimetype-icon {
+    filter: grayscale(1);
+    opacity: 0.5;
+}
+
 .list .size, .list .modification-date {
     margin-right: 0.5rem;
     color: rgba(0, 0, 0, 0.5);
+}
+
+.list .disabled .size, .list .disabled .modification-date {
+    color: #bdbdbd;
 }
 
 .list .selected .size, .list .selected .modification-date {

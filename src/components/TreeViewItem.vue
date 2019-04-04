@@ -76,6 +76,10 @@ export default {
 
         isSelected() {
             return this.$store.getters["ui/selections/isSelected"](this);
+        },
+
+        isDisabled() {
+            return this.entry.isFake;
         }
     },
 
@@ -87,7 +91,7 @@ export default {
         select(event) {
             if (this.selectMode === "disabled") return;
 
-            let alreadySelected = this.$store.state.ui.selections.selected.includes(this);
+            let alreadySelected = this.$store.getters["ui/selections/allSelected"].includes(this);
             let rightClick = event.which === 3;
 
             if (rightClick) {
@@ -112,7 +116,7 @@ export default {
 
         shiftSelect(event) {
             if (this.selectMode === "disabled") return;
-            
+
             if (this.selectMode === "multiple") {
                 // ctrl-select instead of shift-select for nested trees
                 if (this.deepness !== 1) return this.ctrlSelect();

@@ -12,6 +12,8 @@
 <div
     id="fm"
     v-else
+    @mousedown="clearSelections"
+    v-context-menu.disabled
 >
     <file-picker
         id="fm-file-picker"
@@ -84,6 +86,12 @@ export default {
     computed: {
         showFilePicker() {
             return this.$store.state.ui.filePicker.show;
+        }
+    },
+
+    methods: {
+        clearSelections() {
+            this.$store.dispatch("ui/selections/clear");
         }
     }
 };

@@ -75,7 +75,15 @@ export default {
 
     getters: {
         isSelected: (state) => (item) => {
-            return state.selected.includes(item);
+            return state.selected.filter(selected => {
+                return !selected.isDisabled;
+            }).includes(item);
+        },
+
+        allSelected: (state) => {
+            return state.selected.filter(selected => {
+                return !selected.entry.isFake;
+            })
         }
     }
 };

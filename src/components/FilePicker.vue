@@ -18,7 +18,7 @@
 
         <section class="tree-view">
             <tree-view
-                :tree="currentFolder.contents"
+                :tree="normalizedCurrentFolderContents"
                 mode="folders"
                 :deepness="1"
                 select-mode="single"
@@ -89,7 +89,13 @@ export default {
             "currentFolder",
             "prohibitedFolders",
             "choise"
-        ])
+        ]),
+
+        normalizedCurrentFolderContents() {
+            return this.currentFolder.contents.filter(child => {
+                return !child.isFake;
+            });
+        }
     },
 
     data() {
