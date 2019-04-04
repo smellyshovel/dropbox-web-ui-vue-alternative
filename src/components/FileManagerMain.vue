@@ -10,10 +10,10 @@
             <input
                 id="create-folder"
                 type="file" multiple
-                @input="createFolder"
                 hidden
             >
             <label
+                @click="createFolder"
                 for="create-folder-button"
                 class="button create-folder"
             >
@@ -110,88 +110,24 @@ export default {
 
     data() {
         return {
-            listView: "list",
-
-            createFolderDialogOpened: false,
-            folderToCreateName: "",
-            createFolderError: null,
-            downloadDialogOpened: false,
-            downloadAsZip: false,
-            downloadError: null,
-            downloadEntriesChosen: [],
-            uploadError: null,
-            uploadConflict: null,
-            uploadConflictResolver: null,
-            uploadConflictResolutionStrategy: null,
-            uploadConflictResolutionStrategySameForTheRest: null
+            listView: "list"
         }
     },
 
     methods: {
-        async toggleDownloadDialog() {
-            this.downloadDialogOpened = !this.downloadDialogOpened;
-        },
-
-        async downloadEntries() {
-            try {
-                await this.$store.dispatch("cloud/downloadEntries", {
-                    entries: this.downloadEntriesChosen,
-                    asZip: this.downloadAsZip
-                })
-            } catch (err) {
-                this.downloadError = err;
-            }
-        },
-
-        async resolveUploadConflict(conflict, totalNumberOfConflicts) {
-            this.uploadConflict = {
-                conflict,
-                totalNumberOfConflicts
-            };
-
-            return new Promise((resolve, reject) => {
-                this.uploadConflictResolver = resolve;
-            })
-                .then((res) => {
-                    this.uploadConflict = null;
-                    this.uploadConflictResolver = null;
-                    this.uploadConflictResolutionStrategy = null;
-                    this.uploadConflictResolutionStrategySameForTheRest = null;
-                    return res;
-                });
-        },
-
-        async upload(event) {
-            try {
-                await this.$store.dispatch("cloud/uploadEntries", {
-                    files: event.target.files,
-                    destination: this.folder,
-                    conflictResolver: this.resolveUploadConflict
-                });
-            } catch (err) {
-                this.uploadError = err;
-            }
-        },
-
-        async update() {
-            await this.$store.dispatch("cloud/updateEntries");
-        },
-
         async createFolder() {
             try {
-                await this.$store.dispatch("cloud/createFolder", {
-                    name: this.folderToCreateName,
+                this.$store.dispatch("cloud/createFolder", {
+                    name: await this.$store.dispatch("ui/namePicker/pickName", {
+                        purpose: "create",
+                        entryType: "folder",
+                        currentName: ""
+                    }),
                     destination: this.folder
-                });
-
-                this.createFolderError = null;
+                })
             } catch (err) {
-                this.createFolderError = err;
+                console.error(err);
             }
-        },
-
-        toggleCreateFolderDialog() {
-            this.createFolderDialogOpened = !this.createFolderDialogOpened;
         }
     }
 }
