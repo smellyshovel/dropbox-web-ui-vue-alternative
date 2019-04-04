@@ -15,15 +15,9 @@
     @mousedown="clearSelections"
     v-context-menu.disabled
 >
-    <file-picker
-        id="fm-file-picker"
-        v-if="showFilePicker"
-    />
-
-    <name-picker
-        id="fm-name-picker"
-        v-if="showNamePicker"
-    />
+    <file-picker v-if="showFilePicker" />
+    <name-picker v-if="showNamePicker" />
+    <conflict-resolver v-if="showConflictResolver" />
 
     <file-manager-header id="fm-header" />
     <file-manager-sidebar id="fm-sidebar" />
@@ -40,6 +34,7 @@ import FileManagerMain from "@/components/FileManagerMain.vue";
 
 import FilePicker from "@/components/FilePicker.vue";
 import NamePicker from "@/components/NamePicker.vue";
+import ConflictResolver from "@/components/ConflictResolver.vue";
 
 export default {
     components: {
@@ -50,7 +45,8 @@ export default {
         FileManagerMain,
 
         FilePicker,
-        NamePicker
+        NamePicker,
+        ConflictResolver
     },
 
     async created() {
@@ -97,6 +93,10 @@ export default {
 
         showNamePicker() {
             return this.$store.state.ui.namePicker.show;
+        },
+
+        showConflictResolver() {
+            return this.$store.state.ui.conflictResolver.show;
         }
     },
 

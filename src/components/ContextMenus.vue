@@ -121,7 +121,13 @@ export default {
                     destination: await this.$store.dispatch("ui/filePicker/pickFolder", {
                         purpose: "move",
                         entries: this.selectedEntries
-                    })
+                    }),
+                    conflictResolver: async (conflict, totalNumberOfConflicts) => {
+                        return await this.$store.dispatch("ui/conflictResolver/resolveConflict", {
+                            conflict,
+                            totalNumberOfConflicts
+                        });
+                    }
                 });
             } catch (err) {
                 if (err !== "file_picker_cancel") {
