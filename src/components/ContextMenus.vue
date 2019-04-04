@@ -19,7 +19,7 @@
                 <span class="icon copy"></span>
                 <span class="text">Copy</span>
             </cm-item>
-            <cm-item>
+            <cm-item :action="rename">
                 <span class="icon rename"></span>
                 <span class="text">Rename</span>
             </cm-item>
@@ -141,6 +141,23 @@ export default {
                 });
             } catch (err) {
                 if (err !== "file_picker_cancel") {
+                    console.error(err);
+                }
+            }
+        },
+
+        async rename() {
+            try {
+                await this.$store.dispatch("cloud/renameEntry", {
+                    entry: this.selectedEntries[0],
+                    name: await this.$store.dispatch("ui/namePicker/pickName", {
+                        purpose: "rename",
+                        currentName: this.selectedEntries[0].name,
+                        entryType: this.selectedEntries[0].type
+                    })
+                });
+            } catch (err) {
+                if (err !== "name_picker_cancel") {
                     console.error(err);
                 }
             }

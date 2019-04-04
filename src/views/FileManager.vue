@@ -20,6 +20,11 @@
         v-if="showFilePicker"
     />
 
+    <name-picker
+        id="fm-name-picker"
+        v-if="showNamePicker"
+    />
+
     <file-manager-header id="fm-header" />
     <file-manager-sidebar id="fm-sidebar" />
     <file-manager-main id="fm-main" />
@@ -34,6 +39,7 @@ import FileManagerSidebar from "@/components/FileManagerSidebar.vue";
 import FileManagerMain from "@/components/FileManagerMain.vue";
 
 import FilePicker from "@/components/FilePicker.vue";
+import NamePicker from "@/components/NamePicker.vue";
 
 export default {
     components: {
@@ -43,7 +49,8 @@ export default {
         FileManagerSidebar,
         FileManagerMain,
 
-        FilePicker
+        FilePicker,
+        NamePicker
     },
 
     async created() {
@@ -86,6 +93,10 @@ export default {
     computed: {
         showFilePicker() {
             return this.$store.state.ui.filePicker.show;
+        },
+
+        showNamePicker() {
+            return this.$store.state.ui.namePicker.show;
         }
     },
 
