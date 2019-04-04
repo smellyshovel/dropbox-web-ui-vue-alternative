@@ -15,7 +15,7 @@
                 <span class="icon move"></span>
                 <span class="text">Move</span>
             </cm-item>
-            <cm-item>
+            <cm-item :action="copy">
                 <span class="icon copy"></span>
                 <span class="text">Copy</span>
             </cm-item>
@@ -44,7 +44,7 @@
                 <span class="icon move"></span>
                 <span class="text">Move</span>
             </cm-item>
-            <cm-item>
+            <cm-item :action="copy">
                 <span class="icon copy"></span>
                 <span class="text">Copy</span>
             </cm-item>
@@ -120,6 +120,22 @@ export default {
                     entries: this.selectedEntries,
                     destination: await this.$store.dispatch("ui/filePicker/pickFolder", {
                         purpose: "move",
+                        entries: this.selectedEntries
+                    })
+                });
+            } catch (err) {
+                if (err !== "file_picker_cancel") {
+                    console.error(err);
+                }
+            }
+        },
+
+        async copy() {
+            try {
+                await this.$store.dispatch("cloud/copyEntries", {
+                    entries: this.selectedEntries,
+                    destination: await this.$store.dispatch("ui/filePicker/pickFolder", {
+                        purpose: "copy",
                         entries: this.selectedEntries
                     })
                 });

@@ -69,7 +69,7 @@ export default {
             commit("SET_CURRENT_FOLDER", currentFolder.parent ? currentFolder.parent : currentFolder);
 
             // can't move folders inside themselves, their parents and their sub-folders; and can't move files inside thair parents
-            // but can copy/upload anywhere
+            // can't copy folders inside themselves (Dropbox's quirk) and their sub-folders
             if (purpose === "move") {
                 let prohibitedFolders = entries.map(entry => {
                     if (entry.type === "folder") {
@@ -84,8 +84,22 @@ export default {
                 });
 
                 commit("PROHIBIT_FOLDERS", prohibitedFolders);
-            } else {
-                commit("PROHIBIT_FOLDERS", []);
+            } else if (purpose === "copy") {
+                let prohibitedFolders = entries.map(entry => {
+                    if (entry.type === "folder") {
+                        return getters.allContents(entry);
+                    } else if (entry.type === "file") {
+                        return entry.parent;
+                    }
+                }).reduce((acc, curr) => {
+                    return acc.concat(curr);
+                }, []).filter((folder, index, self) => {
+                    return self.indexOf(folder) === index;
+                });
+
+                commit("PROHIBIT_FOLDERS", prohibitedFolders);
+            } else if (purpose === "upload") {
+                // TODO
             }
 
             commit("SHOW_FILE_PICKER");
