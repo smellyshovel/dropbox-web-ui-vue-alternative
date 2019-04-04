@@ -24,7 +24,7 @@
             <input
                 id="upload-files"
                 type="file" multiple
-                @input="upload($event)"
+                @input="uploadAndReset($event)"
                 hidden
             >
             <label
@@ -38,7 +38,7 @@
             <input
                 id="upload-folder"
                 type="file" webkitdirectory
-                @input="upload($event)"
+                @input="uploadAndReset($event)"
                 hidden
             >
             <label
@@ -130,7 +130,7 @@ export default {
             }
         },
 
-        async upload(event) {
+        async uploadAndReset(event) {
             try {
                 this.$store.dispatch("cloud/uploadEntries", {
                     files: event.target.files,
@@ -145,6 +145,9 @@ export default {
             } catch (err) {
                 console.error(err);
             }
+
+            // can't upload the same files more than once in a row without the next line
+            event.target.value = "";
         }
     }
 }
