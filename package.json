@@ -28,6 +28,6 @@
     },
     "dependencies": {
         "dropbox": "^4.0.15",
-        "vue-custom-context-menu": "^2.1.0"
+        "vue-custom-context-menu": "^2.1.2"
     }
 }
