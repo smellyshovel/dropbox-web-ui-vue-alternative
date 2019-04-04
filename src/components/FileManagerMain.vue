@@ -134,7 +134,13 @@ export default {
             try {
                 this.$store.dispatch("cloud/uploadEntries", {
                     files: event.target.files,
-                    destination: this.folder
+                    destination: this.folder,
+                    conflictResolver: async (conflict, totalNumberOfConflicts) => {
+                        return await this.$store.dispatch("ui/conflictResolver/resolveConflict", {
+                            conflict,
+                            totalNumberOfConflicts
+                        });
+                    }
                 })
             } catch (err) {
                 console.error(err);
