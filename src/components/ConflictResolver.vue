@@ -114,7 +114,7 @@ export default {
         },
 
         acceptButtonText() {
-            let postfix = this.sameForTheRest ? ` (${ this.remainingConflictsNumber })` : "";
+            let postfix = this.sameForTheRest ? ` (${ this.remainingConflictsNumber + 1 })` : "";
             return `<strong>${ this.resolutionStrategy }</strong> the ${ this.conflict.source.type }${postfix}`;
         }
     },
