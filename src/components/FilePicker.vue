@@ -112,7 +112,10 @@ export default {
 
         revealAndChoose(event, folder) {
             this.$store.dispatch("ui/filePicker/changeFolder", folder);
-            this.$store.dispatch("ui/filePicker/chooseFolder", folder);
+
+            if (!this.prohibitedFolders.includes(folder)) {
+                this.$store.dispatch("ui/filePicker/chooseFolder", folder);
+            }
         }
     }
 }
