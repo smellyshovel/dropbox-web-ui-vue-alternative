@@ -54,7 +54,7 @@
                     {{ purpose }} to <strong>{{ choise.name }}</strong></span>
                 </button>
             </template>
-            <template v-else="choise">
+            <template v-else>
                 <button
                     class="accept"
                     disabled
