@@ -126,6 +126,11 @@ export default {
     text-transform: capitalize;
 }
 
+.header .sub {
+    font-size: 0.85rem;
+    color: rgba(0, 0, 0, 0.65);
+}
+
 .main-wrapper {
     display: flex;
     flex-flow: column;
@@ -156,19 +161,6 @@ input:hover {
 
 input:focus {
     border-bottom-color: rgb(126, 87, 194);
-}
-
-.folder-path {
-    margin: 0.5rem;
-}
-
-.tree-view {
-    width: 100%;
-}
-
-.header .sub {
-    font-size: 0.85rem;
-    color: rgba(0, 0, 0, 0.65);
 }
 
 .footer {
