@@ -4,9 +4,9 @@ export default {
     state: {
         show: false,
         conflict: null,
-        totalNumberOfConflicts: 0,
+        remainingConflictsNumber: 0,
         resolutionStrategy: null,
-        sameForTheRest: null,
+        sameForTheRest: false,
         resolver: null
     },
 
@@ -15,13 +15,17 @@ export default {
             state.show = true;
         },
 
-        SET_INITIALS(state, { conflict, totalNumberOfConflicts }) {
+        SET_INITIALS(state, { conflict, remainingConflictsNumber }) {
             state.conflict = conflict;
-            state.totalNumberOfConflicts = totalNumberOfConflicts;
+            state.remainingConflictsNumber = remainingConflictsNumber;
         },
 
         SET_RESOLUTION_STRATEGY(state, strategy) {
             state.resolutionStrategy = strategy;
+        },
+
+        SET_SAME_FOR_THE_REST(state, sameForTheRest) {
+            state.sameForTheRest = sameForTheRest;
         },
 
         SAVE_PROMISE(state, { resolve, reject }) {
@@ -45,15 +49,16 @@ export default {
         CLEAR_STATE(state) {
             state.show = false;
             state.conflict = null;
-            state.totalNumberOfConflicts = 0;
+            state.remainingConflictsNumber = 0;
             state.resolutionStrategy = null;
+            state.sameForTheRest = false;
             state.resolver = null;
         }
     },
 
     actions: {
-        async resolveConflict({ commit, getters }, { conflict, totalNumberOfConflicts }) {
-            commit("SET_INITIALS", { conflict, totalNumberOfConflicts });
+        async resolveConflict({ commit, getters }, { conflict, remainingConflictsNumber }) {
+            commit("SET_INITIALS", { conflict, remainingConflictsNumber });
 
             commit("SHOW_NAME_PICKER");
 
@@ -67,6 +72,10 @@ export default {
 
         changeStrategy({ commit }, strategy) {
             commit("SET_RESOLUTION_STRATEGY", strategy);
+        },
+
+        changeSameForTheRest({ commit }, sameForTheRest) {
+            commit("SET_SAME_FOR_THE_REST", sameForTheRest);
         },
 
         resolve({ commit }) {

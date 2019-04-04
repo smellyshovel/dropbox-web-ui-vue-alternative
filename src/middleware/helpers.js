@@ -143,13 +143,15 @@ export async function resolveConflicts(entries, destination, conflictResolver) {
 
     let resolutionStrategies = [];
 
-    for (let conflict of conflicts) {
+    for (let i = 0; i < conflicts.length; i++) {
+        let conflict = conflicts[i];
+
         if (!conflict.target) {
             resolutionStrategies.push(null);
             continue;
         }
 
-        let { strategy, sameForTheRest } = await conflictResolver(conflict, conflicts.length);
+        let { strategy, sameForTheRest } = await conflictResolver(conflict, conflicts.length - i - 1);
 
         if (strategy === "cancel") {
             return "cancel";

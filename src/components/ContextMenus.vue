@@ -122,10 +122,10 @@ export default {
                         purpose: "move",
                         entries: this.selectedEntries
                     }),
-                    conflictResolver: async (conflict, totalNumberOfConflicts) => {
+                    conflictResolver: async (conflict, remainingConflictsNumber) => {
                         return await this.$store.dispatch("ui/conflictResolver/resolveConflict", {
                             conflict,
-                            totalNumberOfConflicts
+                            remainingConflictsNumber
                         });
                     }
                 });
@@ -144,10 +144,10 @@ export default {
                         purpose: "copy",
                         entries: this.selectedEntries
                     }),
-                    conflictResolver: async (conflict, totalNumberOfConflicts) => {
+                    conflictResolver: async (conflict, remainingConflictsNumber) => {
                         return await this.$store.dispatch("ui/conflictResolver/resolveConflict", {
                             conflict,
-                            totalNumberOfConflicts
+                            remainingConflictsNumber
                         });
                     }
                 });

@@ -34,6 +34,18 @@
             <span class="option">Skip</span>
             <span class="hint">The {{ conflict.source.type }} would remain untouched</span>
         </label>
+
+        <template v-if="this.remainingConflictsNumber >= 1 && this.resolutionStrategy">
+            <input
+                id="same-for-the-rest"
+                type="checkbox"
+                v-model="sameForTheRest"
+                :value="true"
+            >
+            <label for="same-for-the-rest">
+                Apply the same for the rest <strong>{{ this.remainingConflictsNumber }}</strong> conflicts
+            </label>
+        </template>
     </div>
 
     <template v-slot:footer>
@@ -78,7 +90,7 @@ export default {
     computed: {
         ...mapState("ui/conflictResolver", [
             "conflict",
-            "totalNumberOfConflicts"
+            "remainingConflictsNumber"
         ]),
 
         resolutionStrategy: {
@@ -91,8 +103,19 @@ export default {
             }
         },
 
+        sameForTheRest: {
+            get() {
+                return this.$store.state.ui.conflictResolver.sameForTheRest;
+            },
+
+            set(value) {
+                this.$store.dispatch("ui/conflictResolver/changeSameForTheRest", value);
+            }
+        },
+
         acceptButtonText() {
-            return `<strong>${ this.resolutionStrategy }</strong> the ${ this.conflict.source.type }`;
+            let postfix = this.sameForTheRest ? ` (${ this.remainingConflictsNumber })` : "";
+            return `<strong>${ this.resolutionStrategy }</strong> the ${ this.conflict.source.type }${postfix}`;
         }
     },
 
@@ -150,13 +173,35 @@ label {
     width: 100%;
     background-color: white;
     color: rgba(0, 0, 0, 0.85);
-    border: 2px solid rgb(126, 87, 194);
+    border: 2px solid #bdbdbd;
     border-radius: 5px;
+}
+
+label:hover {
+    border: 2px solid rgb(126, 87, 194);
 }
 
 input:checked + label {
     background-color: rgb(126, 87, 194);
     color: rgba(255, 255, 255, 0.9);
+    border: 2px solid rgb(126, 87, 194);
+}
+
+label[for="same-for-the-rest"] {
+    display: block;
+    text-align: center;
+    padding: 0.5rem;
+    background-color: white;
+    border: 2px solid #bdbdbd;
+}
+
+label[for="same-for-the-rest"]:hover {
+    border: 2px solid #424242;
+}
+
+input:checked + label[for="same-for-the-rest"] {
+    background-color: #424242;
+    border: 2px solid #424242;
 }
 
 .option {

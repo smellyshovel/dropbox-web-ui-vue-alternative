@@ -135,10 +135,10 @@ export default {
                 this.$store.dispatch("cloud/uploadEntries", {
                     files: event.target.files,
                     destination: this.folder,
-                    conflictResolver: async (conflict, totalNumberOfConflicts) => {
+                    conflictResolver: async (conflict, remainingConflictsNumber) => {
                         return await this.$store.dispatch("ui/conflictResolver/resolveConflict", {
                             conflict,
-                            totalNumberOfConflicts
+                            remainingConflictsNumber
                         });
                     }
                 })
