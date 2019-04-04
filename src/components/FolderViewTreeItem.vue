@@ -105,7 +105,7 @@ export default {
         mainAction() {
             if (this.entry.type === "folder") {
                 this.$router.push({ name: "fm", params: { folderLink: this.entry.link } })
-            } else if (this.entry.type === "file") {
+            } else if (this.entry.type === "file" && !this.entry.isFake) {
                 this.$store.dispatch("cloud/downloadEntries", {
                     entries: [this.entry],
                     asZip: false
