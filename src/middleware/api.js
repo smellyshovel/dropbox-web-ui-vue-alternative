@@ -53,8 +53,6 @@ export default {
             });
         }
 
-        console.log(accountInfo);
-
         return {
             email: accountInfo.email,
             name: accountInfo.name.display_name,
