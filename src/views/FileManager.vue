@@ -19,7 +19,9 @@
     <name-picker v-if="showNamePicker" />
     <conflict-resolver v-if="showConflictResolver" />
 
+    <file-manager-sidebar-header id="fm-sidebar-header" />
     <file-manager-header id="fm-header" />
+    <file-manager-status-reflector id="status-reflector" />
     <file-manager-sidebar id="fm-sidebar" />
     <file-manager-main id="fm-main" />
 </div>
@@ -28,7 +30,9 @@
 <script>
 import FileManagerLoading from "@/components/FileManagerLoading.vue";
 import FileManagerError from "@/components/FileManagerError.vue";
+import FileManagerSidebarHeader from "@/components/FileManagerSidebarHeader.vue";
 import FileManagerHeader from "@/components/FileManagerHeader.vue";
+import FileManagerStatusReflector from "@/components/FileManagerStatusReflector.vue";
 import FileManagerSidebar from "@/components/FileManagerSidebar.vue";
 import FileManagerMain from "@/components/FileManagerMain.vue";
 
@@ -40,7 +44,9 @@ export default {
     components: {
         FileManagerLoading,
         FileManagerError,
+        FileManagerSidebarHeader,
         FileManagerHeader,
+        FileManagerStatusReflector,
         FileManagerSidebar,
         FileManagerMain,
 
@@ -112,9 +118,10 @@ export default {
 #fm {
     display: grid;
     grid-template-areas:
-        "sidebar header"
+        "sidebar-header header"
+        "status-reflector status-reflector"
         "sidebar main";
-    grid-template-rows: 64px auto;
+    grid-template-rows: 64px min-content auto;
     grid-template-columns: 256px auto;
     width: 100vw;
     height: 100vh;
@@ -122,8 +129,16 @@ export default {
     user-select: none;
 }
 
+#fm-sidebar-header {
+    grid-area: sidebar-header;
+}
+
 #fm-header {
     grid-area: header;
+}
+
+#fm-status-reflector {
+    grid-area: status-reflector;
 }
 
 #fm-sidebar {
