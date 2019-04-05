@@ -22,7 +22,7 @@
 
 <script>
 import TreeView from "@/components/TreeView.vue";
-import TreeItem from "@/components/TheFileManagerSidebarTreeItem.vue";
+import TreeItem from "@/components/FileManagerSidebarTreeItem.vue";
 
 export default {
     components: {
