@@ -97,7 +97,7 @@ export default {
 
         acceptButtonText() {
             if (this.purpose === "rename") {
-                return `RENAME THE <strong>${ this.entryType }</strong>`;
+                return `<strong>RENAME</strong> THE ${ this.entryType }`;
             } else if (this.purpose === "create") {
                 return `<strong>CREATE</strong> THE ${ this.entryType }`
             }

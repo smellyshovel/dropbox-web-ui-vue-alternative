@@ -137,21 +137,4 @@ export default {
 .list li .list {
     margin-left: 1rem;
 }
-
-.grid li {
-    box-sizing: border-box;
-    padding: 0.5rem;
-    width: 128px;
-    height: 128px;
-    border: 2px solid #bdbdbd;
-    border-radius: 5px;
-}
-
-div {
-    height: 100%;
-}
-
-.grid .selected {
-    border-color: rgb(126, 87, 194);
-}
 </style>

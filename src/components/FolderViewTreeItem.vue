@@ -178,4 +178,63 @@ export default {
 .list .selected .size, .list .selected .modification-date {
     color: rgba(255, 255, 255, 0.85);
 }
+
+.grid .entry {
+    box-sizing: border-box;
+    padding: 0.5rem;
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    align-items: center;
+    width: 128px;
+    height: 128px;
+    background-color: white;
+    border: 2px solid #bdbdbd;
+    border-radius: 5px;
+    color: rgba(0, 0, 0, 0.8);
+}
+
+.grid .entry:hover {
+    border-color: rgb(126, 87, 194);
+}
+
+.grid .entry.disabled {
+    border-color: #f2f2f2;
+}
+
+.grid .selected .entry {
+    background-color: rgb(126, 87, 194);
+    color: rgba(255, 255, 255, 0.9);
+    border-color: rgb(126, 87, 194);
+}
+
+.grid .mimetype-icon {
+    width: 60%;
+    min-height: 60%;
+    background-color: white;
+    background-size: 80%;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 5px;
+}
+
+.grid .name {
+    max-height: 2rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    width: 100%;
+    text-align: center;
+    margin-top: auto;
+    word-break: break-all;
+}
+
+.grid .disabled .mimetype-icon {
+    filter: grayscale(1);
+    opacity: 0.5;
+}
+
+.grid .size, .grid .modification-date {
+    display: none;
+}
 </style>
