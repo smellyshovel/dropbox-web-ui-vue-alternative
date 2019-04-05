@@ -44,6 +44,7 @@ export default {
     */
     async getAccountInfo() {
         try {
+            var accountInfo = await Connection.usersGetCurrentAccount();
             var spaceUsage = await Connection.usersGetSpaceUsage();
         } catch (err) {
             throw new CustomError({
@@ -52,7 +53,12 @@ export default {
             });
         }
 
+        console.log(accountInfo);
+
         return {
+            email: accountInfo.email,
+            name: accountInfo.name.display_name,
+            photo: accountInfo.profile_photo_url || require("@/assets/default_photo.svg"),
             spaceUsage: {
                 total: spaceUsage.allocation.allocated,
                 occupied: spaceUsage.used,
