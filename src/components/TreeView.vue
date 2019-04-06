@@ -120,6 +120,7 @@ ol {
 }
 
 .grid {
+    padding-left: 0.5rem;
     display: grid;
     grid-template-rows: 128px;
     grid-template-columns: repeat(auto-fill, minmax(128px, auto));
