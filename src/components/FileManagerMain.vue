@@ -116,23 +116,33 @@ export default {
 
     methods: {
         async createFolder() {
+            this.$store.commit("ui/statusReflector/setInProgress");
+
             try {
-                this.$store.dispatch("cloud/createFolder", {
+                await this.$store.dispatch("cloud/createFolder", {
                     name: await this.$store.dispatch("ui/namePicker/pickName", {
                         purpose: "create",
                         entryType: "folder",
                         currentName: ""
                     }),
                     destination: this.folder
-                })
+                });
+
+                this.$store.commit("ui/statusReflector/setReady");
             } catch (err) {
-                console.error(err);
+                if (err !== "name_picker_cancel") {
+                    this.$store.commit("ui/statusReflector/setError", err);
+                } else {
+                    this.$store.commit("ui/statusReflector/setReady");
+                }
             }
         },
 
         async uploadAndReset(event) {
+            this.$store.commit("ui/statusReflector/setInProgress");
+
             try {
-                this.$store.dispatch("cloud/uploadEntries", {
+                await this.$store.dispatch("cloud/uploadEntries", {
                     files: event.target.files,
                     destination: this.folder,
                     conflictResolver: async (conflict, remainingConflictsNumber) => {
@@ -141,9 +151,11 @@ export default {
                             remainingConflictsNumber
                         });
                     }
-                })
+                });
+
+                this.$store.commit("ui/statusReflector/setReady");
             } catch (err) {
-                console.error(err);
+                this.$store.commit("ui/statusReflector/setError", err);
             }
 
             // can't upload the same files more than once in a row without the next line

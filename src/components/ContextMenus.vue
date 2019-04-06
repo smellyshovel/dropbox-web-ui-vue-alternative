@@ -93,28 +93,38 @@ export default {
         },
 
         async downloadPlain() {
+            this.$store.commit("ui/statusReflector/setInProgress");
+
             try {
                 await this.$store.dispatch("cloud/downloadEntries", {
                     entries: this.selectedEntries,
                     asZip: false
                 });
+
+                this.$store.commit("ui/statusReflector/setReady");
             } catch (err) {
-                console.error(err);
+                this.$store.commit("ui/statusReflector/setError", err);
             }
         },
 
         async downloadZip() {
+            this.$store.commit("ui/statusReflector/setInProgress");
+
             try {
                 await this.$store.dispatch("cloud/downloadEntries", {
                     entries: this.selectedEntries,
                     asZip: true
                 });
+
+                this.$store.commit("ui/statusReflector/setReady");
             } catch (err) {
-                console.error(err);
+                this.$store.commit("ui/statusReflector/setError", err);
             }
         },
 
         async move() {
+            this.$store.commit("ui/statusReflector/setInProgress");
+
             try {
                 await this.$store.dispatch("cloud/moveEntries", {
                     entries: this.selectedEntries,
@@ -129,14 +139,20 @@ export default {
                         });
                     }
                 });
+
+                this.$store.commit("ui/statusReflector/setReady");
             } catch (err) {
                 if (err !== "file_picker_cancel") {
-                    console.error(err);
+                    this.$store.commit("ui/statusReflector/setError", err);
+                } else {
+                    this.$store.commit("ui/statusReflector/setReady");
                 }
             }
         },
 
         async copy() {
+            this.$store.commit("ui/statusReflector/setInProgress");
+
             try {
                 await this.$store.dispatch("cloud/copyEntries", {
                     entries: this.selectedEntries,
@@ -151,14 +167,20 @@ export default {
                         });
                     }
                 });
+
+                this.$store.commit("ui/statusReflector/setReady");
             } catch (err) {
                 if (err !== "file_picker_cancel") {
-                    console.error(err);
+                    this.$store.commit("ui/statusReflector/setError", err);
+                } else {
+                    this.$store.commit("ui/statusReflector/setReady");
                 }
             }
         },
 
         async rename() {
+            this.$store.commit("ui/statusReflector/setInProgress");
+
             try {
                 await this.$store.dispatch("cloud/renameEntry", {
                     entry: this.selectedEntries[0],
@@ -168,9 +190,13 @@ export default {
                         entryType: this.selectedEntries[0].type
                     })
                 });
+
+                this.$store.commit("ui/statusReflector/setReady");
             } catch (err) {
                 if (err !== "name_picker_cancel") {
-                    console.error(err);
+                    this.$store.commit("ui/statusReflector/setError", err);
+                } else {
+                    this.$store.commit("ui/statusReflector/setReady");
                 }
             }
         },
@@ -178,10 +204,14 @@ export default {
         async remove() {
             if (!confirm("Are you sure?")) return;
 
+            this.$store.commit("ui/statusReflector/setInProgress");
+
             try {
                 await this.$store.dispatch("cloud/deleteEntries", this.selectedEntries);
+
+                this.$store.commit("ui/statusReflector/setReady");
             } catch (err) {
-                console.error(err);
+                this.$store.commit("ui/statusReflector/setError", err);
             }
         }
     }

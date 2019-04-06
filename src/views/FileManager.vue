@@ -21,7 +21,7 @@
 
     <file-manager-sidebar-header id="fm-sidebar-header" />
     <file-manager-header id="fm-header" />
-    <file-manager-status-reflector id="status-reflector" />
+    <file-manager-status-reflector id="fm-status-reflector" />
     <file-manager-sidebar id="fm-sidebar" />
     <file-manager-main id="fm-main" />
 </div>
