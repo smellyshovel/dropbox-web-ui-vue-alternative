@@ -5,9 +5,27 @@
             class="update-button"
         />
 
-        <div class="user-corner">
+        <div
+            @click="openDropdown"
+            class="user-corner"
+        >
             <span class="user-name">{{ userName }}</span>
             <img :src="userPhoto">
+
+            <div
+                v-if="showDropdown"
+                @mouseleave="closeDropdown"
+                class="dropdown-menu"
+            >
+                <span
+                    class="email"
+                    v-html="userEmail"
+                />
+                <span
+                    @click="quit"
+                    class="option"
+                >Quit</span>
+            </div>
         </div>
     </header>
 </template>
@@ -21,6 +39,16 @@ export default {
 
         userPhoto() {
             return this.$store.state.cloud.accountInfo.photo;
+        },
+
+        userEmail() {
+            return this.$store.state.cloud.accountInfo.email;
+        }
+    },
+
+    data() {
+        return {
+            showDropdown: false
         }
     },
 
@@ -36,6 +64,31 @@ export default {
             } catch (err) {
                 this.$store.commit("ui/statusReflector/setError", err);
             }
+        },
+
+        openDropdown() {
+            this.showDropdown = true;
+        },
+
+        closeDropdown() {
+            this.showDropdown = false;
+        },
+
+        quit() {
+            if (!confirm("Are you sure you want to quit?")) return;
+
+            this.$store.dispatch("cloud/disconnect");
+
+            this.$router.push({
+                name: "home",
+                params: {
+                    redirected: true,
+                    redirectionDetails: {
+                        type: "success",
+                        message: "Successfully quit"
+                    }
+                }
+            });
         }
     }
 }
@@ -97,5 +150,45 @@ header {
 
 .user-corner:hover img {
     border: 2px solid rgb(126, 87, 194);
+}
+
+.dropdown-menu {
+    padding: 0.5rem;
+    position: absolute;
+    top: 69px;
+    right: 1rem;
+    display: flex;
+    flex-flow: column;
+    min-width: 200px;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px #bdbdbd;
+    cursor: default;
+}
+
+.dropdown-menu .option {
+    box-sizing: border-box;
+    padding: 0.5rem;
+    display: block;
+    width: 100%;
+    color: rgba(0, 0, 0, 0.85);
+    border-radius: 2.5px;
+    cursor: pointer;
+}
+
+.dropdown-menu .option:hover {
+    background-color: #f2f2f2;
+}
+
+.email {
+    padding: 0.25rem;
+    display: block;
+    color: rgba(0, 0, 0, 0.65);
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+.email:hover {
+    background-color: white;
 }
 </style>
