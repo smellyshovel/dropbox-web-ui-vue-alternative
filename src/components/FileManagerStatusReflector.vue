@@ -51,16 +51,6 @@ export default {
     background-color: rgb(39, 193, 93);
 }
 
-@-webkit-keyframes wave {
-    0% { background-position: 0% 50% }
-    50% { background-position: 100% 50% }
-    100% { background-position: 0% 50% }
-}
-@-moz-keyframes wave {
-    0% { background-position: 0% 50% }
-    50% { background-position: 100% 50% }
-    100% { background-position: 0% 50% }
-}
 @keyframes wave {
     0% { background-position: 0% 50% }
     50% { background-position: 100% 50% }
