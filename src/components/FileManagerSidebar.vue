@@ -42,7 +42,7 @@ function sizeToText(size) {
     }
 
     let prefixes = ["", "k", "M", "G", "T", "P"];
-    return size.toFixed(2) + (prefixes[steps] || "?") + "B";
+    return size.toFixed(2) + prefixes[steps] + "B";
 }
 
 export default {
