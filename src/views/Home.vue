@@ -110,22 +110,34 @@ export default {
     font-size: 0.8rem;
 }
 
+@keyframes fade {
+    0% {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    100% {
+        visibility: hidden;
+        opacity: 0;
+    }
+}
+
 .redirection-message {
+    animation: fade 1s ease 5s forwards;
     padding: 1rem;
     position: fixed;
     top: 0;
     left: 0;
     display: block;
     width: 100%;
+    color: rgba(255, 255, 255, 0.9);
 }
 
-.redirection-mesage.success {
-    background-color: green;
-    color: white;
+.redirection-message.success {
+    background-color: rgb(39, 193, 93);
 }
 
 .redirection-message.error {
     background-color: #ff6666;
-    color: rgba(255, 255, 255, 0.9);
 }
 </style>
