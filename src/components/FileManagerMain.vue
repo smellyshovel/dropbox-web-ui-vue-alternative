@@ -51,10 +51,12 @@
         </section>
         <section class="view-settings">
             <div
+                @mousedown.stop
                 @click="listView = 'list'"
                 class="button list"
             />
             <div
+                @mousedown.stop
                 @click="listView = 'grid'"
                 class="button grid"
             />
