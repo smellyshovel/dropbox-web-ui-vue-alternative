@@ -26,10 +26,15 @@ export default {
 
     methods: {
         async update() {
+            this.$store.commit("ui/statusReflector/setInProgress");
+
             try {
-                this.$store.dispatch("cloud/updateEntries")
+                await this.$store.dispatch("cloud/updateEntries");
+                await this.$store.dispatch("cloud/updateAccountInfo");
+
+                this.$store.commit("ui/statusReflector/setReady");
             } catch (err) {
-                console.error(err);
+                this.$store.commit("ui/statusReflector/setError", err);
             }
         }
     }
