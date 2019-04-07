@@ -106,7 +106,6 @@ aside {
 }
 
 .meter {
-    transition: width 0.1s ease;
     display: block;
     width: 100%;
     height: 10px;
