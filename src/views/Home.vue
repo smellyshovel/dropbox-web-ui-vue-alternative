@@ -154,4 +154,8 @@ export default {
     color: white;
     border-color: white;
 }
+
+h1 {
+    margin-top: 0;
+}
 </style>
