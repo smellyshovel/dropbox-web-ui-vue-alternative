@@ -14,7 +14,7 @@
 
             <div
                 v-if="showDropdown"
-                @mouseleave="closeDropdown"
+                @mouseleave="toggleDropdown"
                 class="dropdown-menu"
             >
                 <span
@@ -57,8 +57,10 @@ export default {
             this.$store.commit("ui/statusReflector/setInProgress");
 
             try {
-                await this.$store.dispatch("cloud/updateEntries");
-                await this.$store.dispatch("cloud/updateAccountInfo");
+                await Promise.all([
+                    this.$store.dispatch("cloud/updateEntries"),
+                    this.$store.dispatch("cloud/updateAccountInfo")
+                ]);
 
                 this.$store.commit("ui/statusReflector/setReady");
             } catch (err) {
@@ -68,10 +70,6 @@ export default {
 
         toggleDropdown() {
             this.showDropdown = !this.showDropdown;
-        },
-
-        closeDropdown() {
-            this.showDropdown = false;
         },
 
         quit() {
