@@ -62,7 +62,7 @@ export default {
     -moz-animation: wave 1s ease infinite;
     animation: wave 1s ease infinite;
 
-    background: linear-gradient(270deg, rgb(39, 193, 93), rgb(126, 87, 194));
+    background: linear-gradient(90deg, rgb(39, 193, 93), rgb(126, 87, 194));
     background-size: 200% 200%;
 }
 
