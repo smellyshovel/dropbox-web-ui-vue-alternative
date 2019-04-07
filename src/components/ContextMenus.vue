@@ -7,10 +7,16 @@
                 <span class="icon open"></span>
                 <span class="text">Open</span>
             </cm-item>
+
+            <div class="separator" />
+
             <cm-item v-context-menu="'#cm-folder-view-download-options'">
                 <span class="icon download"></span>
                 <span class="text">Download</span>
             </cm-item>
+
+            <div class="separator" />
+
             <cm-item :action="move">
                 <span class="icon move"></span>
                 <span class="text">Move</span>
@@ -27,10 +33,6 @@
                 <span class="icon delete"></span>
                 <span class="text">Delete</span>
             </cm-item>
-            <cm-item>
-                <span class="icon info"></span>
-                <span class="text">Info</span>
-            </cm-item>
         </context-menu>
 
         <context-menu
@@ -40,6 +42,9 @@
                 <span class="icon download"></span>
                 <span class="text">Download</span>
             </cm-item>
+
+            <div class="separator" />
+
             <cm-item :action="move">
                 <span class="icon move"></span>
                 <span class="text">Move</span>
@@ -347,5 +352,12 @@ export default {
 
 .cm-item:hover .icon.download-option-as-zip {
     background-image: url("/src/assets/icons/context-menus/download-zip-purple.svg");
+}
+
+.separator {
+    box-sizing: border-box;
+    margin: 0.5rem 1rem;
+    display: block;
+    border-bottom: 1px solid #f2f2f2;
 }
 </style>
