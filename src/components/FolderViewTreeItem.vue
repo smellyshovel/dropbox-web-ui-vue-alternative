@@ -27,7 +27,7 @@
 <div
     v-else
     @dblclick="mainAction"
-    :class="{ selected: isSelected}"
+    :class="{ selected: isSelected }"
     class="entry disabled"
     v-context-menu.disabled
 >
