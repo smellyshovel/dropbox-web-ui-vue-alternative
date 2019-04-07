@@ -1,9 +1,35 @@
 <template>
 <div
+    v-if="!entry.isFake"
     @dblclick="reveal"
     :class="{ selected: isSelected, current: isCurrentDirectory }"
     class="folder"
     :style="{ paddingLeft: (level - 1) * 1.5 + 'rem' }"
+    v-context-menu="appropriateContextMenu"
+>
+    <div class="toggler-holder">
+        <span
+            v-if="item.hasSubTree"
+            @click="item.toggleSubTree()"
+            :class="{ opened: subTreeOpened }"
+            class="toggler"
+        />
+    </div>
+
+    <span class="folder-icon" />
+
+    <span class="folder-name">
+        {{ entry.name }}
+    </span>
+</div>
+
+<div
+    v-else
+    @dblclick="reveal"
+    :class="{ selected: isSelected, current: isCurrentDirectory }"
+    class="folder disabled"
+    :style="{ paddingLeft: (level - 1) * 1.5 + 'rem' }"
+    v-context-menu.disabled
 >
     <div class="toggler-holder">
         <span
@@ -52,6 +78,20 @@ export default {
 
         subTreeOpened() {
             return this.item.subTreeOpened;
+        },
+
+        appropriateContextMenu() {
+            let selectedEntries = this.$store.getters["ui/selections/allSelected"].map(selected => {
+                return selected.entry;
+            });
+
+            let prefix = "#cm-folder-view-"
+
+            if (selectedEntries.length === 1) {
+                return prefix + "single";
+            } else if (selectedEntries.length > 1) {
+                return prefix + "multiple";
+            }
         }
     },
 
@@ -70,6 +110,11 @@ export default {
     flex-flow: row nowrap;
     justify-content: flex-start;
     align-items: center;
+}
+
+.folder.disabled {
+    opacity: 0.5;
+    filter: grayscale(1);
 }
 
 .folder:hover {
