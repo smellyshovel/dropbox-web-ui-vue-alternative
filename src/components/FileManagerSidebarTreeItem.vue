@@ -117,6 +117,10 @@ export default {
     filter: grayscale(1);
 }
 
+.folder.disabled:hover {
+    background-color: transparent;
+}
+
 .folder:hover {
     background-color: #e8e8e8;
 }
