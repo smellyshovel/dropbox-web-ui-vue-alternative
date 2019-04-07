@@ -9,7 +9,7 @@
         />
 
         <div class="centered-block">
-            <template v-if="!connected">
+            <template v-if="!isConnected()">
                 <h1>Hello.</h1>
                 <p>
                     Click the button below to securely connect your Dropbox account
@@ -66,10 +66,12 @@ export default {
 
         redirectionMessage() {
             return this.redirectionDetails.message;
-        },
+        }
+    },
 
-        connected() {
-            return this.$store.getters["cloud/connected"];
+    methods: {
+        isConnected() {
+            return this.$store.getters["cloud/connected"]();
         }
     }
 }
@@ -88,6 +90,7 @@ export default {
 
 .centered-block {
     text-align: center;
+    max-width: 80%;
 }
 
 .main-button {
@@ -139,5 +142,16 @@ export default {
 
 .redirection-message.error {
     background-color: #ff6666;
+}
+
+/deep/ .redirection-message a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+/deep/ .redirection-message a:hover {
+    color: white;
+    border-color: white;
 }
 </style>

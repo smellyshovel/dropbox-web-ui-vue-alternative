@@ -112,6 +112,10 @@ export default {
             localStorage.setItem("token", token);
         },
 
+        FORGET_TOKEN(state) {
+            localStorage.removeItem("token");
+        },
+
         SET_ACCOUNT_INFO(state, accountInfo) {
             state.accountInfo = accountInfo;
         },
@@ -205,6 +209,10 @@ export default {
             } catch (err) {
                 handleError("connect", err);
             }
+        },
+
+        disconnect({ commit }) {
+            commit("FORGET_TOKEN");
         },
 
         async updateAccountInfo({ commit }) {
@@ -332,12 +340,13 @@ export default {
     },
 
     getters: {
-        // only used to tweak the UI
-        connected: (state, getters) => {
-            return !!getters.token;
+        // only used to tweak the UI, non-reactive
+        connected: (state, getters) => () => {
+            return !!getters.token();
         },
 
-        token: () => {
+        // non-reactive
+        token: () => () => {
             return localStorage.getItem("token");
         },
 

@@ -58,7 +58,7 @@ export default {
     async created() {
         try {
             this.loading = "Connecting to the cloud";
-            await this.$store.dispatch("cloud/connect", this.$store.getters["cloud/token"]);
+            await this.$store.dispatch("cloud/connect", this.$store.getters["cloud/token"]());
         } catch (err) {
             return this.$router.replace({
                 name: "home",
