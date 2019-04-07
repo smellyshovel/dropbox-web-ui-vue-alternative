@@ -17,7 +17,15 @@
     </div>
 
     <div class="space-usage">
-        You have {{ spaceUsage.free }} left out of {{ spaceUsage.total }}
+        <span class="text">
+            <strong>{{ freeSpace }}</strong> free / <strong>{{ totalSpace }}</strong>
+        </span>
+        <div class="meter">
+            <div
+                class="meter occupied"
+                :style="{ width: usedMeterWidth }"
+            />
+        </div>
     </div>
 </aside>
 </template>
@@ -25,6 +33,17 @@
 <script>
 import TreeView from "@/components/TreeView.vue";
 import TreeItem from "@/components/FileManagerSidebarTreeItem.vue";
+
+function sizeToText(size) {
+    let steps = 0;
+    while (size / 1024 > 1) {
+        size = size / 1024;
+        steps += 1;
+    }
+
+    let prefixes = ["", "k", "M", "G", "T", "P"];
+    return size.toFixed(2) + (prefixes[steps] || "?") + "B";
+}
 
 export default {
     components: {
@@ -35,6 +54,18 @@ export default {
     computed: {
         spaceUsage() {
             return this.$store.state.cloud.accountInfo.spaceUsage;
+        },
+
+        freeSpace() {
+            return sizeToText(this.spaceUsage.free);
+        },
+
+        totalSpace() {
+            return sizeToText(this.spaceUsage.total);
+        },
+
+        usedMeterWidth() {
+            return (this.spaceUsage.occupied * 100) / this.spaceUsage.total + "%";
         },
 
         tree() {
@@ -57,5 +88,33 @@ aside {
 
 .folders-tree {
     margin-top: 0.5rem;
+}
+
+.space-usage {
+    padding: 1rem;
+}
+
+.space-usage .text {
+    display: block;
+    margin: 0.5rem;
+    color: rgba(0, 0, 0, 0.65);
+    text-align: center;
+}
+
+.space-usage strong {
+    color: rgba(0, 0, 0, 0.85);
+}
+
+.meter {
+    transition: width 0.1s ease;
+    display: block;
+    width: 100%;
+    height: 10px;
+    background-color: #bdbdbd;
+    border-radius: 5px;
+}
+
+.occupied {
+    background-color: rgb(126, 87, 194);
 }
 </style>
