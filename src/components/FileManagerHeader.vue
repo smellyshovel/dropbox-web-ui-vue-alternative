@@ -47,8 +47,8 @@ header {
 
 .update-button {
     display: block;
-    width: 36px;
-    height: 36px;
+    width: 24px;
+    height: 24px;
     background-image: url("/src/assets/icons/update-gray.svg");
     background-size: 100%;
     cursor: pointer;
