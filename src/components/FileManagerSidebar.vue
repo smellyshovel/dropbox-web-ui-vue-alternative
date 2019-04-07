@@ -88,6 +88,7 @@ aside {
 
 .folders-tree {
     margin-top: 0.5rem;
+    max-width: 256px;
 }
 
 .space-usage {

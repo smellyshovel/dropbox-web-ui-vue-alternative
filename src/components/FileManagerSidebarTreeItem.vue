@@ -87,8 +87,8 @@ export default {
 .folder-icon {
     padding: 0.25rem;
     display: block;
-    width: 1rem;
-    height: 1rem;
+    min-width: 1rem;
+    min-height: 1rem;
     background-image: url("/src/assets/mimetypes/folder.svg");
     background-size: 1rem;
     background-position: center;
@@ -113,8 +113,8 @@ export default {
 .toggler-holder {
     padding: 0.25rem;
     display: block;
-    width: 1rem;
-    height: 1rem;
+    min-width: 1rem;
+    min-height: 1rem;
 }
 
 .toggler {
