@@ -1,0 +1,1 @@
+All (or at least the overwhelming majority) of the graphics for the app are taken from [The Numix Project](https://github.com/numixproject/numix-icon-theme) (MIT). Some of them are edited. A huge thanks!
