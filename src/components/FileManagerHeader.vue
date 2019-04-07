@@ -6,7 +6,7 @@
         />
 
         <div
-            @click="openDropdown"
+            @click="toggleDropdown"
             class="user-corner"
         >
             <span class="user-name">{{ userName }}</span>
@@ -66,8 +66,8 @@ export default {
             }
         },
 
-        openDropdown() {
-            this.showDropdown = true;
+        toggleDropdown() {
+            this.showDropdown = !this.showDropdown;
         },
 
         closeDropdown() {
@@ -155,7 +155,7 @@ header {
 .dropdown-menu {
     padding: 0.5rem;
     position: absolute;
-    top: 69px;
+    top: 64px;
     right: 1rem;
     display: flex;
     flex-flow: column;
