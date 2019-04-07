@@ -178,7 +178,7 @@ export default {
 }
 
 .list .size, .list .modification-date {
-    margin-right: 0.5rem;
+    margin: 0 0.5rem;
     color: rgba(0, 0, 0, 0.5);
 }
 
