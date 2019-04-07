@@ -72,6 +72,10 @@ export default {
         normalizedSize() {
             let size = this.entry.size;
 
+            if (!size) {
+                return "empty";
+            }
+
             let steps = 0;
             while (size / 1024 > 1) {
                 size = size / 1024;
@@ -83,7 +87,13 @@ export default {
         },
 
         modificationDate() {
-            return this.entry.lastModified.toLocaleDateString();
+            let date = this.entry.lastModified;
+
+            if (date.getTime() === 0) {
+                return "never modified";
+            } else {
+                return date.toLocaleString();
+            }
         },
 
         appropriateContextMenu() {
