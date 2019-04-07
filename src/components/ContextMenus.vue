@@ -3,13 +3,6 @@
         <context-menu
             id="cm-folder-view-single"
         >
-            <cm-item :action="open">
-                <span class="icon open"></span>
-                <span class="text">Open</span>
-            </cm-item>
-
-            <div class="separator" />
-
             <cm-item v-context-menu="'#cm-folder-view-download-options'">
                 <span class="icon download"></span>
                 <span class="text">Download</span>
@@ -91,12 +84,6 @@ export default {
     },
 
     methods: {
-        open() {
-            if (this.selectedEntry.type === "folder") {
-                this.$router.push({ name: "fm", params: { folderLink: this.selectedEntry.link } });
-            }
-        },
-
         async downloadPlain() {
             this.$store.commit("ui/statusReflector/setInProgress");
 
