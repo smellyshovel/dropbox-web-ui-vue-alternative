@@ -1,19 +1,24 @@
 <template>
 <div
-    :class="{ current: isCurrentDirectory }"
-    @dblclick="navigate"
+    @dblclick="reveal"
+    :class="{ selected: isSelected, current: isCurrentDirectory }"
+    class="folder"
+    :style="{ paddingLeft: (level - 1) * 1.5 + 'rem' }"
 >
-    <img :src="entry.thumbnail">
+    <div class="toggler-holder">
+        <span
+            v-if="item.hasSubTree"
+            @click="item.toggleSubTree()"
+            :class="{ opened: subTreeOpened }"
+            class="toggler"
+        />
+    </div>
 
-    <span
-        v-if="item.hasSubTree"
-        class="toggler"
-        @click="item.toggleSubTree()"
-    >
-        {{ item.subTreeOpened ? "⮝" : "⮟" }}
+    <span class="folder-icon" />
+
+    <span class="folder-name">
+        {{ entry.name }}
     </span>
-
-    {{ entry.name }}
 </div>
 </template>
 
@@ -33,13 +38,25 @@ export default {
             return this.item.entry;
         },
 
+        isSelected() {
+            return this.item.isSelected;
+        },
+
         isCurrentDirectory() {
             return this.$route.params.folderLink === this.entry.link;
+        },
+
+        level() {
+            return this.item.level;
+        },
+
+        subTreeOpened() {
+            return this.item.subTreeOpened;
         }
     },
 
     methods: {
-        navigate() {
+        reveal() {
             this.$router.push({ name: "fm", params: { folderLink: this.entry.link } });
         }
     }
@@ -47,16 +64,79 @@ export default {
 </script>
 
 <style scoped>
-img {
+.folder {
+    padding: 0.25rem;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.folder:hover {
+    background-color: #e8e8e8;
+}
+
+.folder.current {
+    background-color: #d2d2d2;
+}
+
+.folder.selected {
+    background-color: rgb(126, 87, 194);
+}
+
+.folder-icon {
+    padding: 0.25rem;
+    display: block;
+    width: 1rem;
+    height: 1rem;
+    background-image: url("/src/assets/mimetypes/folder.svg");
+    background-size: 1rem;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 5px;
+}
+
+.selected > .folder-icon, .current > .folder-icon {
+    background-color: white;
+}
+
+.folder-name {
+    margin-left: 0.25rem;
+    color: rgba(0, 0, 0, 0.85);
+    white-space: nowrap;
+}
+
+.selected > .folder-name {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.toggler-holder {
+    padding: 0.25rem;
+    display: block;
+    width: 1rem;
     height: 1rem;
 }
 
-.current {
-    background-color: rgb(75, 115, 184);
-    color: #fff;
+.toggler {
+    display: block;
+    width: 1rem;
+    height: 1rem;
+    background-image: url("/src/assets/icons/toggler-closed-gray.svg");
+    background-size: 1rem;
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor: pointer;
 }
 
-.toggler {
-    color: #be006c;
+.toggler.opened {
+    background-image: url("/src/assets/icons/toggler-opened-gray.svg");
+}
+
+.selected > .toggler, .current > .toggler {
+    background-image: url("/src/assets/icons/toggler-closed-white.svg");
+}
+
+.selected > .toggler.opened, .current > .toggler.opened {
+    background-image: url("/src/assets/icons/toggler-opened-white.svg");
 }
 </style>

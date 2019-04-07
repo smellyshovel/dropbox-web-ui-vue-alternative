@@ -17,8 +17,9 @@ a {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: white;
+    background-color: #f8f8f8;
     text-decoration: none;
+    box-shadow: 0px 0px 5px #bdbdbd;
 }
 
 .contents {

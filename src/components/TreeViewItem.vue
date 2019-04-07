@@ -132,9 +132,3 @@ export default {
     }
 };
 </script>
-
-<style scoped>
-.list li .list {
-    margin-left: 1rem;
-}
-</style>
