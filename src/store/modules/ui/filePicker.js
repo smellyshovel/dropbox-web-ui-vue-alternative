@@ -69,7 +69,7 @@ export default {
                     return a.path.length < b.path.length;
                 })[0];
 
-                commit("SET_CURRENT_FOLDER", currentFolder.parent ? currentFolder.parent : currentFolder);
+                commit("SET_CURRENT_FOLDER", currentFolder);
             } else {
                 commit("SET_CURRENT_FOLDER", getters.rootFolder);
             }
