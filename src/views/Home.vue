@@ -16,7 +16,7 @@
                     via OAuth2 and start using the <strong>dropbox-web-ui-alternative</strong>.
                 </p>
 
-                <a href="https://www.dropbox.com/oauth2/authorize?client_id=8i7l6utem7a0g6t&response_type=token&redirect_uri=http://localhost:8080/auth">
+                <a :href="`https://www.dropbox.com/oauth2/authorize?client_id=8i7l6utem7a0g6t&response_type=token&redirect_uri=${ oAuthRedirectURI }`">
                     <div class="main-button">
                         <div>
                             <span class="main">Connect to you Dropbox account</span>
@@ -51,7 +51,8 @@ export default {
     data() {
         return {
             redirected: false,
-            showRedirectionMessage: true
+            showRedirectionMessage: true,
+            oAuthRedirectURI: function() { return window.location.href + "auth" }()
         }
     },
 
