@@ -13,8 +13,32 @@
     id="fm"
     v-else
     @mousedown="clearSelections"
+    @dragenter="showDropzone"
     v-context-menu.disabled
 >
+    <div
+        id="dropzone"
+        v-if="dropzoneVisible"
+
+        @dragover.prevent
+        @dragleave="hideDropzone"
+        @drop.prevent="upload($event)"
+    >
+        <div
+            class="hint"
+            @dragenter.stop
+            @dragleave.stop
+        >
+            <h1>Upload files</h1>
+            <span class="known-bug">
+                Please, notice that the current version of the application
+                <strong>doesn't support folder uploadings</strong>.
+                Use "Upload Folder" button located in the top right corner
+                instead to upload a folder
+            </span>
+        </div>
+    </div>
+
     <file-picker v-if="showFilePicker" />
     <name-picker v-if="showNamePicker" />
     <conflict-resolver v-if="showConflictResolver" />
@@ -88,7 +112,8 @@ export default {
     data() {
         return {
             loading: true,
-            error: null
+            error: null,
+            dropzoneVisible: false
         };
     },
 
@@ -109,6 +134,43 @@ export default {
     methods: {
         clearSelections() {
             this.$store.dispatch("ui/selections/clear");
+        },
+
+        showDropzone() {
+            this.dropzoneVisible = true;
+        },
+
+        hideDropzone() {
+            this.dropzoneVisible = false;
+        },
+
+        async upload(event) {
+            this.hideDropzone();
+
+            this.$store.commit("ui/statusReflector/setInProgress");
+
+            try {
+                await this.$store.dispatch("cloud/uploadEntries", {
+                    files: Array.from(event.dataTransfer.files), // has to transform to an array beforehand because of a bug in chrome
+                    destination: await this.$store.dispatch("ui/filePicker/pickFolder", {
+                        purpose: "upload"
+                    }),
+                    conflictResolver: async (conflict, remainingConflictsNumber) => {
+                        return await this.$store.dispatch("ui/conflictResolver/resolveConflict", {
+                            conflict,
+                            remainingConflictsNumber
+                        });
+                    }
+                });
+
+                this.$store.commit("ui/statusReflector/setReady");
+            } catch (err) {
+                if (err !== "file_picker_cancel") {
+                    this.$store.commit("ui/statusReflector/setError", err);
+                } else {
+                    this.$store.commit("ui/statusReflector/setReady");
+                }
+            }
         }
     }
 };
@@ -127,6 +189,40 @@ export default {
     height: 100vh;
     overflow: hidden;
     user-select: none;
+}
+
+#dropzone {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 500;
+}
+
+#dropzone .hint {
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    align-items: center;
+    min-width: 400px;
+    max-width: 50%;
+    overflow: hidden;
+    background-color: white;
+    border-radius: 5px;
+}
+
+#dropzone h1 {
+    color: rgb(126, 87, 194);
+}
+
+#dropzone .known-bug {
+    padding: 1rem;
+    background-color: rgb(204, 69, 69);
+    color: rgba(255, 255, 255, 0.9);
+    text-align: center;
 }
 
 #fm-sidebar-header {

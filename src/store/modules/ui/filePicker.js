@@ -60,16 +60,23 @@ export default {
         async pickFolder({ commit, getters }, { purpose, entries }) {
             commit("SET_PURPOSE", purpose);
 
-            let currentFolder = entries.map(entry => {
-                return entry.parent;
-            }).sort((a, b) => {
-                return a.path.length < b.path.length;
-            })[0];
+            // there're no entries created yet when drag'n'drop-uploading files
+            // so set currentFolder to root
+            if (purpose !== "upload") {
+                let currentFolder = entries.map(entry => {
+                    return entry.parent;
+                }).sort((a, b) => {
+                    return a.path.length < b.path.length;
+                })[0];
 
-            commit("SET_CURRENT_FOLDER", currentFolder.parent ? currentFolder.parent : currentFolder);
+                commit("SET_CURRENT_FOLDER", currentFolder.parent ? currentFolder.parent : currentFolder);
+            } else {
+                commit("SET_CURRENT_FOLDER", getters.rootFolder);
+            }
 
             // can't move folders inside themselves, their parents and their sub-folders; and can't move files inside thair parents
             // can't copy folders inside themselves (Dropbox's quirk) and their sub-folders
+            // can upload in any folder
             if (purpose === "move") {
                 let prohibitedFolders = entries.map(entry => {
                     if (entry.type === "folder") {
@@ -99,7 +106,7 @@ export default {
 
                 commit("PROHIBIT_FOLDERS", prohibitedFolders);
             } else if (purpose === "upload") {
-                // TODO
+                commit("PROHIBIT_FOLDERS", []);
             }
 
             commit("SHOW_FILE_PICKER");
@@ -140,6 +147,10 @@ export default {
             }).filter(entry => {
                 return entry.path.startsWith(folder.path);
             });
+        },
+
+        rootFolder: (state, getters, rootState, rootGetters) => {
+            return rootGetters["cloud/folderByLink"]("");
         }
     }
 };
