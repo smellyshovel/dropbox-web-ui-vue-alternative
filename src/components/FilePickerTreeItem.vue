@@ -36,9 +36,7 @@ export default {
 
     methods: {
         reveal() {
-            if (!this.isProhibited) {
-                this.$store.dispatch("ui/filePicker/changeFolder", this.folder);
-            }
+            this.$store.dispatch("ui/filePicker/changeFolder", this.folder);
         },
 
         choose() {
@@ -75,6 +73,10 @@ export default {
 .entry.disabled, .selected .entry.disabled {
     background-color: white;
     color: #bdbdbd;
+}
+
+.entry.disabled:hover {
+    background-color: #f2f2f2;
 }
 
 .name {
