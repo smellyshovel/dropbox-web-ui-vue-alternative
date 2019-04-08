@@ -10,7 +10,7 @@ export const Messages = {
         },
 
         get retry() {
-            return `Please, retry or <a href="#">tell us</a> (including the details from the console) if this keeps happening`
+            return `Please, retry or <a href="https://github.com/smellyshovel/dropbox-web-ui-vue-alternative/issues/new">tell us</a> (including the details from the console) if this keeps happening`
         }
     },
 
